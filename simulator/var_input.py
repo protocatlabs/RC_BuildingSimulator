@@ -17,11 +17,9 @@ import csv
 import pandas as pd
 
 
-
-
-#x=pd.read_csv(epw_name)
-
-#Extract DryBulb Temperature from the Weather File
+#Constants
+human_heat_emission=0.12 #[kWh] heat emitted by a human body per hour. Source: HVAC Engineers Handbook, F. Porges
+floor_area=30 #[m^2] floor area
 
 
 
@@ -59,16 +57,25 @@ def read_transmittedR(my_filename='radiation_combination2.csv'):
 		incRad=np.asarray(incRad)	
 		incRad=incRad.astype(np.float)
 		incRad=incRad/30 #Approximately convert it back from the monthly average to a daily average
-
-		return incRad
-
+		Q_fenstRad=pd.DataFrame(incRad)
 
 
+	return Q_fenstRad
+
+def read_occupancy(myfilename='Occupancy_COM.csv'):
+	#People: Average number of people per hour per m2
+	#tintH_set: Temperature set point of the heating season, if negative then heating is disabled
+	#tintC_set: Temperature set point for cooling season. Error: When does this turn on and off
+	occupancy=pd.read_csv(myfilename, nrows=8760)
+	#print occupancy['tintH_set'].iat[100]
+	Q_human=occupancy['People']*human_heat_emission*floor_area
+	return occupancy, Q_human.transpose()
 
 
-
-
-	return radvalues
-
-
+read_occupancy()
 read_transmittedR()
+
+
+
+
+
