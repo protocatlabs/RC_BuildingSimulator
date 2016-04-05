@@ -73,11 +73,11 @@ def read_occupancy(myfilename='Occupancy_COM.csv'):
 	return occupancy, Q_human.transpose()
 
 
-Kloten_T,Kloten_R=read_EWP(epw_name='Zurich-Kloten_2013.epw')
-Geneva_T,Geneva_R=read_EWP(epw_name='CHE_Geneva.067000_IWEC.epw')
+# Kloten_T,Kloten_R=read_EWP(epw_name='Zurich-Kloten_2013.epw')
+# Geneva_T,Geneva_R=read_EWP(epw_name='CHE_Geneva.067000_IWEC.epw')
 
 
-plt.plot(range(0, int(8760)),Kloten_R, 'b', range(0, int(8760)),Geneva_R,'g')
-plt.show()
+# plt.plot(range(0, int(8760)),Kloten_R, 'b', range(0, int(8760)),Geneva_R,'g')
+# plt.show()
 
 
