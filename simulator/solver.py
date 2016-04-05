@@ -13,7 +13,7 @@ Amr Elesawy
 
 import numpy as np
 import math
-import var_input as f
+import input_data as f
 import matplotlib.pyplot as plt
 import PID_controller
 
