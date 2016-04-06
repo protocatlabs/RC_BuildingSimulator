@@ -30,13 +30,15 @@ def read_EWP(epw_name='Zurich-Kloten_2013.epw'):
 	
 	To=[] #Open empty matrix for storing dry bulb temperature values
 	glbRad=[] #Global radiation values
+	glbIll=[]
 	with open(epw_name, 'rb') as csvfile:
 		weatherfile = csv.reader(csvfile, delimiter=',', quotechar='|')
 		for row in weatherfile:
 			if row[0].isdigit():
 				To.append(row[6])
-				glbRad.append(row[15])
-	return To,glbRad
+				glbRad.append(float(row[13]))
+				glbIll.append(float(row[16]))
+	return np.asarray(To),np.asarray(glbRad), np.asarray(glbIll)
 
 def read_transmittedR(my_filename='radiation_combination2.csv'):
 	incRad=[] #Incident radiation through the window
@@ -73,11 +75,37 @@ def read_occupancy(myfilename='Occupancy_COM.csv'):
 	return occupancy, Q_human.transpose()
 
 
-# Kloten_T,Kloten_R=read_EWP(epw_name='Zurich-Kloten_2013.epw')
-# Geneva_T,Geneva_R=read_EWP(epw_name='CHE_Geneva.067000_IWEC.epw')
+
+def Equate_Ill(epw_name='Zurich-Kloten_2013.epw'):
+	''' 
+	Equation relating elluminance to irradiation.
+	Input: epw weather file
+	Output: eq, a vector of coefficients for a linear polynomial 
+	'''
+
+	To,glbRad, glbIll=read_EWP(epw_name) #Read EPW
+
+	
+	#Measured data for plotting
+	X=glbRad
+	Y=glbIll
+
+	#Aquire best fit vector of coefficients. 1st order
+	eq = np.polyfit(X,Y,1)
+
+	#Vector for plotting the best fit
+	x=np.arange(0,1000)
 
 
-# plt.plot(range(0, int(8760)),Kloten_R, 'b', range(0, int(8760)),Geneva_R,'g')
-# plt.show()
+	#Plot results
+	# fig=plt.figure()
+	# plt.plot(glbRad,glbIll, 'o',x,x*eq[0]+eq[1],'r.')
+	# plt.xlabel('Global Radiation (W/m2)')
+	# plt.ylabel('Global Illuminance (lx)')
+	#plt.show()
 
+	return eq
+
+
+	
 
