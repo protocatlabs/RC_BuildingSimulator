@@ -25,7 +25,11 @@ Ill_Eq= f.Equate_Ill(epw_name='Zurich-Kloten_2013.epw') #Equation coefficients f
 
 #Building Properties
 Fest_A=13.5 #[m2] Window Area
-Floor_A=34.3 #[m2] Floor Area
+Room_Depth=7 #[m] Room Depth
+Room_Width=4.9 #[m] Room Width
+Room_Height=3.1 #[m] Room Height
+Floor_A=Room_Depth*Room_Width #[m2] Floor Area
+Room_Vol=Room_Width*Room_Depth*Room_Height #[m3] Room Volume
 glass_solar_transmitance=0.687 #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 glass_light_transmitance=0.744 #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 LightLoad=0.0117 #[kW/m2] lighting load
