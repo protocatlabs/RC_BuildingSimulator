@@ -106,6 +106,9 @@ def Equate_Ill(epw_name='Zurich-Kloten_2013.epw'):
 
 	return eq
 
+x,y=read_occupancy()
+
+
 
 	
 

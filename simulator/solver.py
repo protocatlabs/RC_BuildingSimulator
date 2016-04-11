@@ -26,7 +26,7 @@ Ill_Eq= f.Equate_Ill(epw_name='Zurich-Kloten_2013.epw') #Equation coefficients f
 
 
 #Set Office Building Parameters. See BuildingProperties.py
-Office=Building(Cm=2.07, Ri=42)
+Office=Building(Cm=2.07, R_wi=42, Infl=0.5, minAirFlowPp=0.0001)
 
 
 #Calculate Illuminance in the room. 
@@ -72,7 +72,7 @@ for ii in range(0, int(8760)):
 
 			
 
-		dTi=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.Ri))*(float(To[ii])-Ti))*dt
+		dTi=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(To[ii])-Ti))*dt
 		Ti=Ti+dTi
 		if occupancy['tintH_set'].iat[ii]>=0 and occupancy['tintH_set'].iat[ii]>Ti:
 			heatingControl.setPoint(occupancy['tintH_set'].iat[ii])
