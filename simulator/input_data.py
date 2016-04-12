@@ -28,17 +28,17 @@ def read_EWP(epw_name='data/Zurich-Kloten_2013.epw'):
 	#Should be done later with Pandas, but for some reason I'ts not working
 
 	
-	To=[] #Open empty matrix for storing dry bulb temperature values
+	T_out=[] #Open empty matrix for storing dry bulb temperature values
 	glbRad=[] #Global radiation values
 	glbIll=[]
 	with open(epw_name, 'rb') as csvfile:
 		weatherfile = csv.reader(csvfile, delimiter=',', quotechar='|')
 		for row in weatherfile:
 			if row[0].isdigit():
-				To.append(row[6])
+				T_out.append(row[6])
 				glbRad.append(float(row[13]))
 				glbIll.append(float(row[16]))
-	return np.asarray(To),np.asarray(glbRad), np.asarray(glbIll)
+	return np.asarray(T_out),np.asarray(glbRad), np.asarray(glbIll)
 
 def read_transmittedMonthlyR(myfilename='data/radiation_combination2.csv'):
 	incRad=[] #Incident radiation through the window

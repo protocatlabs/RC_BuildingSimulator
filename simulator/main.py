@@ -19,7 +19,7 @@ import PID_controller
 from BuildingProperties import Building #Importing Building Class
 
 #Import Data
-To,glbRad, glbIll= f.read_EWP(epw_name='data/Zurich-Kloten_2013.epw') #C, W, lx
+T_out,glbRad, glbIll= f.read_EWP(epw_name='data/Zurich-Kloten_2013.epw') #C, W, lx
 Q_fenstRad=f.read_transmittedR(myfilename='data/radiation_Building_Zh.csv') #kWh/h
 occupancy, Q_human=f.read_occupancy(myfilename='data/Occupancy_COM.csv') #people/m2/h, kWh/h
 Ill_Eq= f.Equate_Ill(epw_name='data/Zurich-Kloten_2013.epw') #Equation coefficients for linear polynomial
@@ -49,8 +49,8 @@ Q_cool=0
 Total_Heating=0
 Total_Cooling=0
 Total_Lighting=0
-Ti=20 #Starting internal temperature
-Data_Ti=[] 
+T_in=20 #Starting internal temperature
+Data_T_in=[] 
 Data_Heating=np.empty([8760])
 Data_Cooling=np.empty([8760])
 Data_Lighting=np.empty([8760])
@@ -74,20 +74,20 @@ for ii in range(0, int(8760)):
 
 			
 
-		dTi=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(To[ii])-Ti))*dt
-		Ti=Ti+dTi
-		if occupancy['tintH_set'].iat[ii]>=0 and occupancy['tintH_set'].iat[ii]>Ti:
+		dT_in=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
+		T_in=T_in+dT_in
+		if occupancy['tintH_set'].iat[ii]>=0 and occupancy['tintH_set'].iat[ii]>T_in:
 			heatingControl.setPoint(occupancy['tintH_set'].iat[ii])
 
-			Q_heat= heatingControl.update(Ti)/10
+			Q_heat= heatingControl.update(T_in)/10
 		else:
 			Q_heat=0
 		Heat_hr+=Q_heat
 
 
-		if Ti>tintC_set:
+		if T_in>tintC_set:
 			coolingControl.setPoint(tintC_set)
-			Q_cool = coolingControl.update(Ti)/2
+			Q_cool = coolingControl.update(T_in)/2
 		else:
 			Q_cool=0
 		Cool_hr+=Q_cool
@@ -105,7 +105,7 @@ for ii in range(0, int(8760)):
 
 
 
-	Data_Ti.append(Ti)
+	Data_T_in.append(T_in)
 	Data_Heating[ii]=Heat_hr
 	Data_Cooling[ii]=abs(Cool_hr)
 	Data_Lighting[ii]=Lighting_hr
