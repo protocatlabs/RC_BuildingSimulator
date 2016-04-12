@@ -1,5 +1,16 @@
 # RC_BuildingSimulator
-Software under Development!
+
+Simulates the energy balance of a single zone room based on an RC model. This project is still under development
+
+## RC Model used
+![RC Model](./Images/1c_rc_circuit.svg)
+
+
+
+
+
+
+
 
 ##References
 
