@@ -1,16 +1,18 @@
+"""
+===========================
+PID Controller for 
+===========================
+File history and credits:
+http://code.activestate.com/recipes/577231-discrete-pid-controller/  
+Minor Modifications by Prageeth Jayathissa
+
+For more information see: http://en.wikipedia.org/wiki/PID_controller
+"""
+
+
 #The recipe gives simple implementation of a Discrete Proportional-Integral-Derivative (PID) controller. PID controller gives output value for error between desired reference input and measurement feedback to minimize error value.
 #More information: http://en.wikipedia.org/wiki/PID_controller
-#
-#cnr437@gmail.com
-#
-#######	Example	#########
-#
-#p=PID(3.0,0.4,1.2)
-#p.setPoint(5.0)
-#while True:
-#     pid = p.update(measurement_value)
-#
-#
+
 
 
 class PID:
