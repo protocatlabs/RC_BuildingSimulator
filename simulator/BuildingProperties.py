@@ -28,8 +28,7 @@ class Building(object):
 		Cm=2.07,
 		R_wi=42,
 		Infl=0.5,
-		minAirFlowPp=0.00944,
-		averageOccupancy=0.1
+		vent_Pp=0.016,
 		):
 
 		#Building Dimensions
@@ -50,28 +49,24 @@ class Building(object):
 
 		#Single Capacitance Model Parameters
 		self.Cm=Cm #[kWh/K] Room Capacitance. Default based of Madsen2011
-		self.R_wi=R_wi #[K/kWh] Wall resistance to outside air. Default based off glass having a Uvalue of 1.978W/m2K, 12m2 facade glass
+		self.R_wi=R_wi #[K/kW] Wall resistance to outside air. Default based off glass having a Uvalue of 1.978W/m2K, 12m2 facade glass
 
-		#Infiltration and Ventilation
-		#ToDO, take this away from __init__ and make a method that computes this based on the occupancy profile
-		#Refer to line 398 - 476 in CEA functions.py for more informaiton
-		self.Infl=Infl #Air Changes per hour
-		self.R_infl=1.0/(Infl*self.Room_Vol*1.2*1/3600) #Resistance due to infiltration
-		self.R_minVent=1.0/(minAirFlowPp*averageOccupancy*self.Floor_A*1.2*1)
-		self.R_i=1.0/((1.0/self.R_wi) + (1.0/self.R_infl)+ (1.0/self.R_minVent))
-		print 'Wall resistance including infiltration of', Infl, 'exchange per hour and ventelation of ', minAirFlowPp, 'm3/s/person: is :', self.R_i
+		#Infiltration 
+		self.Infl=Infl # [ACH/hr] Air Changes per hour
+		InflHeatTransfer=Infl*self.Room_Vol*1.2*1/3600 #[kW/K]
+		self.R_infl=1.0/InflHeatTransfer # [K/kW]Resistance due to infiltration
 
-		# print self.R_infl
-		# print self.R_minVent
-		# if self.R_infl<self.R_minVent:
-		# 	self.R_i=1.0/((1.0/self.R_wi) + (1.0/self.R_infl))
-		# 	print 'Infiltration of is greater than the min air flow requirements'
-		# 	print 'Wall resistance including infiltration of', Infl, 'exchange per hour is:', self.R_i
-		# else:
-		# 	self.R_i=1.0/((1.0/self.R_wi) + (1.0/self.R_minVent))
-		# 	print 'Min air flow is greater than infiltration, using min air flow to set envelope resistance'
-		# 	print 'Wall resistance including minimum air flow of', minAirFlowPp, 'm3/s/person:', self.R_i
+		#Initialise ventilation set point
+		self.vent_Pp=vent_Pp #[m3/s/person] ventilation rate requirements per person
 
+
+	def setVentilation(self, people):
+		self.vent=self.vent_Pp*people*self.Floor_A #[m3/s]
+		heatTransfer=self.vent*1.2*1 #[kW/K] energy loss due to ventilation
+		self.R_vent=1/heatTransfer #[K/kW] Resistance due to ventlation
+
+		#Combine resistors in parallel 
+		self.R_i=1.0/((1.0/self.R_wi) + (1.0/self.R_infl) + (1.0/self.R_vent))
 
 
 

@@ -26,7 +26,7 @@ Ill_Eq= f.Equate_Ill(epw_name='Zurich-Kloten_2013.epw') #Equation coefficients f
 
 
 #Set Office Building Parameters. See BuildingProperties.py
-Office=Building(Cm=2.07, R_wi=42, Infl=0.5, minAirFlowPp=0.0001)
+Office=Building(Cm=2.07, R_wi=42, Infl=0.5)
 
 
 #Calculate Illuminance in the room. 
@@ -66,7 +66,8 @@ for ii in range(0, int(8760)):
 	#Initialise hourly energy requirements
 	Heat_hr=0
 	Cool_hr=0
-
+	Office.setVentilation(occupancy['People'][ii])
+	print Office.R_i
 
 	for jj in range(0,int(1/dt)):
 
