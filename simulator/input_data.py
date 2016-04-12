@@ -24,7 +24,7 @@ floor_area=30 #[m^2] floor area
 
 
 
-def read_EWP(epw_name='Zurich-Kloten_2013.epw'):
+def read_EWP(epw_name='data/Zurich-Kloten_2013.epw'):
 	#Should be done later with Pandas, but for some reason I'ts not working
 
 	
@@ -40,7 +40,7 @@ def read_EWP(epw_name='Zurich-Kloten_2013.epw'):
 				glbIll.append(float(row[16]))
 	return np.asarray(To),np.asarray(glbRad), np.asarray(glbIll)
 
-def read_transmittedR(my_filename='radiation_combination2.csv'):
+def read_transmittedMonthlyR(myfilename='data/radiation_combination2.csv'):
 	incRad=[] #Incident radiation through the window
 	with open(my_filename, 'rb') as csvfile:
 		radvalues= csvfile.read().split(',')
@@ -65,7 +65,13 @@ def read_transmittedR(my_filename='radiation_combination2.csv'):
 
 	return Q_fenstRad
 
-def read_occupancy(myfilename='Occupancy_COM.csv'):
+def read_transmittedR(myfilename='data/radiation_Building_Zh.csv'):
+	Q_fenstRad=pd.read_csv(myfilename, header=None)
+	Q_fenstRad= Q_fenstRad.transpose()
+	return Q_fenstRad
+
+
+def read_occupancy(myfilename='data/Occupancy_COM.csv'):
 	#People: Average number of people per hour per m2
 	#tintH_set: Temperature set point of the heating season, if negative then heating is disabled
 	#tintC_set: Temperature set point for cooling season. Error: When does this turn on and off
@@ -76,7 +82,7 @@ def read_occupancy(myfilename='Occupancy_COM.csv'):
 
 
 
-def Equate_Ill(epw_name='Zurich-Kloten_2013.epw'):
+def Equate_Ill(epw_name='data/Zurich-Kloten_2013.epw'):
 	''' 
 	Equation relating elluminance to irradiation.
 	Input: epw weather file
@@ -106,7 +112,7 @@ def Equate_Ill(epw_name='Zurich-Kloten_2013.epw'):
 
 	return eq
 
-x,y=read_occupancy()
+read_transmittedR(myfilename='data/radiation_Building_Madrid.csv')
 
 
 

@@ -19,10 +19,10 @@ import PID_controller
 from BuildingProperties import Building #Importing Building Class
 
 #Import Data
-To,glbRad, glbIll= f.read_EWP(epw_name='Zurich-Kloten_2013.epw') #C, W, lx
-Q_fenstRad=f.read_transmittedR(my_filename='radiation_combination2.csv') #kWh/h I think. Check this
-occupancy, Q_human=f.read_occupancy(myfilename='Occupancy_COM.csv') #people/m2/h, kWh/h
-Ill_Eq= f.Equate_Ill(epw_name='Zurich-Kloten_2013.epw') #Equation coefficients for linear polynomial
+To,glbRad, glbIll= f.read_EWP(epw_name='data/Zurich-Kloten_2013.epw') #C, W, lx
+Q_fenstRad=f.read_transmittedR(myfilename='data/radiation_Building_Zh.csv') #kWh/h
+occupancy, Q_human=f.read_occupancy(myfilename='data/Occupancy_COM.csv') #people/m2/h, kWh/h
+Ill_Eq= f.Equate_Ill(epw_name='data/Zurich-Kloten_2013.epw') #Equation coefficients for linear polynomial
 
 
 #Set Office Building Parameters. See BuildingProperties.py
@@ -35,6 +35,7 @@ TransIll=fenstIll*Office.glass_light_transmitance
 Lux=TransIll/Office.Floor_A
 
 #Other Set Points
+occupancy['tintH_set']=20
 tintC_set=26 #Because data in occupancy is a bit wierd and will causes control issues FIX THIS
 
 
@@ -50,24 +51,24 @@ Total_Cooling=0
 Total_Lighting=0
 Ti=20 #Starting internal temperature
 Data_Ti=[] 
-Data_Heating=np.empty([0,8760])
-print Data_Heating
-Data_Cooling=[]
-Data_Lighting=[]
+Data_Heating=np.empty([8760])
+Data_Cooling=np.empty([8760])
+Data_Lighting=np.empty([8760])
 
 #PID setup
-heatingControl=PID_controller.PID(P=2.0, I=4.0, D=0.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500)
-coolingControl=PID_controller.PID(P=2.0, I=4.0, D=0.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500)
+heatingControl=PID_controller.PID(P=0.5, I=1.0, D=0.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500)
+coolingControl=PID_controller.PID(P=0.5, I=1.0, D=0.0, Derivator=0, Integrator=0, Integrator_max=500, Integrator_min=-500)
 
 #Differential Equation Parameters
-dt=.25 #hours
+dt=0.25 #hours
 
 for ii in range(0, int(8760)):
 	#Initialise hourly energy requirements
 	Heat_hr=0
 	Cool_hr=0
+	Lighting_hr=0
 	Office.setVentilation(occupancy['People'][ii])
-	print Office.R_i
+
 
 	for jj in range(0,int(1/dt)):
 
@@ -91,23 +92,34 @@ for ii in range(0, int(8760)):
 			Q_cool=0
 		Cool_hr+=Q_cool
 
+	Heat_hr=Heat_hr*dt
+	Cool_hr=Cool_hr*dt
 
 	Total_Heating+=Heat_hr
 	Total_Cooling+=Cool_hr
 	#Lighting calc. Double check this as I wrote it rushed. Try find allternative for .iat
 
 	if Lux.get_value(ii,0)< Office.LightingControl and occupancy['People'].iat[ii]>0:
-		Total_Lighting+=Office.LightLoad*Office.Floor_A
+		Lighting_hr=Office.LightLoad*Office.Floor_A
+		Total_Lighting+=Lighting_hr
 
 
 
 	Data_Ti.append(Ti)
+	Data_Heating[ii]=Heat_hr
+	Data_Cooling[ii]=abs(Cool_hr)
+	Data_Lighting[ii]=Lighting_hr
 
 print 'Total Heating Load is:', Total_Heating, 'kWh'
 print 'Total Cooling Load is:', Total_Cooling*-1, 'kWh'
 print 'Total Lighting Load is:', Total_Lighting, 'kWh'
-#Heating and Lighting values look good. Cooling is about 2x high. Most likely because theres no natural ventilation
+#Heating is good
+#Cooling is about 1000kWh lower than Diva, but the same as design builder
+#Lighting is 150kWh lower than design builder and DIVA
+#		heating 	Cooling 	Lighting
+#Diva 	1224		4337		427
+#Db 	1386		2990		497
 
 
-# plt.plot(range(0, int(8760)),To, range(0, int(8760)),Data_Ti)
+# plt.plot(range(0, int(8760)),Data_Cooling, range(0, int(8760)),Data_Heating)
 # plt.show()
