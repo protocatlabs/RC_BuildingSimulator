@@ -3,7 +3,7 @@
 Simulates the energy balance of a single zone room based on an RC model. This project is still under development
 
 ## RC Model used
-![RC Model](./Images/1c_rc_circuit.svg)
+![RC Model](./Images/1c_rc_circuit.png)
 
 
 
