@@ -56,7 +56,60 @@ This is the main file which you will modify and run.
 The first lines should run the various methods form `import_data.py` and read in the necessary data
 
 ####Step 2: Set the Room Building Parameters
-Simply typing `Office=Building()` will initialise your building with default parameters. If you want to specialise your building then run 
+Simply typing `Office=Building()` will initialise your building with default parameters. If you want to specialise your building then you can set them in the arguments. Default arguments are:
+
+```python
+Building(Fenst_A=13.5 , Room_Depth=7 , Room_Width=4.9 ,Room_Height=3.1 ,glass_solar_transmitance=0.687 ,
+glass_light_transmitance=0.744 ,LightLoad=0.0117 , LightingControl = 300,Cm=2.07, R_env=42, 
+Infl=0.5, vent_Pp=0.016)
+```
+
+`Infl`: [ACH/hr] Air changes per hour, Infiltration
+
+`vent_Pp`: [m3/s/person]Is the ventilation rate per person
+
+`Lighting Control` [Lux]: Lighting control set point. Lights will turn on if the illuminance drops below this value
+
+`Lighting Load` [kW/m2]: Energy consumption of the lighting
+
+All dimenions are in [m] meters. All other variables are described in the RC section above.
+
+####Step 3: Calculate the room illuminance
+This is calculated based off the formula determined in `Equate_Ill` funciton of `input_data.py`. Note that this is rough and maybe causing the light loads to be lower than what EnergyPlus is calculating **To_Do**
+
+####Step 4: Hack some set points
+The Occupancy data file which is read in has some issues with the set point. We therefore manually set some fixed set points here. Fix this. Low priority **TO_DO**
+
+####Step 5: Calculate Heat Gains
+*Solar Gains: We have external radiation on the window. Simply multiply this by the transmittance rate
+*Human Heast Gains: Based off the occupancy profile. Calculated in `input_data.py`
+
+Note that the heat gains value `Q` is an array of size 8760. 
+
+**To_Do**: Add heat gains from lighting and equipment
+
+####Step 6: Set initial conditions. Most important is the starting internal temperature `T_in`
+`T_in` = 20C (Default)
+
+####Step 7: Tune PI controller for heating and cooling
+Default settings are ```P=0.5, I=1, D=0```
+The PID was copied from [here](http://code.activestate.com/recipes/577231-discrete-pid-controller/)
+
+####Step 8: Differentiate! The heart of the program
+
+```python
+dT_in=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
+````
+
+This equation was derived from the single capacitance model shown above. I will need to write another document on how to dervie it, let me know if you are interested in this
+
+####Step 9: Control the Heating, Cooling and Lighting
+If the `T_in` internal temperature is not within the setpoints then the cooling or heating system is activated for that specific timestep. The amount of heating/cooling that is provided demends on the PI control output. **Note:** There is no maximum heating or cooling capacity set. We assume a system that is capable of providing infite amount of power. **To_Do:** Set some limitations on the Q_heat and Q_cool
+
+The lighting control is a simple on off situation depending on the lighting levels and the occupants in the room. **Note:** This value is about 1/2 the energyplus output. This could be due to the control system, or the basic illuminance calculation
+
+
+
 
 
 
