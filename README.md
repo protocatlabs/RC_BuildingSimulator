@@ -26,34 +26,12 @@ Simulates the energy balance of a single zone room based on an RC model. This pr
 
 ##How it Works
 
-### Reading External Data Files `input_data.py`
-`input_data.py` contains the methods required to read epw weather files, radiation files and occupancy profiles
-
-`read_EWP`: Reads the EPW file and outputs the average external temperature `T_out`, Global Irradiance, and Global Illuminance 
-
-`read_transmittedMonthlyR`: Reads a radiation file outputted from Jeremias' ladybug script. The radiation file contains hourly radiation data for a day for each month. The data therefore needs to be converted into hourly data for the whole year
-
-`read_transmittedR`: Reads radiation value outputted from a standard ladybug script. The radiation file should contain hourly radiation data for the whole year
-
-`read_occupancy`: Reads the occupancy file used by the [CEA](https://github.com/architecture-building-systems/CEAforArcGIS/tree/master/cea/db/Schedules) tool.
-
-`Equate_Ill`: measures the global irradiation and global illuminance of the weather file to obtain a formula of the type
-$$Ill=Rad*x + y$$
-
-This formula will then be used to determine the illuminance of room based off the radiaion supplied. NOTE: This is a bit of a hack. Try find a more elegant way of calculating the solar illumination of the room. **TO_DO**
-
-
-### Setting your Building Parameters `BuildingProperties.py`
-This script contains a `Building` class which sets your building parameters. Default values are already provided. Do not modify any of the parameters here. You will create an instance of this class in the `Main.py` file
-
-`setVentilation`: A method which outputs the resistance between the inside and outside air temperatures. This is the combination of `R_env`, `R_vent` and `R_infl` as described in the RC Model Above
-
 ###Running your Simulation `Main.py`
 
 This is the main file which you will modify and run. 
 
 ####Step 1: Import the data. 
-The first lines should run the various methods form `import_data.py` and read in the necessary data
+The first lines should run the various methods form `import_data.py` and read in the necessary data. Read the instructions about this file below for more information 
 
 ####Step 2: Set the Room Building Parameters
 Simply typing `Office=Building()` will initialise your building with default parameters. If you want to specialise your building then you can set them in the arguments. Default arguments are:
@@ -109,7 +87,27 @@ If the `T_in` internal temperature is not within the setpoints then the cooling 
 The lighting control is a simple on off situation depending on the lighting levels and the occupants in the room. **Note:** This value is about 1/2 the energyplus output. This could be due to the control system, or the basic illuminance calculation
 
 
+### Reading External Data Files `input_data.py`
+`input_data.py` contains the methods required to read epw weather files, radiation files and occupancy profiles
 
+`read_EWP`: Reads the EPW file and outputs the average external temperature `T_out`, Global Irradiance, and Global Illuminance 
+
+`read_transmittedMonthlyR`: Reads a radiation file outputted from Jeremias' ladybug script. The radiation file contains hourly radiation data for a day for each month. The data therefore needs to be converted into hourly data for the whole year
+
+`read_transmittedR`: Reads radiation value outputted from a standard ladybug script. The radiation file should contain hourly radiation data for the whole year
+
+`read_occupancy`: Reads the occupancy file used by the [CEA](https://github.com/architecture-building-systems/CEAforArcGIS/tree/master/cea/db/Schedules) tool.
+
+`Equate_Ill`: measures the global irradiation and global illuminance of the weather file to obtain a formula of the type
+$$Ill=Rad*x + y$$
+
+This formula will then be used to determine the illuminance of room based off the radiaion supplied. NOTE: This is a bit of a hack. Try find a more elegant way of calculating the solar illumination of the room. **TO_DO**
+
+
+### Setting your Building Parameters `BuildingProperties.py`
+This script contains a `Building` class which sets your building parameters. Default values are already provided. Do not modify any of the parameters here. You will create an instance of this class in the `Main.py` file
+
+`setVentilation`: A method which outputs the resistance between the inside and outside air temperatures. This is the combination of `R_env`, `R_vent` and `R_infl` as described in the RC Model Above
 
 
 
