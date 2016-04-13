@@ -59,8 +59,8 @@ This is calculated based off the formula determined in `Equate_Ill` funciton of 
 The Occupancy data file which is read in has some issues with the set point. We therefore manually set some fixed set points here. Fix this. Low priority **TO_DO**
 
 ####Step 5: Calculate Heat Gains
-*Solar Gains: We have external radiation on the window. Simply multiply this by the transmittance rate
-*Human Heast Gains: Based off the occupancy profile. Calculated in `input_data.py`
+* Solar Gains: We have external radiation on the window. Simply multiply this by the transmittance rate. **Note**: The radiation values imported from the file are for a specific building case. If you want to simulate your own building then you will have to generate your own radiation file. We generated our file using LadyBug. **To_Do**: Find a way of calculating the radiation transfer through the building
+* Human Heast Gains: Based off the occupancy profile. Calculated in `input_data.py`
 
 Note that the heat gains value `Q` is an array of size 8760. 
 
