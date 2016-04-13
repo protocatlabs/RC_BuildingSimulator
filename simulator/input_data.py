@@ -18,7 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-#Constants
+#Constants.  FIX THIS: Bring the building properties before the input data and then read off building data
 human_heat_emission=0.12 #[kWh] heat emitted by a human body per hour. Source: HVAC Engineers Handbook, F. Porges
 floor_area=30 #[m^2] floor area
 

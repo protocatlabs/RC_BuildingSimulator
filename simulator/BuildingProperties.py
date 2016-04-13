@@ -14,7 +14,7 @@ Amr Elesawy
 class Building(object):
 	'''Sets the parameters of the building. Default arguments are:
 	Building(Fenst_A=13.5 , Room_Depth=7 , Room_Width=4.9 ,Room_Height=3.1 ,glass_solar_transmitance=0.687 ,
-	glass_light_transmitance=0.744 ,LightLoad=0.0117 , LightingControl = 300,Cm=2.07, Ri=42) '''
+	glass_light_transmitance=0.744 ,LightLoad=0.0117 , LightingControl = 300,Cm=2.07, R_env=42, Infl=0.5, vent_Pp=0.016) '''
 
 	def __init__(self, 
 		Fenst_A=13.5 ,
@@ -26,7 +26,7 @@ class Building(object):
 		LightLoad=0.0117 ,
 		LightingControl = 300,
 		Cm=2.07,
-		R_wi=42,
+		R_env=42,
 		Infl=0.5,
 		vent_Pp=0.016,
 		):
@@ -49,7 +49,7 @@ class Building(object):
 
 		#Single Capacitance Model Parameters
 		self.Cm=Cm #[kWh/K] Room Capacitance. Default based of Madsen2011
-		self.R_wi=R_wi #[K/kW] Wall resistance to outside air. Default based off glass having a Uvalue of 1.978W/m2K, 12m2 facade glass
+		self.R_env=R_env #[K/kW] Wall resistance to outside air. Default based off glass having a Uvalue of 1.978W/m2K, 12m2 facade glass
 
 		#Infiltration 
 		self.Infl=Infl # [ACH/hr] Air Changes per hour
@@ -66,7 +66,7 @@ class Building(object):
 		self.R_vent=1/heatTransfer #[K/kW] Resistance due to ventlation
 
 		#Combine resistors in parallel 
-		self.R_i=1.0/((1.0/self.R_wi) + (1.0/self.R_infl) + (1.0/self.R_vent))
+		self.R_i=1.0/((1.0/self.R_env) + (1.0/self.R_infl) + (1.0/self.R_vent))
 
 
 

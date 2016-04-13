@@ -26,7 +26,7 @@ Ill_Eq= f.Equate_Ill(epw_name='data/Zurich-Kloten_2013.epw') #Equation coefficie
 
 
 #Set Office Building Parameters. See BuildingProperties.py
-Office=Building(Cm=2.07, R_wi=42, Infl=0.5)
+Office=Building(Cm=2.07, R_env=42, Infl=0.5)
 
 
 #Calculate Illuminance in the room. 
@@ -79,7 +79,7 @@ for ii in range(0, int(8760)):
 		if occupancy['tintH_set'].iat[ii]>=0 and occupancy['tintH_set'].iat[ii]>T_in:
 			heatingControl.setPoint(occupancy['tintH_set'].iat[ii])
 
-			Q_heat= heatingControl.update(T_in)/10
+			Q_heat= heatingControl.update(T_in)
 		else:
 			Q_heat=0
 		Heat_hr+=Q_heat
@@ -87,7 +87,7 @@ for ii in range(0, int(8760)):
 
 		if T_in>tintC_set:
 			coolingControl.setPoint(tintC_set)
-			Q_cool = coolingControl.update(T_in)/2
+			Q_cool = coolingControl.update(T_in)
 		else:
 			Q_cool=0
 		Cool_hr+=Q_cool
@@ -121,5 +121,5 @@ print 'Total Lighting Load is:', Total_Lighting, 'kWh'
 #Db 	1386		2990		497
 
 
-# plt.plot(range(0, int(8760)),Data_Cooling, range(0, int(8760)),Data_Heating)
+# plt.plot(range(0, int(8760)),T_out, range(0, int(8760)),Data_T_in)
 # plt.show()
