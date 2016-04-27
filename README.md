@@ -70,8 +70,12 @@ Note that the heat gains value `Q` is an array of size 8760.
 `T_in` = 20C (Default)
 
 ####Step 7: Tune PI controller for heating and cooling
-Default settings are ```P=0.5, I=1, D=0```
+Default settings are 
+```P=1, I=0.08, D=0``` for heating
+```P=2, I=1.0, D=0``` for cooling
 The PID was copied from [here](http://code.activestate.com/recipes/577231-discrete-pid-controller/)
+
+Note that the PID controller still needs some work as a lot of unecessary energy may be lost **To_Do**
 
 ####Step 8: Differentiate! The heart of the program
 
@@ -79,7 +83,7 @@ The PID was copied from [here](http://code.activestate.com/recipes/577231-discre
 dT_in=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
 ````
 
-This equation was derived from the single capacitance model shown above. I will need to write another document on how to dervie it, let me know if you are interested in this
+This equation was derived from the single capacitance model shown above. I will need to write another document on how to dervie it, let me know if you are interested in this!
 
 ####Step 9: Control the Heating, Cooling and Lighting
 If the `T_in` internal temperature is not within the setpoints then the cooling or heating system is activated for that specific timestep. The amount of heating/cooling that is provided demends on the PI control output. **Note:** There is no maximum heating or cooling capacity set. We assume a system that is capable of providing infite amount of power. **To_Do:** Set some limitations on the Q_heat and Q_cool
