@@ -1,4 +1,4 @@
-# C_BuildingSimulator
+# RC_BuildingSimulator
 
 Simulates the energy balance of a single zone room based on an RC model. This project is still under development
 
