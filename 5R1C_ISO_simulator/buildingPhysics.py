@@ -322,18 +322,18 @@ class Building(object):
 
 
 
-	def procedure_1(hoy, bpr, setpoints):
+	def procedure_1(self,theta_e, theta_m_prev):
 
 
 		#TODO: Define theta_m_prev and theta_e
 		
 	    # building thermal properties at previous time step
 	    # +++++++++++++++++++++++++++++++++++++++++++++++++
-	    theta_m_prev = None
+	    #theta_m_prev = None
 
 	    # environmental properties
 	    # ++++++++++++++++++++++++
-	    theta_e = None
+	    #theta_e = None
 
 	    # air flows
 	    # +++++++++

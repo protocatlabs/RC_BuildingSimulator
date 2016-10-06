@@ -6,7 +6,7 @@ EN-13970
 """
 
 import numpy as np
-from buildingProperties import Building #Importing Building Class
+from buildingPhysics import Building #Importing Building Class
 
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -51,6 +51,12 @@ theta_m: Some wierd average between the previous and current timestep of the med
 
 """
 
+
+theta_e=13
+theta_m_prev=20
+
 #Set Building Parameters
 Office=Building()
+
+Office.procedure_1(theta_e, theta_m_prev)
 
