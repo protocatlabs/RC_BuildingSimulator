@@ -74,10 +74,11 @@ class Building(object):
 		c_m = 2.07*3600000,
 		h_tr_ms = 45,
 		h_tr_is = 15,
-		theta_int_h_set = 20,
-		theta_int_c_set = 26,
+		theta_int_h_set = 293,
+		theta_int_c_set = 299,
 
 		):
+		# type: (object, object, object, object, object, object, object, object, object, object, object, object, object, object, object, object) -> object
 
 		#Building Dimensions
 		self.Fenst_A=Fenst_A #[m2] Window Area
@@ -121,26 +122,20 @@ class Building(object):
 	def calc_heatflow(self,phi_int, phi_sol):
 		#C.1 - C.3 in [C.3 ISO 13790]
 
-		self.phi_ia=0.5*phi_sol
-		self.phi_m=0.
 
-
-
-
-	def calc_heatflow(self,phi_int, phi_sol):
-		#C.1 - C.3 in [C.3 ISO 13790]
-
-		self.phi_ia=0.5*phi_sol
+		self.phi_ia=0.5*phi_int
 
 		self.phi_m=(self.A_m/self.A_t)*(0.5*phi_int+phi_sol)
 
 		self.phi_st=(1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*phi_int+phi_sol)
 
+		'''manually checked, OK'''
+
 	def calc_theta_m_t(self, theta_m_prev):
 
 		# (C.4) in [C.3 ISO 13790]
 
-		self.theta_m_t = (theta_m_prev((self.c_m/3600)-0.5*(self.h_tr_3+self.h_tr_em))) + self.phi_m_tot / ((self.c_m/3600)+0.5*(self.h_tr_3+self.h_tr_em))
+		self.theta_m_t = (theta_m_prev*((self.c_m/3600)-0.5*(self.h_tr_3+self.h_tr_em))) + self.phi_m_tot / ((self.c_m/3600)+0.5*(self.h_tr_3+self.h_tr_em))
 
 
 
@@ -153,6 +148,7 @@ class Building(object):
 		self.phi_m_tot = self.phi_m + self.h_tr_em*theta_e + \
 		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_e))/self.h_tr_2
 
+		print 'phi_m_tot =', self.phi_m_tot
 
 	'''Functions to Caluculate the derived heat transfer simplifications'''
 
@@ -160,9 +156,9 @@ class Building(object):
 
 		# (C.6) in [C.3 ISO 13790]
 
-		self.h_tr_1 = 1/(1/self.h_ve_adj + 1/self.h_tr_is)
+		self.h_tr_1 = 1.0/(1.0/self.h_ve_adj + 1.0/self.h_tr_is)
 
-
+		print 'h_tr_1=', self.h_tr_1
 
 	def calc_h_tr_2(self):
 
@@ -170,14 +166,15 @@ class Building(object):
 
 		self.h_tr_2 = self.h_tr_1 + self.h_tr_w
 
-
+		print 'h_tr_2 =',self.h_tr_2
 
 	def calc_h_tr_3(self):
 
 		# (C.8) in [C.3 ISO 13790]
 
-		self.h_tr_3 = 1/(1/self.h_tr_2 + 1/self.h_tr_ms)
+		self.h_tr_3 = 1.0/(1.0/self.h_tr_2 + 1.0/self.h_tr_ms)
 		
+		print 'h_tr_3=', self.h_tr_3
 
 	'''Functions to Calculate the temperatures at the nodes'''
 
@@ -185,7 +182,7 @@ class Building(object):
 		#PJ doesn't understand this
 
 		# (C.9) in [C.3 ISO 13790]
-		self.theta_m = (self.theta_m_t+theta_m_prev)/2
+		self.theta_m = (self.theta_m_t+theta_m_prev)/2.0
 
 
 
@@ -212,34 +209,34 @@ class Building(object):
 
 	'''Derivate using the Crank-Nicolson method'''
 
-	def calc_temperatures_crank_nicholson(self, phi_hc_nd, theta_e):
+	def calc_temperatures_crank_nicholson(self, phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev):
 
-	    # calculates air temperature and operative temperature for a given heating/cooling load
-	    # section C.3 in [C.3 ISO 13790]
-
-
+		# calculates air temperature and operative temperature for a given heating/cooling load
+		# section C.3 in [C.3 ISO 13790]
 
 
-	    self.calc_phi_m_tot(theta_e, phi_hc_nd)
+		self.calc_heatflow(phi_int, phi_sol)
 
-	    self.calc_theta_m_t(theta_m_prev)
+		self.calc_phi_m_tot(theta_e, phi_hc_nd)
 
-	    self.calc_theta_m(theta_m_prev)
+		self.calc_theta_m_t(theta_m_prev)
 
-	    self.calc_theta_s(theta_e, phi_hc_nd)
+		self.calc_theta_m(theta_m_prev)
 
-	    self.calc_theta_air(theta_e, phi_hc_nd)
+		self.calc_theta_s(theta_e, phi_hc_nd)
 
-	    self.calc_theta_op()
+		self.calc_theta_air(theta_e, phi_hc_nd)
 
-	    return theta_m_t, theta_air, theta_op
+		self.calc_theta_op()
 
-	def has_demand(self):
+		return self.theta_m_t, self.theta_air, self.theta_op
+
+	def has_demand(self,phi_int, phi_sol,theta_e, theta_m_prev):
 
 		# step 1 in section C.4.2 in [C.3 ISO 13790]
 
-		self.phi_hc_nd=0
-		self.calc_temperatures_crank_nicholson()
+		phi_hc_nd=0
+		self.calc_temperatures_crank_nicholson(phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev)
 
 		if self.theta_air < self.theta_int_h_set:
 			self.has_heating_demand=True
@@ -254,132 +251,124 @@ class Building(object):
 
 	def calc_phi_hc_nd_un(self, phi_hc_nd_10, theta_air_set, theta_air_0, theta_air_10):
 
-	    # calculates unrestricted heating power
-	    # (C.13) in [C.3 ISO 13790]
+		# calculates unrestricted heating power
+		# (C.13) in [C.3 ISO 13790]
 
-	    self.phi_hc_nd_un = phi_hc_nd_10*(theta_air_set - theta_air_0)/(theta_air_10 - theta_air_0)
-
-
-	def calc_phi_hc_ac(self, theta_e):
-
-	    # Crank-Nicholson calculation procedure if heating/cooling system is active
-	    # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
-
-	    # Step 1:
-	    phi_hc_nd_0 = 0
-	    theta_air_0=self.calc_temperatures_crank_nicholson(phi_hc_nd_0, theta_e)[1] #This is more stable
-	    #theta_air_0 = self.theta_air #This should return the same value
-
-	    # Step 2:
+		self.phi_hc_nd_un = phi_hc_nd_10*(theta_air_set - theta_air_0)/(theta_air_10 - theta_air_0)
 
 
-	    if self.has_heating_demand:
-		    theta_air_set = self.theta_int_h_set
+	def calc_phi_hc_ac(self, phi_int, phi_sol, theta_e, theta_m_prev):
+
+		# Crank-Nicholson calculation procedure if heating/cooling system is active
+		# Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
+
+		# Step 1:
+		phi_hc_nd_0 = 0
+		theta_air_0=self.calc_temperatures_crank_nicholson(phi_hc_nd_0, phi_int, phi_sol, theta_e, theta_m_prev)[1] #This is more stable
+		#theta_air_0 = self.theta_air #This should return the same value
+
+		# Step 2:
+
+
+		if self.has_heating_demand:
+			theta_air_set = self.theta_int_h_set
 		elif self.has_cooling_demand:
 			theta_air_set=self.theta_int_c_set
 		else:
 			print "error heating function has been called event though no heating is required"
 
-	    phi_hc_nd_10 = 10 * self.A_f
+		phi_hc_nd_10 = 10 * self.A_f
 
-	    theta_air_10=self.calc_temperatures_crank_nicholson(phi_hc_nd_10, theta_e)[1]
-	    #theta_air_10 = self.theta_air
+		theta_air_10=self.calc_temperatures_crank_nicholson(phi_hc_nd_10, phi_int, phi_sol, theta_e, theta_m_prev)[1]
+		#theta_air_10 = self.theta_air
 
-	    self.phi_hc_nd_un = self.calc_phi_hc_nd_un(phi_hc_nd_10,theta_air_set, theta_air_0, theta_air_10)
+		self.phi_hc_nd_un = self.calc_phi_hc_nd_un(phi_hc_nd_10,theta_air_set, theta_air_0, theta_air_10)
 
-	    # Step 3:
-
-
-	    if self.phi_c_max <= self.phi_hc_nd_un <= self.phi_h_max:
-
-	        self.phi_hc_nd_ac = phi_hc_nd_un
-	        self.theta_air_ac = theta_air_set
-
-	    # Step 4:
-	    elif phi_hc_nd_un > self.phi_h_max: # necessary heating power exceeds maximum available power
-
-	        self.phi_hc_nd_ac = self.phi_h_max
-
-	    elif phi_hc_nd_un < self.phi_c_max: # necessary cooling power exceeds maximum available power
-
-	        self.phi_hc_nd_ac = self.phi_c_max
-
-	    else: # unknown situation
-
-	        self.phi_hc_nd_ac = 0
-	        print('ERROR: unknown radiative heating/cooling system status')
+		# Step 3:
 
 
-	    # calculate system temperatures for Step 3/Step 4
-	    temp_ac = self.calc_temperatures_crank_nicholson(phi_hc_nd_ac, theta_e)
+		if self.phi_c_max <= self.phi_hc_nd_un <= self.phi_h_max:
 
-	    # theta_m_t_ac = temp_ac[0]
-	    # theta_air_ac = temp_ac[1]  # should be the same as theta_air_set in the first case
-	    # theta_op_ac = temp_ac[2]
+			self.phi_hc_nd_ac = phi_hc_nd_un
+			self.theta_air_ac = theta_air_set
 
-	    # # exit calculation
-	    # return theta_m_t_ac, theta_air_ac, theta_op_ac, phi_hc_nd_ac
+		# Step 4:
+		elif self.phi_hc_nd_un > self.phi_h_max: # necessary heating power exceeds maximum available power
+
+			self.phi_hc_nd_ac = self.phi_h_max
+
+		elif self.phi_hc_nd_un < self.phi_c_max: # necessary cooling power exceeds maximum available power
+
+			self.phi_hc_nd_ac = self.phi_c_max
+
+		else: # unknown situation
+
+			self.phi_hc_nd_ac = 0
+			print('ERROR: unknown radiative heating/cooling system status')
+
+
+		# calculate system temperatures for Step 3/Step 4
+		temp_ac = self.calc_temperatures_crank_nicholson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
+
+		# theta_m_t_ac = temp_ac[0]
+		# theta_air_ac = temp_ac[1]  # should be the same as theta_air_set in the first case
+		# theta_op_ac = temp_ac[2]
+
+		# # exit calculation
+		# return theta_m_t_ac, theta_air_ac, theta_op_ac, phi_hc_nd_ac
 
 
 
-	def procedure_1(self,theta_e, theta_m_prev):
+	def procedure_1(self,phi_int, phi_sol,theta_e, theta_m_prev):
 
 
 		#TODO: Define theta_m_prev and theta_e
 		
-	    # building thermal properties at previous time step
-	    # +++++++++++++++++++++++++++++++++++++++++++++++++
-	    #theta_m_prev = None
+		# building thermal properties at previous time step
+		# +++++++++++++++++++++++++++++++++++++++++++++++++
+		#theta_m_prev = None
 
-	    # environmental properties
-	    # ++++++++++++++++++++++++
-	    #theta_e = None
+		# environmental properties
+		# ++++++++++++++++++++++++
+		#theta_e = None
 
-	    # air flows
-	    # +++++++++
-	    m_ve_mech = None
-	    m_ve_window = None
-	    m_ve_leakage = None
+		# air flows
+		# +++++++++
+		m_ve_mech = None
+		m_ve_window = None
+		m_ve_leakage = None
 
-	    # air supply temperatures (HEX)
-	    # +++++++++++++++++++++++++++++
-	    temp_ve_mech = None
+		# air supply temperatures (HEX)
+		# +++++++++++++++++++++++++++++
+		temp_ve_mech = None
 
 	   
 
-	    self.calc_h_tr_1()
-	    self.calc_h_tr_2()
-	    self.calc_h_tr_3()
+		self.calc_h_tr_1()
+		self.calc_h_tr_2()
+		self.calc_h_tr_3()
 
-	    # check demand
-	    # ++++++++++++
-	    self.has_demand()
+		# check demand
+		# ++++++++++++
+		self.has_demand(phi_int, phi_sol,theta_e, theta_m_prev)
 
-	    if not self.has_heating_demand and not self.has_cooling_demand:
+		if not self.has_heating_demand and not self.has_cooling_demand:
 
-	        # no heating or cooling demand
-	        # calculate temperatures of building R-C-model and exit
-	        # --> rc_model_function_1(...)
-	        self.phi_hc_nd = 0
-	        calc_temperatures_crank_nicholson( phi_hc_nd, theta_e)
+			# no heating or cooling demand
+			# calculate temperatures of building R-C-model and exit
+			# --> rc_model_function_1(...)
+			self.phi_hc_nd = 0
+			calc_temperatures_crank_nicholson( phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev)
 
-	       
+		   
 
-	    else self.has_heating_demand:
+		else:
 
-	        # has heating demand
-	        
-	        self.calc_phi_hc_ac(theta_e)
+			# has heating demand
+			
+			self.calc_phi_hc_ac(phi_int, phi_sol, theta_e, theta_m_prev)
 
-	        
-
-
-	    return
+			
 
 
-
-
-
-
-
-
+		return
