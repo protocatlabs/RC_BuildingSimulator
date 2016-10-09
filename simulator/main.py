@@ -141,6 +141,9 @@ print 'Total Uncomfortable Hours are', uncomfortHours,' hours'
 #Diva 	1224		4337		427
 #Db 	1386		2990		497
 
+
+print 'illiminance', TransIll
+print 'radiation', Q_fenstRad
 pltrange=100
 
 plt.figure(1)

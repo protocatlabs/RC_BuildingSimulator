@@ -66,16 +66,16 @@ class Building(object):
 		Room_Height=3.1 ,
 		glass_solar_transmitance=0.687 ,
 		glass_light_transmitance=0.744 ,
-		LightLoad=0.0117 ,
-		LightingControl = 300,
+		lighting_load=0.0117 ,
+		lighting_control = 300,
 		h_tr_em = 47 , 
 		h_tr_w = 13,
 		h_ve_adj = 45,
-		c_m = 2.07*3600000,
+		c_m = 2.07*3.6*10**6,
 		h_tr_ms = 45,
 		h_tr_is = 15,
-		theta_int_h_set = 293,
-		theta_int_c_set = 299,
+		theta_int_h_set = 20,
+		theta_int_c_set = 26,
 
 		):
 		# type: (object, object, object, object, object, object, object, object, object, object, object, object, object, object, object, object) -> object
@@ -89,8 +89,8 @@ class Building(object):
 		#Fenstration and Lighting Properties
 		self.glass_solar_transmitance=glass_solar_transmitance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 		self.glass_light_transmitance=glass_light_transmitance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
-		self.LightLoad=LightLoad #[kW/m2] lighting load
-		self.LightingControl = LightingControl #[lux] Lighting setpoint
+		self.lighting_load=lighting_load #[kW/m2] lighting load
+		self.lighting_control = lighting_control #[lux] Lighting setpoint
 
 		#Calculated Propoerties
 		self.A_f=Room_Depth*Room_Width #[m2] Floor Area
@@ -135,7 +135,7 @@ class Building(object):
 
 		# (C.4) in [C.3 ISO 13790]
 
-		self.theta_m_t = (theta_m_prev*((self.c_m/3600)-0.5*(self.h_tr_3+self.h_tr_em))) + self.phi_m_tot / ((self.c_m/3600)+0.5*(self.h_tr_3+self.h_tr_em))
+		self.theta_m_t = ((theta_m_prev*((self.c_m/3600.0)-0.5*(self.h_tr_3+self.h_tr_em))) + self.phi_m_tot) / ((self.c_m/3600.0)+0.5*(self.h_tr_3+self.h_tr_em))
 
 
 
@@ -319,7 +319,7 @@ class Building(object):
 
 
 
-	def procedure_1(self,phi_int, phi_sol,theta_e, theta_m_prev):
+	def solve_building_energy(self,phi_int, phi_sol,theta_e, theta_m_prev):
 
 
 		#TODO: Define theta_m_prev and theta_e
@@ -372,3 +372,23 @@ class Building(object):
 
 
 		return
+
+
+	def solve_building_lighting(self, ill, occupancy):
+
+		Lux=ill/self.A_f #[Lx]
+
+		if Lux < self.lighting_control and occupancy>0:
+			self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
+		else:
+			self.lighting_demand=0
+
+
+
+
+
+
+
+
+
+
