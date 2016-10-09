@@ -8,8 +8,7 @@ EN-13970
 import numpy as np
 
 
-__author__ = "Gabriel Happle"
-__modified__ = "Prageeth Jayathissa"
+__author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
 __credits__ = ["Gabriel Happle"]
 __license__ = "MIT"
