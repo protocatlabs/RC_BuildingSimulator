@@ -67,12 +67,10 @@ class Building(object):
 		glass_light_transmitance=0.744 ,
 		lighting_load=0.0117 ,
 		lighting_control = 300,
-		h_tr_em = 0 , 
-		h_tr_w = 15,
-		h_ve_adj = 71,
-		c_m = 5659500,
-		h_tr_ms = 780,
-		h_tr_is = 491.2,
+		U_em = 0.2 , 
+		U_w = 1.1,
+		ACH=2,
+		c_m_A_f = 165000,
 		theta_int_h_set = 20,
 		theta_int_c_set = 26,
 
@@ -95,16 +93,16 @@ class Building(object):
 		self.A_f=Room_Depth*Room_Width #[m2] Floor Area
 		self.A_m=self.A_f* 2.5 #[m2] Effective Mass Area assuming a medium weight building #12.3.1.2
 		self.Room_Vol=Room_Width*Room_Depth*Room_Height #[m3] Room Volume
-		self.A_t=self.A_f*2 + Room_Width*Room_Height*2 + Room_Depth*Room_Height*2 #TODO: Not sure what A_t is, check it out
+		self.A_tot=self.A_f*2 + Room_Width*Room_Height*2 + Room_Depth*Room_Height*2
+		self.A_t=self.A_tot #TODO: Not sure what A_t is, check it out
 
 		#Single Capacitance Model Parameters
-		self.c_m=c_m #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
-		self.h_tr_em = h_tr_em #Conductance of opaque surfaces to exterior, we assume that there are no oppaque surfaces [W/K]
-		self.h_tr_w = 	h_tr_w  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
-		self.h_ve_adj =	h_ve_adj  #Conductance through ventilation [W/M]
-		self.c_m = c_m 			#Thermal Capacitance in J/K
-		self.h_tr_ms = 	h_tr_ms #Transmitance from the internal air to the thermal mass of the building
-		self.h_tr_is = 	h_tr_is # Conductance from the conditioned air to interior building surface
+		self.c_m=c_m_A_f*self.A_f #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
+		self.h_tr_em = U_em*(Room_Height*Room_Width-Fenst_A) #Conductance of opaque surfaces to exterior [W/K]
+		self.h_tr_w = 	U_w*Fenst_A  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
+		self.h_ve_adj =	1200*self.Room_Vol*ACH/3600  #Conductance through ventilation [W/M]
+		self.h_tr_ms = 	9.1 * self.A_m #Transmitance from the internal air to the thermal mass of the building
+		self.h_tr_is = 	self.A_tot * 3.45 # Conductance from the conditioned air to interior building surface
 
 		#Thermal set points
 		self.theta_int_h_set = theta_int_h_set
