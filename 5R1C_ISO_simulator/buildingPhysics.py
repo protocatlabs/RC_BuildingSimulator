@@ -67,12 +67,12 @@ class Building(object):
 		glass_light_transmitance=0.744 ,
 		lighting_load=0.0117 ,
 		lighting_control = 300,
-		h_tr_em = 47 , 
-		h_tr_w = 13,
-		h_ve_adj = 45,
-		c_m = 2.07*3.6*10**6,
-		h_tr_ms = 45,
-		h_tr_is = 15,
+		h_tr_em = 0 , 
+		h_tr_w = 15,
+		h_ve_adj = 71,
+		c_m = 5659500,
+		h_tr_ms = 780,
+		h_tr_is = 491.2,
 		theta_int_h_set = 20,
 		theta_int_c_set = 26,
 
@@ -98,12 +98,12 @@ class Building(object):
 		self.A_t=self.A_f*2 + Room_Width*Room_Height*2 + Room_Depth*Room_Height*2 #TODO: Not sure what A_t is, check it out
 
 		#Single Capacitance Model Parameters
-		self.c_m=c_m #[kWh/K] Room Capacitance. Default based of Madsen2011, consider changing to ISO standard 12.3.1.2
-		self.h_tr_em = h_tr_em #Conductance of opaque surfaces to exterior [W/K]
-		self.h_tr_w = 	h_tr_w  #Conductance to exterior through glazed surfaces [W/K]
+		self.c_m=c_m #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
+		self.h_tr_em = h_tr_em #Conductance of opaque surfaces to exterior, we assume that there are no oppaque surfaces [W/K]
+		self.h_tr_w = 	h_tr_w  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
 		self.h_ve_adj =	h_ve_adj  #Conductance through ventilation [W/M]
 		self.c_m = c_m 			#Thermal Capacitance in J/K
-		self.h_tr_ms = 	h_tr_ms #Opaque transimitance #TODO: Check what this really means
+		self.h_tr_ms = 	h_tr_ms #Transmitance from the internal air to the thermal mass of the building
 		self.h_tr_is = 	h_tr_is # Conductance from the conditioned air to interior building surface
 
 		#Thermal set points
