@@ -147,8 +147,10 @@ class Building(object):
 
 		#Calculates a global heat transfer. This is a definition used to simplify equation calc_theta_m_t so it's not so long
 
+		theta_sup=theta_e #Supply air comes straight from the outside air
+
 		self.phi_m_tot = self.phi_m + self.h_tr_em*theta_e + \
-		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_e))/self.h_tr_2
+		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_sup))/self.h_tr_2
 
 		#print 'phi_m_tot =', self.phi_m_tot
 
@@ -197,7 +199,9 @@ class Building(object):
 		# h_ve = h_ve_adj and theta_sup = theta_e [9.3.2 ISO 13790]
 
 		#Calculate the temperature of the inside room surfaces
-		self.theta_s = (self.h_tr_ms*self.theta_m+self.phi_st+self.h_tr_w*theta_e+self.h_tr_1*(theta_e+(self.phi_ia+phi_hc_nd)/self.h_ve_adj)) / \
+		theta_sup=theta_e
+
+		self.theta_s = (self.h_tr_ms*self.theta_m+self.phi_st+self.h_tr_w*theta_e+self.h_tr_1*(theta_sup+(self.phi_ia+phi_hc_nd)/self.h_ve_adj)) / \
 				  (self.h_tr_ms+self.h_tr_w+self.h_tr_1)
 
 
@@ -206,8 +210,10 @@ class Building(object):
 		# (C.11) in [C.3 ISO 13790]
 		# h_ve = h_ve_adj and theta_sup = theta_e [9.3.2 ISO 13790]
 
+		theta_sup=theta_e
+
 		#Calculate the temperature of the inside air
-		self.theta_air = (self.h_tr_is * self.theta_s + self.h_ve_adj * theta_e + self.phi_ia + phi_hc_nd) / (self.h_tr_is + self.h_ve_adj)
+		self.theta_air = (self.h_tr_is * self.theta_s + self.h_ve_adj * theta_sup + self.phi_ia + phi_hc_nd) / (self.h_tr_is + self.h_ve_adj)
 
 
 	def calc_theta_op(self):
