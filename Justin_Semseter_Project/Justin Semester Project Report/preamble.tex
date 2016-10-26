@@ -1,0 +1,75 @@
+% !TEX root = Thesis.tex
+
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   % ... or a4paper or a5paper or ... 
+%\geometry{landscape}                % Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{setspace} %For double space environment
+\usepackage[numbers]{natbib}
+%To convert ugly border to nice clickable links
+\usepackage{xcolor}
+\usepackage{multirow}
+
+\usepackage{array}
+\usepackage[page,toc]{appendix}
+
+\usepackage{nomencl} %For list of abbreviations
+
+\usepackage{pgfgantt} %Use gantt charts
+
+%\usepackage{fancyhdr}
+
+%\usepackage[final]{pdfpages}
+
+\definecolor{suatblue}{rgb}{0.06,0.5,0.64}
+
+\graphicspath{{./Images/}}
+
+\definecolor{dark-red}{rgb}{0.6,0.1,0.1}
+\definecolor{dark-blue}{rgb}{0.15,0.15,0.4}
+\definecolor{medium-blue}{rgb}{0,0,0.5}
+\definecolor{black}{rgb}{0,0,0}
+\hypersetup{
+    colorlinks=true,linkcolor={black},
+    citecolor={dark-blue}, urlcolor={medium-blue}
+}
+%Remove widows and orphans from page
+\widowpenalty=1000
+\clubpenalty=1000
+
+%Command to get Rule lines for title page
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+%New command to make blank pages
+\newcommand{\blankpage}{
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\newpage
+}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+%Remove the 'Chapter X' subheading over chapters. Basically this designs the heading
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+%Bring section titles to the left
+% \makeatletter
+% \def\specialsection{\@startsection{section}{1}%
+%   \z@{\linespacing\@plus\linespacing}{.5\linespacing}%
+%   {\normalfont}}% NEW
+% \def\section{\@startsection{section}{1}%
+%   \z@{.7\linespacing\@plus\linespacing}{.5\linespacing}%
+%   {\normalfont\scshape}}% NEW
+% \makeatother
