@@ -3,7 +3,7 @@
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
 ###HOW TO USE
-```
+```python
 from buildingPhysics import Building #Importing Building Class
 Office=Building() #Set an instance of the class
 Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev) #Solve for Heating
