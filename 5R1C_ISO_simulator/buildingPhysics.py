@@ -20,36 +20,67 @@ __status__ = "Production"
 
 
 """
-The equations presented here is this code are derived from ISO 13790 Annex C 
+The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
-Methods are listed in order of apperance in the Annex
-
+HOW TO USE
+from buildingPhysics import Building #Importing Building Class
+Office=Building() #Set an instance of the class
+Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev) #Solve for Heating
+Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 
 
 VARIABLE DEFINITION
 
-theta_m_t: Medium temperature of the enxt time step 
-theta_m_prev: Medium temperature from the previous time step
-c_m: Thermal Capacitance of the medium 
-h_tr_3: combined heat conductance, see function for definition
-h_tr_em: Heat conductance from the outside through opaque elements 
-phi_m_tot: see formula for the calculation, eq C.5 in standard
+	phi_int: Internal Heat Gains [W]
+	phi_sol: Solar Heat Gains [W]
+	theta_e: Outdoor air temperature [C]
+	theta_m_prev: Air temperature from the previous time step 
+	ill: Illuminance in contact with the total outdoor window surface [lumens]
+	occupancy: Occupancy [people/m2]
 
-phi_m: Combination of internal and solar gains directly to the medium 
-theta_e: External air temperature
-phi_st: combination of internal and solar gains directly to the internal surface
-h_tr_w: Heat transfer from the outside through windows, doors
-h_tr_1: combined heat conductance, see function for definition
-phi_ia: combination of internal and solar gains to the air 
-phi_hc_nd: Heating and Cooling of the supply air
-h_ve_adj: Ventilation heat transmission coefficient 
-h_tr_2: combined heat conductance, see function for definition 
+	theta_m_t: Medium temperature of the enxt time step [C]
+	theta_m_prev: Medium temperature from the previous time step [C]
+	theta_m: Some wierd average between the previous and current timestep of the medium  [C] #TODO: Check this 
 
-h_tr_is: Heat transfer coefficient between the air and the inside surface 
+	c_m: Thermal Capacitance of the medium [J/K]
+	h_tr_is: Heat transfer coefficient between the air and the inside surface [W/K]
+	h_tr_w: Heat transfer from the outside through windows, doors [W/K]
+	H_tr_ms: Heat transfer coefficient between the internal surface temperature and the medium [W/K]
+	h_tr_em: Heat conductance from the outside through opaque elements [W/K]
+	h_ve_adj: Ventilation heat transmission coefficient [W/K]
 
-H_tr_ms: Heat transfer coefficient between the internal surface temperature and the medium
+	phi_m_tot: see formula for the calculation, eq C.5 in standard [W]
+	phi_m: Combination of internal and solar gains directly to the medium [W]
+	phi_st: combination of internal and solar gains directly to the internal surface [W]
+	phi_ia: combination of internal and solar gains to the air [W]
+	phi_hc_nd: Heating and Cooling of the supply air [W]
 
-theta_m: Some wierd average between the previous and current timestep of the medium TODO: Check this
+	h_tr_1: combined heat conductance, see function for definition [W/K]
+	h_tr_2: combined heat conductance, see function for definition [W/K]
+	h_tr_3: combined heat conductance, see function for definition [W/K]
+
+
+	
+INPUT PARAMETER DEFINITION 
+
+	Fenst_A: Area of the Glazed Surface  [m2]
+	Room_Depth=7.0 Depth of the modeled room [m]
+	Room_Width=4.9 Width of the modeled room [m]
+	Room_Height=3.1 Height of the modeled room [m]
+	glass_solar_transmitance: Fraction of Radiation transmitting through the window []
+	glass_light_transmitance: Fraction of visible light (luminance) transmitting through the window []
+	lighting_load: Lighting Load [W/m2] 
+	lighting_control: Lux threshold at which the lights turn on [Lx]
+	U_em: U value of opaque surfaces  [W/m2K]
+	U_w: U value of glazed surfaces [W/m2K]
+	ACH_vent: Air changes per hour through ventilation [Air Changes Per Hour]
+	ACH_infl: Air changes per hour through infiltration [Air Changes Per Hour]
+	ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat recovery []
+	c_m_A_f: Thermal capacitance of the room per floor area [J/m2K]
+	theta_int_h_set : Thermal heating set point [C]
+	theta_int_c_set: Thermal cooling set point [C]
+	phi_c_max_A_f: Maximum cooling load. Set to -np.inf for unresctricted cooling [C]
+	phi_h_max_A_f: Maximum heating load. Set to no.inf for unrestricted heating [C]
 
 """
 
@@ -60,24 +91,26 @@ class Building(object):
 
 	def __init__(self, 
 		Fenst_A=13.5 ,
-		Room_Depth=7 ,
+		Room_Depth=7.0 ,
 		Room_Width=4.9 ,
 		Room_Height=3.1 ,
 		glass_solar_transmitance=0.687 ,
 		glass_light_transmitance=0.744 ,
-		lighting_load=0.0117 ,
+		lighting_load=11.7 ,
 		lighting_control = 300,
 		U_em = 0.2 , 
 		U_w = 1.1,
-		ACH=2,
+		ACH_vent=1.5,
+		ACH_infl=0.5,
+		ventilation_efficiency=60,
 		c_m_A_f = 165000,
-		theta_int_h_set = 20,
-		theta_int_c_set = 26,
-		phi_c_max_A_f=-12,
-		phi_h_max_A_f=12,
+		theta_int_h_set = 20.0,
+		theta_int_c_set = 26.0,
+		phi_c_max_A_f=-12.0,
+		phi_h_max_A_f=12.0,
 
 		):
-		# type: (object, object, object, object, object, object, object, object, object, object, object, object, object, object, object, object) -> object
+		
 
 		#Building Dimensions
 		self.Fenst_A=Fenst_A #[m2] Window Area
@@ -102,7 +135,11 @@ class Building(object):
 		self.c_m=c_m_A_f*self.A_f #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
 		self.h_tr_em = U_em*(Room_Height*Room_Width-Fenst_A) #Conductance of opaque surfaces to exterior [W/K]
 		self.h_tr_w = 	U_w*Fenst_A  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
-		self.h_ve_adj =	1200*self.Room_Vol*ACH/3600  #Conductance through ventilation [W/M]
+		
+		#Determine the ventilation conductance
+		ACH_tot=ACH_infl+ACH_vent #Total Air Changes Per Hour
+		b_ek=(1-(ACH_vent/(ACH_tot))*ventilation_efficiency) #temperature adjustement factor taking ventilation and inflimtration [ISO: E -27]
+		self.h_ve_adj =	1200*b_ek*self.Room_Vol*(ACH_tot/3600)  #Conductance through ventilation [W/M]
 		self.h_tr_ms = 	9.1 * self.A_m #Transmitance from the internal air to the thermal mass of the building
 		self.h_tr_is = 	self.A_tot * 3.45 # Conductance from the conditioned air to interior building surface
 
