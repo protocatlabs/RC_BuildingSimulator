@@ -7,6 +7,7 @@ Simulates the energy balance of a single zone room based on an RC model. This pr
 There are two models available
 
 `3R1C_Old_Simulator`: The first itteration which uses PID control 
+
 `5R1C_ISO_Simulator`: A simulation engine based off ISO 13790 Standards
 
 
