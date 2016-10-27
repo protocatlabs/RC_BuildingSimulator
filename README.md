@@ -20,7 +20,6 @@ There are two models available
 [Learn more about the 5R1C Model](5R1C_ISO_Simulator/README.md)
 
 
-
 ##References
 
 Madsen, Henrik, and Jan Holst. "Estimation of continuous-time models for the heat dynamics of a building." Energy and Buildings 22.1 (1995): 67-79.
