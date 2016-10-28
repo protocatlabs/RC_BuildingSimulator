@@ -16,7 +16,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -30,6 +30,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -59,7 +61,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=4000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -73,6 +75,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -106,7 +110,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -120,6 +124,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -150,7 +156,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=5000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -164,6 +170,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -196,7 +204,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -210,6 +218,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -255,6 +265,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -287,7 +299,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -301,6 +313,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -330,7 +344,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=4000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -344,6 +358,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -377,7 +393,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -391,6 +407,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -421,7 +439,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=5000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -435,6 +453,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -467,7 +487,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=14000 #Lumens
+		ill=44000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -481,6 +501,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -512,7 +534,7 @@ class TestBuildingSim(unittest.TestCase):
 		phi_sol=2000
 
 		#Illuminance after transmitting through the window 
-		ill=4000 #Lumens
+		ill=14000 #Lumens
 
 		#Occupancy for the timestep [people/hour/square_meter]
 		occupancy = 0.1
@@ -526,6 +548,8 @@ class TestBuildingSim(unittest.TestCase):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,

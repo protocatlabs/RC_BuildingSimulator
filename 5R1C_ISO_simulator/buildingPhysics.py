@@ -1,6 +1,6 @@
 """
 =========================================
-Physics Required to calculate sensible space heating and space cooling loads
+Physics Required to calculate sensible space heating and space cooling loads, and space lighting loads
 EN-13970
 =========================================
 """
@@ -21,6 +21,8 @@ __status__ = "Production"
 
 """
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
+
+Daylighting is based on methods in The Environmental Science Handbook, S V Szokolay
 
 HOW TO USE
 from buildingPhysics import Building #Importing Building Class
@@ -98,6 +100,8 @@ class Building(object):
 		glass_light_transmitance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -123,6 +127,8 @@ class Building(object):
 		self.glass_light_transmitance=glass_light_transmitance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 		self.lighting_load=lighting_load #[kW/m2] lighting load
 		self.lighting_control = lighting_control #[lux] Lighting setpoint
+		self.Lighting_Utilisation_Factor=Lighting_Utilisation_Factor #How the light entering the window is transmitted to the working plane
+		self.Lighting_MaintenanceFactor= Lighting_MaintenanceFactor #How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
 
 		#Calculated Propoerties
 		self.A_f=Room_Depth*Room_Width #[m2] Floor Area
@@ -423,10 +429,11 @@ class Building(object):
 
 		return
 
-
+	####################################################Lighting Calculations###################################################
 	def solve_building_lighting(self, ill, occupancy):
 
-		Lux=ill/self.A_f #[Lx]
+		#Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
+		Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_MaintenanceFactor*self.glass_light_transmitance)/self.A_f #[Lx]
 
 		if Lux < self.lighting_control and occupancy>0:
 			self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
