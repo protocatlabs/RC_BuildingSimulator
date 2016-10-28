@@ -139,7 +139,6 @@ class Building(object):
 		#Determine the ventilation conductance
 		ACH_tot=ACH_infl+ACH_vent #Total Air Changes Per Hour
 		b_ek=(1-(ACH_vent/(ACH_tot))*ventilation_efficiency) #temperature adjustement factor taking ventilation and inflimtration [ISO: E -27]
-		print b_ek
 		self.h_ve_adj =	1200*b_ek*self.Room_Vol*(ACH_tot/3600)  #Conductance through ventilation [W/M]
 		self.h_tr_ms = 	9.1 * self.A_m #Transmitance from the internal air to the thermal mass of the building
 		self.h_tr_is = 	self.A_tot * 3.45 # Conductance from the conditioned air to interior building surface
