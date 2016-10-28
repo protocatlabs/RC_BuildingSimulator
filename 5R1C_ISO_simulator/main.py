@@ -28,7 +28,7 @@ theta_m_prev=22
 phi_int=10
 
 #Solar heat gains after transmitting through the winow, in Watts
-phi_sol=2000
+phi_sol=20000
 
 #Illuminance after transmitting through the window 
 ill=14000 #Lumens
