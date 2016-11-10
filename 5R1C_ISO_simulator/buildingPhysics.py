@@ -112,6 +112,10 @@ class Building(object):
 		theta_int_c_set = 26.0,
 		phi_c_max_A_f=-20.0,
 		phi_h_max_A_f=20.0,
+		heatingSystem=None,
+		coolingSystem=None,
+		heatingEfficiency=1,
+		coolingEfficiency=1,
 
 		):
 		
@@ -415,6 +419,8 @@ class Building(object):
 			# --> rc_model_function_1(...)
 			self.phi_hc_nd_ac=0
 			self.calc_temperatures_crank_nicholson( self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
+			self.heatingLoad=0
+			self.coolingLoad=0
 
 		   
 
@@ -423,6 +429,8 @@ class Building(object):
 			# has heating/cooling demand
 			
 			self.calc_phi_hc_ac(phi_int, phi_sol, theta_e, theta_m_prev)
+
+			if self.has_heating_demand and h
 
 			
 

@@ -54,6 +54,12 @@ print Office.lighting_demand
 
 print Office.phi_hc_nd_ac
 
+Office.theta_int_h_set = 20.0
+
+Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+
+print Office.theta_m
+
 #print Office.has_heating_demand
 
 # print Office.phi_m_tot
