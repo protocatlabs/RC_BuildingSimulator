@@ -6,6 +6,7 @@ EN-13970
 """
 
 import numpy as np
+from buildingSystem import * #Import Building System
 
 
 __author__ = "Prageeth Jayathissa"
@@ -83,7 +84,13 @@ INPUT PARAMETER DEFINITION
 	theta_int_c_set: Thermal cooling set point [C]
 	phi_c_max_A_f: Maximum cooling load. Set to -np.inf for unresctricted cooling [C]
 	phi_h_max_A_f: Maximum heating load. Set to no.inf for unrestricted heating [C]
-
+	heatingSystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. Direct heater 
+		has no changes to the heating demand load, a resistive heater takes an efficiency into account, and a HeatPumpHeater
+		calculates a COP based on the outdoor and indoor temperature 
+	coolingSystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. DirectCooler
+		has no changes to the cooling demand load, a HeatPumpCooler calculates a COP based on the outdoor and indoor temperature 
+	heatingEfficiency: Efficiency of the heating system (note for DirectHeater this is always 1)
+	coolingEfficiency: Efficiency of the cooling system (note for DirectCooler this is always 1)
 """
 
 
@@ -112,8 +119,8 @@ class Building(object):
 		theta_int_c_set = 26.0,
 		phi_c_max_A_f=-20.0,
 		phi_h_max_A_f=20.0,
-		heatingSystem=None,
-		coolingSystem=None,
+		heatingSystem=DirectHeater,
+		coolingSystem=DirectCooler,
 		heatingEfficiency=1,
 		coolingEfficiency=1,
 
@@ -162,6 +169,12 @@ class Building(object):
 		self.has_cooling_demand=False #Boolean for if cooling is required
 		self.phi_c_max = phi_c_max_A_f*self.A_f #max cooling load
 		self.phi_h_max = phi_h_max_A_f*self.A_f #max heating load
+
+		#Building System Properties
+		self.heatingSystem=heatingSystem
+		self.coolingSystem=coolingSystem
+		self.heatingEfficiency=heatingEfficiency
+		self.coolingEfficiency=coolingEfficiency
 
 
 	def calc_heatflow(self,phi_int, phi_sol):
@@ -419,8 +432,8 @@ class Building(object):
 			# --> rc_model_function_1(...)
 			self.phi_hc_nd_ac=0
 			self.calc_temperatures_crank_nicholson( self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
-			self.heatingLoad=0
-			self.coolingLoad=0
+			self.heatingElectricity=0
+			self.coolingElectricity=0
 
 		   
 
@@ -430,7 +443,23 @@ class Building(object):
 			
 			self.calc_phi_hc_ac(phi_int, phi_sol, theta_e, theta_m_prev)
 
-			if self.has_heating_demand and h
+
+			##Calculate the Electricty Required
+
+			director = Director() #Initialise Heating System Manager
+
+			if self.has_heating_demand:
+				director.setBuilder(self.heatingSystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.heatingEfficiency))
+				system = director.calcSystem()
+				self.heatingElectricity=system.electricity
+				self.coolingElectricity=0
+
+			elif self.has_cooling_demand:
+				director.setBuilder(self.coolingSystem(Load=self.phi_hc_nd_ac*-1, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.coolingEfficiency))
+				system = director.calcSystem()
+				self.coolingElectricity=system.electricity
+				self.heatingElectricity=0
+
 
 			
 
