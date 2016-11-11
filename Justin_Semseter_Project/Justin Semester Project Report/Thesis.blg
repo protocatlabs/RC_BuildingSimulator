@@ -1,0 +1,22 @@
+This is BibTeX, Version 0.99dThe top-level auxiliary file: Thesis.aux
+A level-1 auxiliary file: ./00_Front/00_Front.aux
+A level-1 auxiliary file: ./01_Introduction/01_Introduction.aux
+A level-1 auxiliary file: ./02_Methodology/02_Methodology.aux
+A level-1 auxiliary file: ./03_Results/03_Results.aux
+A level-1 auxiliary file: ./04_Discussion/04_Discussion.aux
+A level-1 auxiliary file: ./05_Conclusion/05_Conclusion.aux
+A level-1 auxiliary file: ./06_Backmatter/06_Backmatter.aux
+A level-1 auxiliary file: ./07_Appendix/07_Appendix.aux
+The style file: unsrtnat.bst
+Database file #1: references.bib
+I was expecting a `,' or a `}'---line 8 of file references.bib
+ : 
+ : year="2014",
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 90 of file references.bib
+ : 
+ : @techreport{EIA,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+(There were 2 error messages)

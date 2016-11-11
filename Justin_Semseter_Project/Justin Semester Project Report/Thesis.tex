@@ -1,0 +1,40 @@
+%MSc main document =============================================================
+
+\documentclass[a4paper,11pt,oneside,onecolumn]{book}  %amsart, IEEEtran
+\input{preamble}
+
+\begin{document}
+%front matter ------------------------------------------------------------------
+\pagestyle{plain}
+
+
+\include{./00_Front/00_Front}
+
+%chapters ----------------------------------------------------------------------
+
+\include{./01_Introduction/01_Introduction}
+\include{./02_Methodology/02_Methodology}
+\include{./03_Results/03_Results}
+\include{./04_Discussion/04_Discussion}
+
+\include{./05_Conclusion/05_Conclusion}
+\include{./06_Backmatter/06_Backmatter}
+
+\include{./07_Appendix/07_Appendix}
+
+\clearpage
+\bibliographystyle{unsrtnat} %unsrtnat
+\bibliography{references}
+
+%appendix ----------------------------------------------------------------------
+\clearpage
+%\begin{appendices}
+%\include{./07_Appendix/07_Appendix}
+%\end{appendices}
+
+%back matter -------------------------------------------------------------------
+ 
+%\include{08-back}
+
+\end{document}
+%===============================================================================
