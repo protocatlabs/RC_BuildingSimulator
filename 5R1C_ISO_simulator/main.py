@@ -22,7 +22,7 @@ __status__ = "Production"
 
 
 theta_e=10
-theta_m_prev=20
+theta_m_prev=22
 
 #Internal heat gains, in Watts
 phi_int=10
@@ -31,7 +31,7 @@ phi_int=10
 phi_sol=2000
 
 #Illuminance after transmitting through the window 
-ill=14000 #Lumens
+ill=44000 #Lumens
 
 #Occupancy for the timestep [people/hour/square_meter]
 occupancy = 0.1
@@ -47,12 +47,19 @@ print Office.theta_m
 
 print Office.lighting_demand
 
+
 # print 'phi_ia=', Office.phi_ia
 # print 'phi_m=', Office.phi_m
 # print 'phi_st=',Office.phi_st
 
-# print Office.phi_hc_nd_ac
+print Office.phi_hc_nd_ac
 
-# print Office.has_heating_demand
+Office.theta_int_h_set = 20.0
+
+Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+
+print Office.theta_m
+
+#print Office.has_heating_demand
 
 # print Office.phi_m_tot
