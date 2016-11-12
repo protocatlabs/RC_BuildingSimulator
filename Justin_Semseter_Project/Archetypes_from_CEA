@@ -1,0 +1,61 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime
+import numpy as np
+import cdecimal as dec
+import re as re
+
+archetypes_path = "C:\Users\Zghiru\Documents\GitHub\RC_BuildingSimulator\Justin_Semseter_Project\data\CH\Archetypes\Archetypes_properties.xlsx"
+
+arch = pd.read_excel(archetypes_path,sheetname='THERMAL')
+r = re.compile("([a-zA-Z_]+)")
+m = r.match(arch["Code"][1])
+arch["code1"] = pd.DataFrame([r.match(string).groups() for string in arch.Code])
+arch = arch.set_index(['code1'])  
+arch = arch.drop(['SERVERROOM','PARKING','SWIMMING','COOLROOM'])
+arch = arch.reset_index(drop=False)
+arch = arch.drop('Es',axis=1)
+arch = arch.drop('Hs',axis=1)
+arch = arch.drop('U_roof',axis=1)
+arch = arch.drop('U_base',axis=1)
+
+int_loads = pd.read_excel(archetypes_path,sheetname='INTERNAL_LOADS')
+int_loads = int_loads.set_index(['Code'])
+int_loads = int_loads['El_Wm2']
+int_loads = int_loads.reset_index(drop=False)
+
+T_sp = pd.read_excel(archetypes_path,sheetname='INDOOR_COMFORT')
+
+b_data = arch.merge(int_loads,how='left', left_on='code1', right_on='Code')
+b_data = b_data.merge(T_sp,how='left', left_on='code1', right_on='Code')
+b_data = b_data.drop('code1',axis=1)
+b_data = b_data.drop('Code_y',axis=1)
+b_data = b_data.drop('Code',axis=1)
+
+#Assign values for Cm from ISO13790:2008, Table 12, based on archetypes
+th_mass = b_data['th_mass']
+c_m = []
+for i in range(0,len(th_mass)):
+    if th_mass[i] == "T1":
+        c_m.append(110*10**3) #Light
+    elif th_mass[i] == "T2":
+        c_m.append(165 * 10**3) #Medium
+    elif th_mass[i] == "T3":
+        c_m.append(260*10**3) #Heavy
+
+       
+#Create dictionaries for Archetypes:
+lighting_load = dict(zip(b_data['Code_x'],b_data['El_Wm2']))
+
+U_w = dict(zip(b_data['Code_x'],b_data['U_win']))
+U_em = dict(zip(b_data['Code_x'],b_data['U_wall']))
+c_m_A_f = dict(zip(b_data['Code_x'],c_m))
+
+theta_int_h_set = dict(zip(b_data['Code_x'],b_data['Ths_set_C']))
+theta_int_c_set  = dict(zip(b_data['Code_x'],b_data['Tcs_set_C']))
+
+b_data_dict = b_data[['Code_x','El_Wm2','U_win','U_wall','Ths_set_C','Tcs_set_C']]
+b_data_dict = b_data_dict.rename(index=str,columns={'Code_x':'Code','El_Wm2':'lighting_load','U_win':'U_w','U_wall':'U_em','Ths_set_C':'theta_int_h_set','Tcs_set_C':'theta_int_c_set'})
+b_data_dict = b_data_dict.set_index(['Code'])
+b_dict = b_data_dict.to_dict(orient='index')
+print b_dict
