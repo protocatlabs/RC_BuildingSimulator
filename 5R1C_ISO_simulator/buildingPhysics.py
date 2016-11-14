@@ -467,12 +467,12 @@ class Building(object):
 		return
 
 	####################################################Lighting Calculations###################################################
-	def solve_building_lighting(self, ill, occupancy):
+	def solve_building_lighting(self, ill, occupancy, probLighting=1):
 
 		#Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
 		Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_MaintenanceFactor*self.glass_light_transmitance)/self.A_f #[Lx]
 
-		if Lux < self.lighting_control and occupancy>0:
+		if Lux < self.lighting_control and occupancy>0 and probLighting>0.1:
 			self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
 		else:
 			self.lighting_demand=0

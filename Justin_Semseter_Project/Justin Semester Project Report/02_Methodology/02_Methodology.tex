@@ -3,4 +3,27 @@
 \chapter{Methodology}\
 \label{ch:methodology}
 
-We did some stuff to solve our problem statement
+Code for a basic RC model was written. Different Solving approaches were compared.
+The 5R1C model from ISO was implemented by PJ, and combined with the ASF model.
+#Potential Comparison with 1r1c model and 3r 1c mdoel
+
+Simulating multiple building archetypes: CEA database
+Simulation parameters: 
+- CEA database provides 15 archetypes of which 11 are used: MULTI_RES SINGLE_RES HOTEL OFFICE RETAIL FOODSTORE RESTAURANT INDUSTRIAL SCHOOL HOSPITAL GYM 
+- For each archetype:
+	-building properties for six distinct periods are provided: 1920 1920-1970 1970-1980 1980-2005 2005-2020 2020-2030. In addition, two sets of properties are defined: one for new construction and another for renovation.
+		possibility to first study new buildings, and later expand to older buildings
+	- heating and cooling setpoints and setbacks (energy_minimization.py)
+	- probability of occupancy, lighting, and electrical appliances on given weekdays and weekends ## need to figure out how to use them
+
+- Room geometry parameters:
+	- different glazing ratios/room dimensions ## check limits in ISO standard
+
+- Weather file and orientation:
+	- Zurich S, Zurich W
+	- Dubai S, Dubai W
+
+- Systems analysis: analyse the effectiveness of different heating and cooling systems coupled with the ASF
+
+
+
