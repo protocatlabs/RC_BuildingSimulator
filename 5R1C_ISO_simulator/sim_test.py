@@ -594,6 +594,56 @@ class TestBuildingSim(unittest.TestCase):
 		self.assertEqual(round(Office.heatingElectricity,2),0)
 		self.assertEqual(round(Office.lighting_demand,2),401.31)
 
+	def test_lightingrequired_probabiltyOff(self):
+
+		theta_e=10
+		theta_m_prev=22
+		#Internal heat gains, in Watts
+		phi_int=10
+
+		#Solar heat gains after transmitting through the winow, in Watts
+		phi_sol=2000
+
+		#Illuminance after transmitting through the window 
+		ill=14000 #Lumens
+
+		#Occupancy for the timestep [people/hour/square_meter]
+		occupancy = 0.1
+
+		probLighting=0.01
+
+		#Set Building Parameters
+		Office=Building(Fenst_A=13.5 ,
+		Room_Depth=7 ,
+		Room_Width=4.9 ,
+		Room_Height=3.1 ,
+		glass_solar_transmitance=0.687 ,
+		glass_light_transmitance=0.744 ,
+		lighting_load=11.7 ,
+		lighting_control = 300,
+		Lighting_Utilisation_Factor=0.45,
+		Lighting_MaintenanceFactor=0.9,
+		U_em = 0.2 , 
+		U_w = 1.1,
+		ACH_vent=1.5,
+		ACH_infl=0.5,
+		ventilation_efficiency=0.6,
+		c_m_A_f = 165000,
+		theta_int_h_set = 20.0,
+		theta_int_c_set = 26.0,
+		phi_c_max_A_f=-12.0,
+		phi_h_max_A_f=12.0,
+		)
+
+		Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+		Office.solve_building_lighting(ill, occupancy, probLighting)
+
+		self.assertEqual(round(Office.theta_m,2), 22.43)
+		self.assertEqual(Office.phi_hc_nd_ac,0)
+		self.assertEqual(round(Office.coolingElectricity,2),0)
+		self.assertEqual(round(Office.heatingElectricity,2),0)
+		self.assertEqual(round(Office.lighting_demand,2),0)
+
 	
 ############################ Heat Pump System ########################
 
