@@ -92,6 +92,8 @@ class HeatPumpHeater(Builder):
 	def calcLoads(self):
 		heater= System()
 		heater.COP=self.efficiency*((self.theta_m_prev+273.0)/(self.theta_m_prev-self.theta_e))
+		if heater.COP<=0:
+			heater.COP=self.efficiency*100 #TODO: This is a quick hackaround of the actual system!!! FIX!!!!
 		heater.electricity=self.Load/heater.COP
 		return heater
 
@@ -101,6 +103,8 @@ class HeatPumpCooler(Builder):
 	def calcLoads(self):
 		cooler=System()
 		cooler.COP=self.efficiency*((self.theta_m_prev+273.0)/(self.theta_e-self.theta_m_prev))
+		if cooler.COP<=0:
+			cooler.COP=self.efficiency*100
 		cooler.electricity=self.Load/cooler.COP
 		return cooler
 
