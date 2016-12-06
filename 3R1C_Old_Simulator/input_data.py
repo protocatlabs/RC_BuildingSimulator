@@ -40,6 +40,8 @@ def read_EWP(epw_name='data/Zurich-Kloten_2013.epw'):
 				glbIll.append(float(row[16]))
 	return np.asarray(T_out),np.asarray(glbRad), np.asarray(glbIll)
 
+
+
 def read_transmittedMonthlyR(myfilename='data/radiation_combination2.csv'):
 	incRad=[] #Incident radiation through the window
 	with open(my_filename, 'rb') as csvfile:

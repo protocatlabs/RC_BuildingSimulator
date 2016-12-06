@@ -1,6 +1,20 @@
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces A 1R1C Model of a single zone\relax }}{3}{figure.caption.9}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces T_{ext} $ and $ T_{int} $ for a 1R1C model$\relax }}{5}{figure.caption.10}
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Error for FE and BE relative to CN\relax }}{6}{figure.caption.11}
+\contentsline {figure}{\numberline {1.4}{\ignorespaces A 3R1C Model of a single zone\relax }}{7}{figure.caption.12}
+\contentsline {figure}{\numberline {1.5}{\ignorespaces A 5R1C Model of the single zone office space\relax }}{8}{figure.caption.13}
+\contentsline {figure}{\numberline {1.6}{\ignorespaces An early prototype of the ASF installed on the House of Natural Resources\relax }}{9}{figure.caption.14}
+\contentsline {figure}{\numberline {1.7}{\ignorespaces The City Energy Analyst is a python plugin for ArcGIS\relax }}{10}{figure.caption.15}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces ASF simulation workflow at the time of writing\relax }}{13}{figure.caption.16}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Archetype comparison for Zurich[South]\relax }}{15}{figure.caption.17}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Comparison of Total Energy \textit {(heating, cooling, lighting)} for the four location scenarios\relax }}{16}{figure.caption.18}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces \textit {Difference} between West and South oriented buildings in the Cairo case\relax }}{17}{figure.caption.19}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Comparison of thermal parameters for RC models described in this report\relax }}{21}{figure.caption.20}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Building parameters which define the CEA archetypes\relax }}{22}{figure.caption.21}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Visualisation of the occupancy schedules for the different building types\relax }}{23}{figure.caption.22}

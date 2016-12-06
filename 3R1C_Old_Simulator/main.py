@@ -13,6 +13,7 @@ Amr Elesawy
 
 import numpy as np
 import math
+import pandas as pd
 import input_data as f
 import matplotlib.pyplot as plt
 import PID_controller
@@ -66,6 +67,14 @@ coolingControl.setPoint(tintC_set)
 #Differential Equation Parameters
 dt=0.25 #hours
 
+HEAT = []
+COOL = []
+LIGHTING = []
+DISCOMFORT = []
+T_m = []
+T_a = []
+
+
 for ii in range(0, int(8760)):
 	#Initialise hourly energy requirements
 	Heat_hr=0
@@ -76,9 +85,10 @@ for ii in range(0, int(8760)):
 
 	for jj in range(0,int(1/dt)):
 
-			
+#		dT_in=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
+#		dT_in=((Q.iat[ii,0])/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
+		dT_in=((1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
 
-		dT_in=((Q.iat[ii,0]+Q_heat+Q_cool)/(Office.Cm) + (1/(Office.Cm*Office.R_i))*(float(T_out[ii])-T_in))*dt
 		T_in=T_in+dT_in
 		if T_in<tintH_set and occupancy['People'].iat[ii]>=0: 
 			#Note that occupancy control is currently disabled. This is done through the >=. If you want occupancy
@@ -109,19 +119,28 @@ for ii in range(0, int(8760)):
 	Total_Heating+=Heat_hr
 	Total_Cooling+=Cool_hr
 
+	T_a.append(T_out[ii])
+	T_m.append(T_in)
+	HEAT.append(Heat_hr)
+	COOL.append(Cool_hr)
+	
+
 
 	#Check for Hours outside the setpoint +/- 1
+	Data_uncomfortHours[ii==0]
 	if T_in>tintC_set+1 or T_in<tintH_set-1:
 		if occupancy['People'].iat[ii]>0:
 			uncomfortHours+=1 #Number of uncomfortable hours
 			Data_uncomfortHours[ii]=1 #array to show which hours were uncomfortable
+	DISCOMFORT.append(Data_uncomfortHours[ii])
 
 
-
+	Lighting_hr == 0
 	#Lighting calc. Double check this as I wrote it rushed. Try find allternative for .iat
 	if Lux.get_value(ii,0)< Office.LightingControl and occupancy['People'].iat[ii]>0:
 		Lighting_hr=Office.LightLoad*Office.Floor_A
 		Total_Lighting+=Lighting_hr
+	LIGHTING.append(Lighting_hr)
 
 
 
@@ -142,8 +161,19 @@ print 'Total Uncomfortable Hours are', uncomfortHours,' hours'
 #Db 	1386		2990		497
 
 
-print 'illiminance', TransIll
-print 'radiation', Q_fenstRad
+#print 'illiminance', TransIll
+#print 'radiation', Q_fenstRad
+
+result3R1C = pd.DataFrame(pd.date_range(pd.datetime(2013,1,1), periods=8760, freq='H'))
+result3R1C['HEAT'] = HEAT
+result3R1C['COOL'] = COOL
+result3R1C['LIGHTING'] = LIGHTING
+result3R1C['DISCOMFORT'] = DISCOMFORT
+result3R1C['T_m'] = T_m
+result3R1C['T_a'] = T_a
+
+result3R1C.to_csv('result3R1C.csv')
+
 pltrange=100
 
 plt.figure(1)
@@ -151,7 +181,5 @@ plt.plot(range(0, int(pltrange)),Data_T_in[0:pltrange], range(0, int(pltrange)),
 
 plt.figure(2)
 plt.plot(range(0, int(pltrange)),Data_Heating[0:pltrange],range(0, int(pltrange)),Data_uncomfortHours[0:pltrange])
-
-
 
 plt.show()

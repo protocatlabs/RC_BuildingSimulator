@@ -19,4 +19,11 @@ I was expecting a `,' or a `}'---line 90 of file references.bib
  : @techreport{EIA,
 (Error may have been on previous line)
 I'm skipping whatever remains of this entry
-(There were 2 error messages)
+I was expecting a `,' or a `}'---line 131 of file references.bib
+ : 
+ : @online{SysThermalModel,
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--entry type for "SysThermalModel" isn't style-file defined
+--line 131 of file references.bib
+(There were 3 error messages)
