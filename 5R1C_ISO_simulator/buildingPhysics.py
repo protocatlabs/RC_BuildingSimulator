@@ -184,7 +184,9 @@ class Building(object):
 
 		self.phi_ia=0.5*phi_int
 
+
 		self.phi_m=(self.A_m/self.A_t)*(0.5*phi_int+phi_sol)
+		print 'setting self.phim', self.phi_m
 
 		self.phi_st=(1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*phi_int+phi_sol)
 
@@ -208,9 +210,21 @@ class Building(object):
 		#Calculates a global heat transfer. This is a definition used to simplify equation calc_theta_m_t so it's not so long
 
 		theta_sup=theta_e #Supply air comes straight from the outside air
+		print 'phim', self.phi_m
+		print self.h_tr_em
+		print theta_e
+		print self.h_tr_3
+		print self.h_tr_1
+		print self.phi_ia
+		print phi_hc_nd
+		print self.h_ve_adj
+		print self.h_tr_2
+		print self.phi_st
 
-		self.phi_m_tot = self.phi_m + self.h_tr_em*theta_e + \
-		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_sup))/self.h_tr_2
+		test= self.phi_m + self.h_tr_em*theta_e + self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1)
+
+
+		self.phi_m_tot = self.phi_m + self.h_tr_em*theta_e + self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_sup))/self.h_tr_2
 
 		#print 'phi_m_tot =', self.phi_m_tot
 
