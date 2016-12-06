@@ -56,6 +56,8 @@ Q_fenstRad=f.read_transmittedR(myfilename='data/radiation_Building_Zh.csv') #kWh
 occupancy, Q_human=f.read_occupancy(myfilename='data/Occupancy_COM.csv') #people/m2/h, kWh/h
 Ill_Eq= f.Equate_Ill(epw_name='data/Zurich-Kloten_2013.epw') #Equation coefficients for linear polynomial
 
+T_out=T_out.astype(np.float) #convert T_out from string to float
+
 occupancy = occupancy.People
 
 
@@ -82,12 +84,11 @@ Tm_h_rad =[]
 Tm_rad =[]
 Tm =[]
 
+
+
 for ii in range(0, int(8760)):
 
-	print 'qhuman is', Q_human[ii]
-	print 'fenst rad is', Q_fenstRad[ii]
-	print 'Tout',T_out[ii]
-	print Office.theta_m_prev
+
 
 	Office.solve_building_energy(phi_int=Q_human[ii], phi_sol=Q_fenstRad[ii], theta_e= T_out[ii], theta_m_prev=Office.theta_m_prev)
 	Tm_h_rad.append(Office.theta_m)
