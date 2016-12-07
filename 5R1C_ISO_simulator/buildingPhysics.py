@@ -11,7 +11,7 @@ from buildingSystem import * #Import Building System
 
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
-__credits__ = ["Gabriel Happle"]
+__credits__ = ["Gabriel Happle, Justin Zarb"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
