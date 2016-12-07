@@ -1,5 +1,11 @@
 ##5R1C Building Simulation Model
 
+* `buildingPhysics.py`: Is the RC model class
+* `buildingSystem.py`: Is a builder pattern class to define the building system (Work in Progress)
+* `example.py` : Is an example showing the implentation of the RC model for one timestep
+* `test.py` : Is the unittest file for the software. Run this before each commit and after each pull
+
+
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
 ###HOW TO USE
