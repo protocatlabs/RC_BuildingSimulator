@@ -70,3 +70,26 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 	phi_c_max_A_f: Maximum cooling load. Set to -np.inf for unresctricted cooling [C]
 	phi_h_max_A_f: Maximum heating load. Set to no.inf for unrestricted heating [C]
 
+###CLASS ATTRIBUTES	
+
+	self.theta_m : Room medium temperature
+	self.theta_air : Room air temperature
+	self.theta_s : Room internal surface temperature
+	self.phi_hc_ac: Room heating/cooling load. Negative if cooling, positive if heating
+	self.phi_hc_nd_ac: Unrestricuted heating/coolign load. Negative if cooling, positive if heating
+	self.heatingElectricity: Electricty consumption through heating. Dependent on the building system (in progress)
+	self.coolingElectricity: Electricty consumption through cooling. Dependent on the building system (in progress)
+	self.lighting_demand: Lighting demand of the building
+	self.has_heating_demand : Boolean if heating is required
+	self.has_cooling_demand : Boolean if cooling is required
+
+
+	self.heatingSystem
+	self.coolingSystem
+	self.heatiningEfficiency
+	self.coolingEfficiency
+
+There are other attributes that are not very important, and can be found within buildingPhysics.py. Post an issue if you have any questions
+
+
+
