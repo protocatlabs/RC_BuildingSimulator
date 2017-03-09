@@ -7,6 +7,8 @@ EN-13970
 
 import numpy as np
 from buildingPhysics import Building #Importing Building Class
+from epwreader import epw_reader #Weather file reader
+
 
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -31,6 +33,10 @@ occupancy = 0.1 #Occupancy for the timestep [people/hour/square_meter]
 
 #Initialise an instance of the building. Empty brackets take on the default parameters. See buildingPhysics.py to see the default values
 Office=Building()
+
+
+#Test for epw reader
+print epw_reader('Zurich-Kloten_2013.epw')['hour'][34]
 
 
 #Solve for building energy

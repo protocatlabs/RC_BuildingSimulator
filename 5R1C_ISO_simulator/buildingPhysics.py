@@ -367,7 +367,7 @@ class Building(object):
 		elif self.has_cooling_demand:
 			theta_air_set=self.theta_int_c_set
 		else:
-			print "error heating function has been called event though no heating is required"
+			print "error heating function has been called even though no heating is required"
 
 		#Set a heating case where the heating load is 10x the floor area
 		phi_hc_nd_10 = 10 * self.A_f
