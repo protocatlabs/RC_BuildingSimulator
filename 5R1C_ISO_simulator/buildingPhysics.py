@@ -70,8 +70,8 @@ INPUT PARAMETER DEFINITION
 	Room_Depth=7.0 Depth of the modeled room [m]
 	Room_Width=4.9 Width of the modeled room [m]
 	Room_Height=3.1 Height of the modeled room [m]
-	glass_solar_transmitance: Fraction of Radiation transmitting through the window []
-	glass_light_transmitance: Fraction of visible light (luminance) transmitting through the window []
+	glass_solar_transmittance: Fraction of Radiation transmitting through the window []
+	glass_light_transmittance: Fraction of visible light (luminance) transmitting through the window []
 	lighting_load: Lighting Load [W/m2] 
 	lighting_control: Lux threshold at which the lights turn on [Lx]
 	U_em: U value of opaque surfaces  [W/m2K]
@@ -103,12 +103,12 @@ class Building(object):
 		Room_Depth=7.0 ,
 		Room_Width=4.9 ,
 		Room_Height=3.1 ,
-		glass_solar_transmitance=0.687 ,
-		glass_light_transmitance=0.744 ,
+		glass_solar_transmittance=0.687 ,
+		glass_light_transmittance=0.744 ,
 		lighting_load=11.7 ,
 		lighting_control = 300,
 		Lighting_Utilisation_Factor=0.45,
-		Lighting_MaintenanceFactor=0.9,
+		Lighting_Maintenance_Factor=0.9,
 		U_em = 0.2 , 
 		U_w = 1.1,
 		ACH_vent=1.5,
@@ -134,12 +134,12 @@ class Building(object):
 		self.Room_Height=Room_Height #[m] Room Height
 
 		#Fenstration and Lighting Properties
-		self.glass_solar_transmitance=glass_solar_transmitance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
-		self.glass_light_transmitance=glass_light_transmitance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
+		self.glass_solar_transmittance=glass_solar_transmittance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
+		self.glass_light_transmittance=glass_light_transmittance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 		self.lighting_load=lighting_load #[kW/m2] lighting load
 		self.lighting_control = lighting_control #[lux] Lighting setpoint
 		self.Lighting_Utilisation_Factor=Lighting_Utilisation_Factor #How the light entering the window is transmitted to the working plane
-		self.Lighting_MaintenanceFactor= Lighting_MaintenanceFactor #How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
+		self.Lighting_Maintenance_Factor= Lighting_Maintenance_Factor #How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
 
 		#Calculated Propoerties
 		self.A_f=Room_Depth*Room_Width #[m2] Floor Area
@@ -157,7 +157,7 @@ class Building(object):
 		ACH_tot=ACH_infl+ACH_vent #Total Air Changes Per Hour
 		b_ek=(1-(ACH_vent/(ACH_tot))*ventilation_efficiency) #temperature adjustement factor taking ventilation and inflimtration [ISO: E -27]
 		self.h_ve_adj =	1200*b_ek*self.Room_Vol*(ACH_tot/3600)  #Conductance through ventilation [W/M]
-		self.h_tr_ms = 	9.1 * self.A_m #Transmitance from the internal air to the thermal mass of the building
+		self.h_tr_ms = 	9.1 * self.A_m #transmittance from the internal air to the thermal mass of the building
 		self.h_tr_is = 	self.A_tot * 3.45 # Conductance from the conditioned air to interior building surface
 
 		#Thermal set points
@@ -167,14 +167,18 @@ class Building(object):
 		#Thermal Properties
 		self.has_heating_demand=False #Boolean for if heating is required
 		self.has_cooling_demand=False #Boolean for if cooling is required
-		self.phi_c_max = phi_c_max_A_f*self.A_f #max cooling load
-		self.phi_h_max = phi_h_max_A_f*self.A_f #max heating load
+		self.phi_c_max = phi_c_max_A_f*self.A_f #max cooling load (W/m2)
+		self.phi_h_max = phi_h_max_A_f*self.A_f #max heating load (W/m2)
 
 		#Building System Properties
 		self.heatingSystem=heatingSystem
 		self.coolingSystem=coolingSystem
 		self.heatingEfficiency=heatingEfficiency
 		self.coolingEfficiency=coolingEfficiency
+        
+        
+        
+        
 
 
 	def calc_heatflow(self,phi_int, phi_sol):
@@ -285,7 +289,7 @@ class Building(object):
 
 	'''Derivate using the Crank-Nicolson method'''
 
-	def calc_temperatures_crank_nicholson(self, phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev):
+	def calc_temperatures_crank_nicolson(self, phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev):
 		# section C.3 in [C.3 ISO 13790]
 
 		# calculates air temperature and operative temperature for a given heating/cooling load
@@ -318,7 +322,7 @@ class Building(object):
 
 		phi_hc_nd=0
 		#Determine the temperatures at various nodes
-		self.calc_temperatures_crank_nicholson(phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev)
+		self.calc_temperatures_crank_nicolson(phi_hc_nd, phi_int, phi_sol, theta_e, theta_m_prev)
 
 		#If the air temperature is less or greater than the set temperature, there is a heating/cooling load
 		if self.theta_air < self.theta_int_h_set:
@@ -348,14 +352,14 @@ class Building(object):
 
 	def calc_phi_hc_ac(self, phi_int, phi_sol, theta_e, theta_m_prev):
 
-		# Crank-Nicholson calculation procedure if heating/cooling system is active
+		# Crank-nicolson calculation procedure if heating/cooling system is active
 		# Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
 
-		# Step 1: Check if heating or cooling is needed
+		# Step 1: Check if heating or cooling is needed (Michael: check isn't needed, is in calling function)
 		#Set heating/cooling to 0
 		phi_hc_nd_0 = 0
 		#Calculate the air temperature with no heating/cooling
-		theta_air_0=self.calc_temperatures_crank_nicholson(phi_hc_nd_0, phi_int, phi_sol, theta_e, theta_m_prev)[1] #This is more stable
+		theta_air_0=self.calc_temperatures_crank_nicolson(phi_hc_nd_0, phi_int, phi_sol, theta_e, theta_m_prev)[1] #This is more stable
 		#theta_air_0 = self.theta_air #This should return the same value
 
 
@@ -369,11 +373,11 @@ class Building(object):
 		else:
 			print "error heating function has been called even though no heating is required"
 
-		#Set a heating case where the heating load is 10x the floor area
+		#Set a heating case where the heating load is 10x the floor area (10 W/m2)
 		phi_hc_nd_10 = 10 * self.A_f
 
-		#Calculate the air temperature obtained by having this 10x setpoint
-		theta_air_10=self.calc_temperatures_crank_nicholson(phi_hc_nd_10, phi_int, phi_sol, theta_e, theta_m_prev)[1]
+		#Calculate the air temperature obtained by having this 10 W/m2 setpoint
+		theta_air_10=self.calc_temperatures_crank_nicolson(phi_hc_nd_10, phi_int, phi_sol, theta_e, theta_m_prev)[1]
 		#theta_air_10 = self.theta_air
 
 		#Determine the unrestricted heating/cooling off the building
@@ -403,7 +407,7 @@ class Building(object):
 
 
 		# calculate system temperatures for Step 3/Step 4
-		temp_ac = self.calc_temperatures_crank_nicholson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
+		temp_ac = self.calc_temperatures_crank_nicolson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
 
 		# theta_m_t_ac = temp_ac[0]
 		# theta_air_ac = temp_ac[1]  # should be the same as theta_air_set in the first case
@@ -431,7 +435,7 @@ class Building(object):
 			# calculate temperatures of building R-C-model and exit
 			# --> rc_model_function_1(...)
 			self.phi_hc_nd_ac=0
-			self.calc_temperatures_crank_nicholson( self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
+			self.calc_temperatures_crank_nicolson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
 			self.heatingElectricity=0
 			self.coolingElectricity=0
 
@@ -441,10 +445,10 @@ class Building(object):
 
 			# has heating/cooling demand
 			
-			self.calc_phi_hc_ac(phi_int, phi_sol, theta_e, theta_m_prev)
+			self.calc_phi_hc_ac(phi_int, phi_sol, theta_e, theta_m_prev)  # Calculates phi_hc_nd_ac used below
 
 
-			##Calculate the Electricty Required
+			##Calculate the Heating/Cooling Input Energy Required
 
 			director = Director() #Initialise Heating System Manager
 
@@ -470,7 +474,7 @@ class Building(object):
 	def solve_building_lighting(self, ill, occupancy, probLighting=1):
 
 		#Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
-		Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_MaintenanceFactor*self.glass_light_transmitance)/self.A_f #[Lx]
+		Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_Maintenance_Factor*self.glass_light_transmittance)/self.A_f #[Lx]
 
 		if Lux < self.lighting_control and occupancy>0 and probLighting>0.1:
 			self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
