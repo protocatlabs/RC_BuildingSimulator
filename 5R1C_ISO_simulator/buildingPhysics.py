@@ -6,10 +6,11 @@ EN-13970
 """
 
 import numpy as np
-from buildingSystem import * #Import Building System
+from supplySystem import * #Import Supply System
+from emissionSystem import * #Import Emission System
 
 
-__author__ = "Prageeth Jayathissa"
+__authors__ = "Prageeth Jayathissa, Michael Fehr"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
 __credits__ = ["Gabriel Happle, Justin Zarb"]
 __license__ = "MIT"
@@ -84,10 +85,10 @@ INPUT PARAMETER DEFINITION
 	theta_int_c_set: Thermal cooling set point [C]
 	phi_c_max_A_f: Maximum cooling load. Set to -np.inf for unresctricted cooling [C]
 	phi_h_max_A_f: Maximum heating load. Set to no.inf for unrestricted heating [C]
-	heatingSystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. Direct heater 
+	heatingSupplySystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. Direct heater 
 		has no changes to the heating demand load, a resistive heater takes an efficiency into account, and a HeatPumpHeater
 		calculates a COP based on the outdoor and indoor temperature 
-	coolingSystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. DirectCooler
+	coolingSupplySystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. DirectCooler
 		has no changes to the cooling demand load, a HeatPumpCooler calculates a COP based on the outdoor and indoor temperature 
 	heatingEfficiency: Efficiency of the heating system (note for DirectHeater this is always 1)
 	coolingEfficiency: Efficiency of the cooling system (note for DirectCooler this is always 1)
@@ -119,10 +120,12 @@ class Building(object):
 		theta_int_c_set = 26.0,
 		phi_c_max_A_f=-20.0,
 		phi_h_max_A_f=20.0,
-		heatingSystem=DirectHeater,
-		coolingSystem=DirectCooler,
-		heatingEfficiency=1,
-		coolingEfficiency=1,
+		heatingSupplySystem=DirectHeater,
+		coolingSupplySystem=DirectCooler,
+       heatingEmissionSystem=,
+       coolingEmissionSystem=,
+#		heatingEfficiency=1,
+#		coolingEfficiency=1,
 
 		):
 		
@@ -171,26 +174,40 @@ class Building(object):
 		self.phi_h_max = phi_h_max_A_f*self.A_f #max heating load (W/m2)
 
 		#Building System Properties
-		self.heatingSystem=heatingSystem
-		self.coolingSystem=coolingSystem
-		self.heatingEfficiency=heatingEfficiency
-		self.coolingEfficiency=coolingEfficiency
+		self.heatingSupplySystem=heatingSupplySystem
+		self.coolingSupplySystem=coolingSupplySystem
+       self.heatingEmissionSystem=heatingEmissionSystem
+       self.coolingEmissionSystem=coolingEmissionSystem
+#		self.heatingEfficiency=heatingEfficiency
+#		self.coolingEfficiency=coolingEfficiency
         
         
         
         
 
 
-	def calc_heatflow(self,phi_int, phi_sol):
+	def calc_heatflow(self,theta_e, phi_int, phi_sol):
 		#C.1 - C.3 in [C.3 ISO 13790]
 
 		#Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3
+        
+        
+       emissionDirector = emissionDirector()
+       
+       emissionDirector.setBuilder(self.heatingEmissionSystem())
+       
+       
+       
+       director.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.heatingEfficiency))
+				system = director.calcSystem()
+				self.heatingElectricity=system.electricity
+				self.coolingElectricity=0
 
-		self.phi_ia=0.5*phi_int
+#		self.phi_ia=0.5*phi_int
 
-		self.phi_m=(self.A_m/self.A_t)*(0.5*phi_int+phi_sol)
+#		self.phi_m=(self.A_m/self.A_t)*(0.5*phi_int+phi_sol)
 
-		self.phi_st=(1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*phi_int+phi_sol)
+#		self.phi_st=(1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*phi_int+phi_sol)
 
 
 	def calc_theta_m_t(self, theta_m_prev):
@@ -204,7 +221,7 @@ class Building(object):
 
 
 
-	def calc_phi_m_tot(self, theta_e, phi_hc_nd):
+	def calc_phi_m_tot(self, theta_e):
 
 		# (C.5) in [C.3 ISO 13790]
 		# h_ve = h_ve_adj and theta_sup = theta_e [9.3.2 ISO 13790]
@@ -214,7 +231,7 @@ class Building(object):
 		theta_sup=theta_e #Supply air comes straight from the outside air
 
 		self.phi_m_tot = self.phi_m + self.h_tr_em*theta_e + \
-		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*(((self.phi_ia+phi_hc_nd)/self.h_ve_adj)+theta_sup))/self.h_tr_2
+		self.h_tr_3*(self.phi_st + self.h_tr_w*theta_e+self.h_tr_1*((self.phi_ia/self.h_ve_adj)+theta_sup))/self.h_tr_2
 
 		#print 'phi_m_tot =', self.phi_m_tot
 
@@ -257,7 +274,7 @@ class Building(object):
 
 
 
-	def calc_theta_s(self, theta_e, phi_hc_nd):
+	def calc_theta_s(self, theta_e):
 
 		# (C.10) in [C.3 ISO 13790]
 		# h_ve = h_ve_adj and theta_sup = theta_e [9.3.2 ISO 13790]
@@ -265,19 +282,19 @@ class Building(object):
 		#Calculate the temperature of the inside room surfaces
 		theta_sup=theta_e
 
-		self.theta_s = (self.h_tr_ms*self.theta_m+self.phi_st+self.h_tr_w*theta_e+self.h_tr_1*(theta_sup+(self.phi_ia+phi_hc_nd)/self.h_ve_adj)) / \
+		self.theta_s = (self.h_tr_ms*self.theta_m+self.phi_st+self.h_tr_w*theta_e+self.h_tr_1*(theta_sup+self.phi_ia/self.h_ve_adj)) / \
 				  (self.h_tr_ms+self.h_tr_w+self.h_tr_1)
 
 
 
-	def calc_theta_air(self, theta_e, phi_hc_nd):
+	def calc_theta_air(self, theta_e):
 		# (C.11) in [C.3 ISO 13790]
 		# h_ve = h_ve_adj and theta_sup = theta_e [9.3.2 ISO 13790]
 
 		theta_sup=theta_e
 
 		#Calculate the temperature of the inside air
-		self.theta_air = (self.h_tr_is * self.theta_s + self.h_ve_adj * theta_sup + self.phi_ia + phi_hc_nd) / (self.h_tr_is + self.h_ve_adj)
+		self.theta_air = (self.h_tr_is * self.theta_s + self.h_ve_adj * theta_sup + self.phi_ia) / (self.h_tr_is + self.h_ve_adj)
 
 
 	def calc_theta_op(self):
@@ -298,17 +315,17 @@ class Building(object):
 		
 
 
-		self.calc_heatflow(phi_int, phi_sol)
+		self.calc_heatflow(phi_int, phi_sol, phi_hc_nd)
 
-		self.calc_phi_m_tot(theta_e, phi_hc_nd)
+		self.calc_phi_m_tot(theta_e)
 
 		self.calc_theta_m_t(theta_m_prev)
 
 		self.calc_theta_m(theta_m_prev)
 
-		self.calc_theta_s(theta_e, phi_hc_nd)
+		self.calc_theta_s(theta_e)
 
-		self.calc_theta_air(theta_e, phi_hc_nd)
+		self.calc_theta_air(theta_e)
 
 		self.calc_theta_op()
 
@@ -453,13 +470,13 @@ class Building(object):
 			director = Director() #Initialise Heating System Manager
 
 			if self.has_heating_demand:
-				director.setBuilder(self.heatingSystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.heatingEfficiency))
+				director.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.heatingEfficiency))
 				system = director.calcSystem()
 				self.heatingElectricity=system.electricity
 				self.coolingElectricity=0
 
 			elif self.has_cooling_demand:
-				director.setBuilder(self.coolingSystem(Load=self.phi_hc_nd_ac*-1, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.coolingEfficiency))
+				director.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*-1, theta_e=theta_e,theta_m_prev=theta_m_prev,efficiency=self.coolingEfficiency))
 				system = director.calcSystem()
 				self.coolingElectricity=system.electricity
 				self.heatingElectricity=0
