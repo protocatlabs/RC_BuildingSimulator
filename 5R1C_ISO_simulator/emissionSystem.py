@@ -36,11 +36,11 @@ class emissionDirector:
         self.__builder = builder
 
     # Calcs the energy load of that system. This is the main() fu
-    def calcSystem(self):
+    def calcFlows(self):
 
         # Director asks the builder to produce the system body. self.__builder is an instance of the class
 
-        body = self.__builder.calcLoads()
+        body = self.__builder.heatFlows()
 
         return body
 
@@ -53,10 +53,11 @@ class emissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, theta_e, phi_int, phi_sol):
+    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd):
       self.theta_e = theta_e   #Outdoor Air Temperature
       self.phi_int = phi_int
       self.phi_sol = phi_sol
+      self.phi_hc_nd_ac = phi_hc_nd
 
     def heatFlows(self): pass
 
@@ -65,69 +66,77 @@ class emissionBuilder:
 
 
 class OldRadiators(emissionBuilder):
-    #The direct heater outputs the raw energy demand. No modifications are made
+    #Old building with radiators and high supply temperature
 
     def heatFlows(self):
-        flows = System()
-        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd_ac)
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd_ac)+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd_ac)+self.phi_sol)
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
         flows.supplyTemperature = 44.67 - 1.23*self.theta_e
         return flows
 
 
 class NewRadiators(emissionBuilder):
-    #The direct cooler outputs the raw energy demand. No modificactons are made
+    #Newer building with radiators and medium supply temperature
 
-    def calcLoads(self):
-        heater = System()
-        heater.electricity = self.Load
-        return heater
+    def heatFlows(self):
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
+        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        return flows
 
 class ChilledBeams(emissionBuilder):
-    #The resistive heater converts electricty to heat with a set efficiency
+    #Chilled beams: identical to newRadiators but used for cooling 
 
-    def calcLoads(self):
-        heater = System()
-        heater.electricity = self.Load * self.efficiency
-        return heater
+    def heatFlows(self):
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
+        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        return flows
 
 
 class AirConditioning(emissionBuilder):
-    #The heat pump calculates a COP with an efficiency and outputs the electricty input requirement
+    #All heat is given to the air via an AC-unit. HC input via the air node as in the ISO standard.
+    #supplyTemperature as with new radiators (assumption)
 
-    def calcLoads(self):
-        heater= System()
-        heater.COP=self.efficiency*((self.theta_m_prev+273.0)/(self.theta_m_prev-self.theta_e))
-        if heater.COP<=0:
-            heater.COP=self.efficiency*100 #TODO: This is a quick hackaround of the actual system!!! FIX!!!!
-        heater.electricity=self.Load/heater.COP
-        return heater
+    def heatFlows(self):
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*self.phi_int+self.phi_hc_nd
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
+        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        return flows
+    
 
 class FloorHeating(emissionBuilder):
-    #The heat pump calculates a COP with an efficiency and outputs the electricty input requirement
+    #All HC energy goes into the surface node, supplyTemperature low
 
-    def calcLoads(self):
-        cooler=System()
-        cooler.COP=self.efficiency*((self.theta_m_prev+273.0)/(self.theta_e-self.theta_m_prev))
-        if cooler.COP<=0: #TODO: This is a quick hackaround of the actual system!!! FIX!!!!
-            cooler.COP=self.efficiency*100
-        cooler.electricity=self.Load/cooler.COP
-        return cooler
+    def heatFlows(self):
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*self.phi_int
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
+        flows.supplyTemperature = 32.0 - 0.6*self.theta_e
+        return flows
 
 class TABS(emissionBuilder):
-    #The heat pump calculates a COP with an efficiency and outputs the electricty input requirement
+    #Thermally activated Building systems. HC energy input into bulk node. Supply Temperature low.
 
-    def calcLoads(self):
-        cooler=System()
-        cooler.COP=self.efficiency*((self.theta_m_prev+273.0)/(self.theta_e-self.theta_m_prev))
-        if cooler.COP<=0: #TODO: This is a quick hackaround of the actual system!!! FIX!!!!
-            cooler.COP=self.efficiency*100
-        cooler.electricity=self.Load/cooler.COP
-        return cooler
+    def heatFlows(self):
+        flows = EmissionOut()
+        flows.phi_ia = 0.5*self.phi_int
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
+        flows.supplyTemperature = 32.0 - 0.6*self.theta_e
+        return flows
 
 
-class System:
+class EmissionOut:
     #The System class which is used to output the final results
 
     phi_ia= None
