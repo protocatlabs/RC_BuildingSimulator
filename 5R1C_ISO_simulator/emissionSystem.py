@@ -20,18 +20,18 @@ __status__ = "Production"
 
 
 """
-Model of different EMISSION systems. New EMISSION Systems can be introduced by adding new classes
+Model of different Emission systems. New Emission Systems can be introduced by adding new classes
 """
 
-class emissionDirector:
+class EmissionDirector:
 
     """
-    The director sets what EMISSION system is being used, and runs that set EMISSION system
+    The director sets what Emission system is being used, and runs that set Emission system
     """
 
     __builder = None
 
-    #Sets what EMISSION system is used
+    #Sets what Emission system is used
     def setBuilder(self, builder):
         self.__builder = builder
 
@@ -48,7 +48,7 @@ class emissionDirector:
 
 
 
-class emissionBuilder:
+class EmissionBuilder:
 
     """ The base class in which systems are built from
     """
@@ -65,7 +65,7 @@ class emissionBuilder:
 
 
 
-class OldRadiators(emissionBuilder):
+class OldRadiators(EmissionBuilder):
     #Old building with radiators and high supply temperature
 
     def heatFlows(self):
@@ -77,7 +77,7 @@ class OldRadiators(emissionBuilder):
         return flows
 
 
-class NewRadiators(emissionBuilder):
+class NewRadiators(EmissionBuilder):
     #Newer building with radiators and medium supply temperature
 
     def heatFlows(self):
@@ -88,7 +88,7 @@ class NewRadiators(emissionBuilder):
         flows.supplyTemperature = 36.0 - 0.8*self.theta_e
         return flows
 
-class ChilledBeams(emissionBuilder):
+class ChilledBeams(EmissionBuilder):
     #Chilled beams: identical to newRadiators but used for cooling 
 
     def heatFlows(self):
@@ -100,7 +100,7 @@ class ChilledBeams(emissionBuilder):
         return flows
 
 
-class AirConditioning(emissionBuilder):
+class AirConditioning(EmissionBuilder):
     #All heat is given to the air via an AC-unit. HC input via the air node as in the ISO standard.
     #supplyTemperature as with new radiators (assumption)
 
@@ -113,7 +113,7 @@ class AirConditioning(emissionBuilder):
         return flows
     
 
-class FloorHeating(emissionBuilder):
+class FloorHeating(EmissionBuilder):
     #All HC energy goes into the surface node, supplyTemperature low
 
     def heatFlows(self):
@@ -124,7 +124,7 @@ class FloorHeating(emissionBuilder):
         flows.supplyTemperature = 32.0 - 0.6*self.theta_e
         return flows
 
-class TABS(emissionBuilder):
+class TABS(EmissionBuilder):
     #Thermally activated Building systems. HC energy input into bulk node. Supply Temperature low.
 
     def heatFlows(self):

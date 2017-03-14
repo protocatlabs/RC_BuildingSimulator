@@ -6,8 +6,8 @@ EN-13970
 """
 
 import numpy as np
-from supplySystem import supplyDirector
-#from supplySystem import *
+#from SupplySystem import SupplyDirector
+from supplySystem import *
 from emissionSystem import * 
 
 
@@ -58,7 +58,7 @@ VARIABLE DEFINITION
     phi_m: Combination of internal and solar gains directly to the medium [W]
     phi_st: combination of internal and solar gains directly to the internal surface [W]
     phi_ia: combination of internal and solar gains to the air [W]
-    phi_hc_nd: Heating and Cooling of the supply air [W]
+    phi_hc_nd: Heating and Cooling of the Supply air [W]
 
     h_tr_1: combined heat conductance, see function for definition [W/K]
     h_tr_2: combined heat conductance, see function for definition [W/K]
@@ -193,17 +193,17 @@ class Building(object):
         #Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3
         
         
-       emissionDirector = emissionDirector()
+       EmissionDirector = EmissionDirector()
        #Emission System Director is called to action (setBuilder and calcFlows available)
        
-       emissionDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd))  #heatingEmissionSystem chosen
+       EmissionDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd))  #heatingEmissionSystem chosen
        
-       flows = emissionDirector.calcFlows()
+       flows = EmissionDirector.calcFlows()
        
        self.phi_ia = flows.phi_ia 
        self.phi_st = flows.phi_st 
        self.phi_m = flows.phi_m 
-       self.supplyTemperature = flows.supplyTemperature
+       self.SupplyTemperature = flows.SupplyTemperature
        
        
        
@@ -481,21 +481,21 @@ class Building(object):
 
             ##Calculate the Heating/Cooling Input Energy Required
 
-            supplyDirector = supplyDirector() #Initialise Heating System Manager
+            SupplyDirector = SupplyDirector() #Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supplyDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))  
-                supplyOut = supplyDirector.calcSystem()
-                self.heatingEnergy=supplyOut.energyIn
-                self.electricityOut=supplyOut.electricityOut
+                SupplyDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))  
+                SupplyOut = SupplyDirector.calcSystem()
+                self.heatingEnergy=SupplyOut.energyIn
+                self.electricityOut=SupplyOut.electricityOut
                 self.coolingEnergy=0
 
             elif self.has_cooling_demand:
-                supplyDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))
-                supplyOut = supplyDirector.calcSystem()
+                SupplyDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))
+                SupplyOut = SupplyDirector.calcSystem()
                 self.heatingEnergy=0
-                self.electricityOut=supplyOut.electricityOut
-                self.coolingEnergy=supplyOut.energyIn
+                self.electricityOut=SupplyOut.electricityOut
+                self.coolingEnergy=SupplyOut.energyIn
 
 
             

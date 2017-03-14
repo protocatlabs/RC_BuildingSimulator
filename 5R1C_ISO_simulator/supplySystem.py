@@ -21,13 +21,13 @@ __status__ = "Production"
 
 
 """
-Model of different SUPPLY systems. New SUPPLY Systems can be introduced by adding new classes
+Model of different Supply systems. New Supply Systems can be introduced by adding new classes
 """
 
-class supplyDirector:
+class SupplyDirector:
     
     """
-    The director sets what SUPPLY system is being used, and runs that set SUPPLY system
+    The director sets what Supply system is being used, and runs that set Supply system
     """
 
     __builder = None
@@ -47,16 +47,16 @@ class supplyDirector:
         return body 
 
 
-class supplyBuilder:
+class SupplyBuilder:
 
-    """ The base class in which supply systems are built from 
+    """ The base class in which Supply systems are built from 
     """
 
-    def __init__(self, Load, theta_e, theta_m, supplyTemperature):
+    def __init__(self, Load, theta_e, theta_m, SupplyTemperature):
         self.Load=Load #Energy Demand of the building at that time step
         self.theta_e=theta_e #Outdoor Air Temperature
         self.theta_m=theta_m #Room Temperature at that timestep
-        self.supplyTemperature = supplyTemperature # Temperature required by the emission system
+        self.SupplyTemperature = SupplyTemperature # Temperature required by the emission system
         
 
 
@@ -64,7 +64,7 @@ class supplyBuilder:
 #    def calcCoolingLoads(self): pass
 
 
-class OilBoilerOld(supplyBuilder):
+class OilBoilerOld(SupplyBuilder):
     #Old oil boiler with fuel efficiency of 63 percent (medium of range in report of semester project M. Fehr)
     #No condensation, pilot light
 
@@ -75,7 +75,7 @@ class OilBoilerOld(supplyBuilder):
         return heater
 
 
-class OilBoilerMed(supplyBuilder):
+class OilBoilerMed(SupplyBuilder):
     #Classic oil boiler with fuel efficiency of 82 percent (medium of range in report of semester project M. Fehr)
     #No condensation, but better nozzles etc.
     
@@ -86,7 +86,7 @@ class OilBoilerMed(supplyBuilder):
         return heater
 
 
-class OilBoilerNew(supplyBuilder):
+class OilBoilerNew(SupplyBuilder):
     #New oil boiler with fuel efficiency of 98 percent (value from report of semester project M. Fehr)
     #Condensation boiler, latest generation
 
@@ -97,54 +97,54 @@ class OilBoilerNew(supplyBuilder):
         return heater
 
 
-class HeatPumpAir(supplyBuilder):
+class HeatPumpAir(SupplyBuilder):
     #Air-Water heat pump. epsilon_carnot = 0.4. Outside Temperature as reservoir temperature.
 
     def calcLoads(self):
         if self.Load > 0:                                   #Heating
             heater = SupplyOut()
-            heater.energyIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.supplyTemperature-self.theta_e))
+            heater.energyIn = self.Load/(0.4*(self.SupplyTemperature+273)/(self.SupplyTemperature-self.theta_e))
             heater.electricityOut = 0
         else:                                               #Cooling
             heater = SupplyOut()
-            heater.energyIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.theta_e-self.supplyTemperature))
+            heater.energyIn = self.Load/(0.4*(self.SupplyTemperature+273)/(self.theta_e-self.SupplyTemperature))
             heater.electricityOut = 0
         return heater
 
 
-class HeatPumpWater(supplyBuilder):
+class HeatPumpWater(SupplyBuilder):
     #Water-Water heat pump. epsilon_carnot = 0.5. Reservoir temperatures 7 degC (winter) and 12 degC (summer).
 
     def calcLoads(self):
         heater = SupplyOut()
         if self.Load > 0:                                   #Heating
-            heater.energyIn = self.Load/(0.5*(self.supplyTemperature+273)/(self.supplyTemperature-7))
+            heater.energyIn = self.Load/(0.5*(self.SupplyTemperature+273)/(self.SupplyTemperature-7))
         else:                                               #Cooling 
-            if self.supplyTemperature > 12:                 #Only by pumping 
+            if self.SupplyTemperature > 12:                 #Only by pumping 
                 heater.energyIn = self.Load*0.1
             else:                                           #Heat Pump active
-                heater.energyIn = self.Load/(0.5*(self.supplyTemperature+273)/(12-self.supplyTemperature))
+                heater.energyIn = self.Load/(0.5*(self.SupplyTemperature+273)/(12-self.SupplyTemperature))
         heater.electricityOut = 0
         return heater
 
 
-class HeatPumpGround(supplyBuilder):
+class HeatPumpGround(SupplyBuilder):
     #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
 
     def calcLoads(self):
         heater = SupplyOut()
         if self.Load > 0:                                   #Heating
-            heater.energyIn = self.Load/(0.45*(self.supplyTemperature+273)/(self.supplyTemperature-7))
+            heater.energyIn = self.Load/(0.45*(self.SupplyTemperature+273)/(self.SupplyTemperature-7))
         else:                                               #Cooling 
-            if self.supplyTemperature > 12:                 #Only by pumping 
+            if self.SupplyTemperature > 12:                 #Only by pumping 
                 heater.energyIn = self.Load*0.1
             else:                                           #Heat Pump active
-                heater.energyIn = self.Load/(0.45*(self.supplyTemperature+273)/(12-self.supplyTemperature))
+                heater.energyIn = self.Load/(0.45*(self.SupplyTemperature+273)/(12-self.SupplyTemperature))
         heater.electricityOut = 0
         return heater
 
 
-class ElectricHeating(supplyBuilder):
+class ElectricHeating(SupplyBuilder):
     #Straight forward electric heating. 100 percent conversion to heat.
     
     def calcLoads(self):
@@ -155,7 +155,7 @@ class ElectricHeating(supplyBuilder):
     
 
 
-class CHP(supplyBuilder):
+class CHP(SupplyBuilder):
     #Combined heat and power unit with 60 percent thermal and 33 percent electrical fuel conversion.
     
     def calcLoads(self):
