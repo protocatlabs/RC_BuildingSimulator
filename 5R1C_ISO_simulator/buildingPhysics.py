@@ -6,8 +6,9 @@ EN-13970
 """
 
 import numpy as np
-from supplySystem import * #Import Supply System
-from emissionSystem import * #Import Emission System
+from supplySystem import supplyDirector
+#from supplySystem import *
+from emissionSystem import * 
 
 
 __authors__ = "Prageeth Jayathissa, Michael Fehr"
@@ -120,10 +121,10 @@ class Building(object):
         theta_int_c_set = 26.0,
         phi_c_max_A_f=-20.0,
         phi_h_max_A_f=20.0,
-        heatingSupplySystem=DirectHeater,
-        coolingSupplySystem=DirectCooler,
-       heatingEmissionSystem=,
-       coolingEmissionSystem=,
+        heatingSupplySystem=OilBoilerMed,
+        coolingSupplySystem=HeatPumpAir,
+        heatingEmissionSystem=NewRadiators,
+        coolingEmissionSystem=AirConditioning,
 #        heatingEfficiency=1,
 #        coolingEfficiency=1,
 
@@ -176,8 +177,8 @@ class Building(object):
         #Building System Properties
         self.heatingSupplySystem=heatingSupplySystem
         self.coolingSupplySystem=coolingSupplySystem
-       self.heatingEmissionSystem=heatingEmissionSystem
-       self.coolingEmissionSystem=coolingEmissionSystem
+        self.heatingEmissionSystem=heatingEmissionSystem
+        self.coolingEmissionSystem=coolingEmissionSystem
 #        self.heatingEfficiency=heatingEfficiency
 #        self.coolingEfficiency=coolingEfficiency
         
@@ -192,7 +193,8 @@ class Building(object):
         #Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3
         
         
-       emissionDirector = emissionDirector()    #Emission System Director is called to action (setBuilder and calcFlows available)
+       emissionDirector = emissionDirector()
+       #Emission System Director is called to action (setBuilder and calcFlows available)
        
        emissionDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd))  #heatingEmissionSystem chosen
        
@@ -475,23 +477,25 @@ class Building(object):
   
             self.calc_temperatures_crank_nicolson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)[1]  
             #calculates the actual theta_m resulting from the actual heating demand (phi_hc_nd_ac)
-
+            
 
             ##Calculate the Heating/Cooling Input Energy Required
 
-            director = Director() #Initialise Heating System Manager
+            supplyDirector = supplyDirector() #Initialise Heating System Manager
 
             if self.has_heating_demand:
-                director.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))  
-                system = director.calcSystem()
-                self.heatingElectricity=system.electricity
-                self.coolingElectricity=0
+                supplyDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))  
+                supplyOut = supplyDirector.calcSystem()
+                self.heatingEnergy=supplyOut.energyIn
+                self.electricityOut=supplyOut.electricityOut
+                self.coolingEnergy=0
 
             elif self.has_cooling_demand:
-                director.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))
-                system = director.calcSystem()
-                self.coolingElectricity=system.electricity
-                self.heatingElectricity=0
+                supplyDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))
+                supplyOut = supplyDirector.calcSystem()
+                self.heatingEnergy=0
+                self.electricityOut=supplyOut.electricityOut
+                self.coolingEnergy=supplyOut.energyIn
 
 
             

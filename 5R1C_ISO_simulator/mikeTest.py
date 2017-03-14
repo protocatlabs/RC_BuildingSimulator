@@ -5,9 +5,11 @@ EN-13970
 =========================================
 """
 
+import pandas as pd
 import numpy as np
 from buildingPhysics import Building #Importing Building Class
 from epwreader import epw_reader #Weather file reader
+from sunPositionReader import SunPosition_reader
 
 
 __author__ = "Prageeth Jayathissa"
@@ -22,7 +24,7 @@ __status__ = "Production"
 
 
 
-#Example Inpiuts
+#Example Inputs
 theta_e=10
 theta_m_prev=22
 phi_int=10 #Internal heat gains, in Watts
@@ -33,6 +35,26 @@ occupancy = 0.1 #Occupancy for the timestep [people/hour/square_meter]
 
 #Initialise an instance of the building. Empty brackets take on the default parameters. See buildingPhysics.py to see the default values
 Office=Building()
+
+HeatingDemand = []
+CoolingDemand = []
+ElectricityOut = []
+
+test = SunPosition_reader('SunPosition.csv')
+
+
+#for i in range(8760):
+#    phi_int = 
+#    
+#    Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+#    theta_m_prev = Office.theta_m_t
+
+
+
+
+
+
+
 
 
 #Test for epw reader
