@@ -120,7 +120,7 @@ class Building(object):
         theta_int_h_set = 20.0,
         theta_int_c_set = 26.0,
         phi_c_max_A_f=-20.0,
-        phi_h_max_A_f=20.0,
+        phi_h_max_A_f=40.0,
         heatingSupplySystem=OilBoilerMed,
         coolingSupplySystem=HeatPumpAir,
         heatingEmissionSystem=NewRadiators,
@@ -484,14 +484,14 @@ class Building(object):
             supDirector = SupplyDirector() #Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))  
+                supDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))  
                 supplyOut = supDirector.calcSystem()
                 self.heatingEnergy=supplyOut.energyIn
                 self.electricityOut=supplyOut.electricityOut
                 self.coolingEnergy=0
 
             elif self.has_cooling_demand:
-                supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))
+                supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))
                 supplyOut = supDirector.calcSystem()
                 self.heatingEnergy=0
                 self.electricityOut=supplyOut.electricityOut
