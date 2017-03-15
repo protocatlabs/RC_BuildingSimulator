@@ -53,11 +53,14 @@ class EmissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd):
+    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd, A_m, A_t, h_tr_w):
       self.theta_e = theta_e   #Outdoor Air Temperature
       self.phi_int = phi_int
       self.phi_sol = phi_sol
-      self.phi_hc_nd_ac = phi_hc_nd
+      self.phi_hc_nd = phi_hc_nd
+      self.A_m = A_m
+      self.A_t = A_t
+      self.h_tr_w = h_tr_w
 
     def heatFlows(self): pass
 

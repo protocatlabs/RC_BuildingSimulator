@@ -193,17 +193,17 @@ class Building(object):
         #Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3
         
         
-       EmissionDirector = EmissionDirector()
+       emDirector = EmissionDirector()
        #Emission System Director is called to action (setBuilder and calcFlows available)
        
-       EmissionDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd))  #heatingEmissionSystem chosen
+       emDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd, A_m=self.A_m, A_t=self.A_t, h_tr_w=self.h_tr_w))  #heatingEmissionSystem chosen
        
-       flows = EmissionDirector.calcFlows()
+       flows = emDirector.calcFlows()
        
        self.phi_ia = flows.phi_ia 
        self.phi_st = flows.phi_st 
        self.phi_m = flows.phi_m 
-       self.SupplyTemperature = flows.SupplyTemperature
+       self.supplyTemperature = flows.supplyTemperature
        
        
        
@@ -481,21 +481,21 @@ class Building(object):
 
             ##Calculate the Heating/Cooling Input Energy Required
 
-            SupplyDirector = SupplyDirector() #Initialise Heating System Manager
+            supDirector = SupplyDirector() #Initialise Heating System Manager
 
             if self.has_heating_demand:
-                SupplyDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))  
-                SupplyOut = SupplyDirector.calcSystem()
-                self.heatingEnergy=SupplyOut.energyIn
-                self.electricityOut=SupplyOut.electricityOut
+                supDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e,theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))  
+                supplyOut = supDirector.calcSystem()
+                self.heatingEnergy=supplyOut.energyIn
+                self.electricityOut=supplyOut.electricityOut
                 self.coolingEnergy=0
 
             elif self.has_cooling_demand:
-                SupplyDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))
-                SupplyOut = SupplyDirector.calcSystem()
+                supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, SupplyTemperature=self.SupplyTemperature))
+                supplyOut = supDirector.calcSystem()
                 self.heatingEnergy=0
-                self.electricityOut=SupplyOut.electricityOut
-                self.coolingEnergy=SupplyOut.energyIn
+                self.electricityOut=supplyOut.electricityOut
+                self.coolingEnergy=supplyOut.energyIn
 
 
             

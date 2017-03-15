@@ -40,7 +40,7 @@ HeatingDemand = []
 CoolingDemand = []
 ElectricityOut = []
 
-test = SunPosition_reader('SunPosition.csv')
+#test = SunPosition_reader('SunPosition.csv')
 
 
 #for i in range(8760):
@@ -51,33 +51,35 @@ test = SunPosition_reader('SunPosition.csv')
 
 
 
+test = pd.read_csv('SunPosition.csv', skiprows=1)
 
+#print test.iat[1,1]
 
-
+print test
 
 
 
 #Test for epw reader
-print epw_reader('Zurich-Kloten_2013.epw')['hour'][34]
+#print epw_reader('Zurich-Kloten_2013.epw')['hour'][34]
 
 
 #Solve for building energy
-Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+#Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
 
 #Solve for building lighting
-Office.solve_building_lighting(ill, occupancy)
+#Office.solve_building_lighting(ill, occupancy)
 
 
-print Office.theta_m #Printing Room Temperature of the medium
-print Office.lighting_demand #Print Lighting Demand
-print Office.phi_hc_nd_ac #Print heating/cooling loads
-
-#Example of how to change the set point temperature after running a simulation
-Office.theta_int_h_set = 20.0
-
-#Solve again for the new set point temperature
-Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
-
-print Office.theta_m #Print the new internal temperature
-
-print Office.has_heating_demand #Print a boolean of whether there is a heating demand
+#print Office.theta_m #Printing Room Temperature of the medium
+#print Office.lighting_demand #Print Lighting Demand
+#print Office.phi_hc_nd_ac #Print heating/cooling loads
+#
+##Example of how to change the set point temperature after running a simulation
+#Office.theta_int_h_set = 20.0
+#
+##Solve again for the new set point temperature
+#Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+#
+#print Office.theta_m #Print the new internal temperature
+#
+#print Office.has_heating_demand #Print a boolean of whether there is a heating demand
