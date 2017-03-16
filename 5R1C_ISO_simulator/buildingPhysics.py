@@ -145,7 +145,7 @@ class Building(object):
         self.Lighting_Utilisation_Factor=Lighting_Utilisation_Factor #How the light entering the window is transmitted to the working plane
         self.Lighting_Maintenance_Factor= Lighting_Maintenance_Factor #How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
 
-        #Calculated Propoerties
+        #Calculated Properties
         self.A_f=Room_Depth*Room_Width #[m2] Floor Area
         self.A_m=self.A_f* 2.5 #[m2] Effective Mass Area assuming a medium weight building #12.3.1.2
         self.Room_Vol=Room_Width*Room_Depth*Room_Height #[m3] Room Volume
@@ -155,7 +155,7 @@ class Building(object):
         #Single Capacitance  5 conductance Model Parameters
         self.c_m=c_m_A_f*self.A_f #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
         self.h_tr_em = U_em*(Room_Height*Room_Width-Fenst_A) #Conductance of opaque surfaces to exterior [W/K]
-        self.h_tr_w =     U_w*Fenst_A  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
+        self.h_tr_w = U_w*Fenst_A  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
         
         #Determine the ventilation conductance
         ACH_tot=ACH_infl+ACH_vent #Total Air Changes Per Hour

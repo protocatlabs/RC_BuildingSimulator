@@ -10,7 +10,10 @@ import numpy as np
 from buildingPhysics import Building #Importing Building Class
 from epwreader import epw_reader #Weather file reader
 from sunPositionReader import SunPosition_reader
+import matplotlib.pyplot as mp
 
+from supplySystem import *
+from emissionSystem import *
 
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -34,7 +37,11 @@ __status__ = "Production"
 
 
 #Initialise an instance of the building. Empty brackets take on the default parameters. See buildingPhysics.py to see the default values
-Office=Building()
+Office=Building(
+    heatingSupplySystem=OilBoilerMed,
+    coolingSupplySystem=HeatPumpAir,
+    heatingEmissionSystem=NewRadiators,
+    coolingEmissionSystem=AirConditioning,)
 
 A_floor = Office.Room_Width*Office.Room_Depth
 A_person = 21.0                #Area per office worker
@@ -79,9 +86,11 @@ for hour in range(8760):
     IndoorAir.append(Office.theta_air)
         
         
-print HeatingDemand
+#print HeatingDemand
 
+t = range(4300,4600)
 
+mp.plot(t, HeatingDemand[4300:4600])
 
 #epw_reader('Zurich-Kloten_2013.epw')['hour'][34]
 #
