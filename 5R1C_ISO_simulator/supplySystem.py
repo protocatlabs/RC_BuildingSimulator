@@ -164,6 +164,25 @@ class CHP(SupplyBuilder):
         heater.electricityOut = heater.energyIn*0.33
         return heater
 
+class DirectHeater(SupplyBuilder):
+    #Created by PJ to check accuracy against previous simulation
+    
+    def calcLoads(self):
+        heater=SupplyOut()
+        heater.energyIn = self.Load
+        heater.electricityOut = 0
+        return heater
+
+class DirectCooler(SupplyBuilder):
+    #Created by PJ to check accuracy against previous simulation
+    
+    def calcLoads(self):
+        heater=SupplyOut()
+        heater.energyIn = self.Load
+        heater.electricityOut = 0
+        return heater
+
+
 
 class SupplyOut:
     #The System class which is used to output the final results
