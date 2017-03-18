@@ -84,13 +84,14 @@ for hour in range(8760):
     CoolingDemand.append(Office.coolingEnergy)
     ElectricityOut.append(Office.electricityOut)
     IndoorAir.append(Office.theta_air)
-        
-        
-#print HeatingDemand
+    
+    
+    
+    
 
-t = range(4300,4600)
+t = range(4300,4400)
 
-mp.plot(t, HeatingDemand[4300:4600])
+mp.plot(HeatingDemand)
 
 #epw_reader('Zurich-Kloten_2013.epw')['hour'][34]
 #

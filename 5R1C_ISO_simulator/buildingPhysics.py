@@ -464,8 +464,9 @@ class Building(object):
             # --> rc_model_function_1(...)
             self.phi_hc_nd_ac=0
             self.calc_temperatures_crank_nicolson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
-            self.heatingElectricity=0
-            self.coolingElectricity=0
+            self.heatingEnergy=0
+            self.coolingEnergy=0
+            self.electricityOut=0
 
            
 
