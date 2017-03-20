@@ -52,11 +52,10 @@ class SupplyBuilder:
     """ The base class in which Supply systems are built from 
     """
 
-    def __init__(self, Load, theta_e, theta_m, supplyTemperature):
-        self.Load=Load #Energy Demand of the building at that time step
-        self.theta_e=theta_e #Outdoor Air Temperature
-        self.theta_m=theta_m #Room Temperature at that timestep
-        self.supplyTemperature = supplyTemperature # Temperature required by the emission system
+    def __init__(self, Load, theta_e, supplyTemperature):
+        self.Load=Load                              #Energy Demand of the building at that time step
+        self.theta_e=theta_e                        #Outdoor Air Temperature
+        self.supplyTemperature = supplyTemperature  #Temperature required by the emission system
         
 
 
@@ -70,7 +69,8 @@ class OilBoilerOld(SupplyBuilder):
 
     def calcLoads(self):
         heater = SupplyOut()
-        heater.energyIn = self.Load/0.63
+        heater.fossilsIn = self.Load/0.63
+        heater.electricityIn = 0
         heater.electricityOut = 0
         return heater
 
@@ -81,7 +81,8 @@ class OilBoilerMed(SupplyBuilder):
     
     def calcLoads(self):
         heater = SupplyOut()
-        heater.energyIn = self.Load/0.82
+        heater.fossilsIn = self.Load/0.82
+        heater.electricityIn = 0
         heater.electricityOut = 0
         return heater
 
@@ -92,7 +93,8 @@ class OilBoilerNew(SupplyBuilder):
 
     def calcLoads(self):
         heater = SupplyOut()
-        heater.energyIn = self.Load/0.98
+        heater.fossilsIn = self.Load/0.98
+        heater.electricityIn = 0
         heater.electricityOut = 0
         return heater
 
@@ -101,14 +103,13 @@ class HeatPumpAir(SupplyBuilder):
     #Air-Water heat pump. epsilon_carnot = 0.4. Outside Temperature as reservoir temperature.
 
     def calcLoads(self):
+        heater = SupplyOut()
         if self.Load > 0:                                   #Heating
-            heater = SupplyOut()
-            heater.energyIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.supplyTemperature-self.theta_e))
-            heater.electricityOut = 0
+            heater.electricityIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.supplyTemperature-self.theta_e))
         else:                                               #Cooling
-            heater = SupplyOut()
-            heater.energyIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.theta_e-self.SupplyTemperature))
-            heater.electricityOut = 0
+            heater.electricityIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.theta_e-self.SupplyTemperature))
+        heater.fossilsIn = 0    
+        heater.electricityOut = 0
         return heater
 
 
@@ -118,12 +119,13 @@ class HeatPumpWater(SupplyBuilder):
     def calcLoads(self):
         heater = SupplyOut()
         if self.Load > 0:                                   #Heating
-            heater.energyIn = self.Load/(0.5*(self.supplyTemperature+273)/(self.supplyTemperature-7))
+            heater.electricityIn = self.Load/(0.5*(self.supplyTemperature+273)/(self.supplyTemperature-7))
         else:                                               #Cooling 
             if self.supplyTemperature > 12:                 #Only by pumping 
-                heater.energyIn = self.Load*0.1
+                heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
-                heater.energyIn = self.Load/(0.5*(self.supplyTemperature+273)/(12-self.supplyTemperature))
+                heater.electricityIn = self.Load/(0.5*(self.supplyTemperature+273)/(12-self.supplyTemperature))
+        heater.fossilsIn = 0
         heater.electricityOut = 0
         return heater
 
@@ -134,13 +136,14 @@ class HeatPumpGround(SupplyBuilder):
     def calcLoads(self):
         heater = SupplyOut()
         if self.Load > 0:                                   #Heating
-            heater.energyIn = self.Load/(0.45*(self.supplyTemperature+273)/(self.supplyTemperature-7))
+            heater.electricityIn = self.Load/(0.45*(self.supplyTemperature+273)/(self.supplyTemperature-7))
         else:                                               #Cooling 
             if self.supplyTemperature > 12:                 #Only by pumping 
-                heater.energyIn = self.Load*0.1
+                heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
-                heater.energyIn = self.Load/(0.45*(self.supplyTemperature+273)/(12-self.supplyTemperature))
+                heater.electricityIn = self.Load/(0.45*(self.supplyTemperature+273)/(12-self.supplyTemperature))
         heater.electricityOut = 0
+        heater.fossilsIn = 0
         return heater
 
 
@@ -149,7 +152,8 @@ class ElectricHeating(SupplyBuilder):
     
     def calcLoads(self):
         heater=SupplyOut()
-        heater.energyIn = self.Load
+        heater.electricityIn = self.Load
+        heater.fossilsIn = 0
         heater.electricityOut = 0
         return heater
     
@@ -160,25 +164,30 @@ class CHP(SupplyBuilder):
     
     def calcLoads(self):
         heater=SupplyOut()
-        heater.energyIn = self.Load/0.6
-        heater.electricityOut = heater.energyIn*0.33
+        heater.fossilsIn = self.Load/0.6
+        heater.electricityIn = 0
+        heater.electricityOut = heater.fossilsIn*0.33
         return heater
+
 
 class DirectHeater(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
     
     def calcLoads(self):
         heater=SupplyOut()
-        heater.energyIn = self.Load
+        heater.electricityIn = self.Load
+        heater.fossilsIn = 0
         heater.electricityOut = 0
         return heater
+
 
 class DirectCooler(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
     
     def calcLoads(self):
         heater=SupplyOut()
-        heater.energyIn = self.Load
+        heater.electricityIn = self.Load
+        heater.fossilsIn = 0
         heater.electricityOut = 0
         return heater
 
@@ -186,9 +195,9 @@ class DirectCooler(SupplyBuilder):
 
 class SupplyOut:
     #The System class which is used to output the final results
-    energyIn = None
+    fossilsIn = None
+    electricityIn = None
     electricityOut = None
-
 
 
 

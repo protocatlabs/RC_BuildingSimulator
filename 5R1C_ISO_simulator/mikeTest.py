@@ -115,6 +115,9 @@ mp.savefig("Heating.png", dpi=300)
 mp.show()
 
 
+#Energy sum of various systems
+
+
 #deg = u'\u2103'
 #
 #mp.figure(figsize=(15,5))
