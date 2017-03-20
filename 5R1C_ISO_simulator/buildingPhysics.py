@@ -182,8 +182,7 @@ class Building(object):
 #        self.heatingEfficiency=heatingEfficiency
 #        self.coolingEfficiency=coolingEfficiency
         
-        
-        
+
         
 
 
@@ -469,7 +468,7 @@ class Building(object):
             self.heatingSysElectricity=0     #Energy (in electricity) required by the supply system to provide HeatingDemand
             self.heatingSysFossils=0         #Energy (in fossil fuel) required by the supply system to provide HeatingDemand
             self.coolingSysElectricity=0     #Energy (in electricity) required by the supply system to get rid of CoolingDemand
-            self.coolingSysFossils           #Energy (in fossil fuel) required by the supply system to get rid of CoolingDemand
+            self.coolingSysFossils=0          #Energy (in fossil fuel) required by the supply system to get rid of CoolingDemand
             self.electricityOut=0            #Electricity produced by the supply system (e.g. CHP)
 
 
@@ -517,7 +516,7 @@ class Building(object):
     def solve_building_lighting(self, ill, occupancy, probLighting=1):
 
         #Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
-        Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_Maintenance_Factor*self.glass_light_transmittance)/self.A_f #[Lx]
+        Lux=(ill*self.Lighting_Utilisation_Factor*self.Lighting_Maintenance_Factor*self.glass_light_transmittance)/self.A_f #[Lux]
 
         if Lux < self.lighting_control and occupancy>0 and probLighting>0.1:
             self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
