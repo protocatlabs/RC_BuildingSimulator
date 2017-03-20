@@ -5,6 +5,7 @@ EN-13970
 =========================================
 """
 
+
 import pandas as pd
 import numpy as np
 from buildingPhysics import Building #Importing Building Class
@@ -40,7 +41,9 @@ Office=Building(
     heatingSupplySystem=OilBoilerMed,
     coolingSupplySystem=HeatPumpAir,
     heatingEmissionSystem=NewRadiators,
-    coolingEmissionSystem=AirConditioning,)
+    coolingEmissionSystem=AirConditioning,
+    phi_c_max_A_f=-100.0,
+    phi_h_max_A_f=100.0)
 
 A_floor = Office.Room_Width*Office.Room_Depth
 A_person = 21.0                #Area per office worker
@@ -48,10 +51,17 @@ maxPeople = A_floor/A_person   #Max occupancy in number of people
 maxIntGain = 23.3*A_floor      #Max internal gains from appliances and lighting
 maxPeopGain = 100*maxPeople    #Max internal gains from metabolic heat from workers (100 W/cap assumed)
 
-HeatingDemand = []
-CoolingDemand = []
+
+#%%
+
 ElectricityOut = []
+HeatingDemand = []      #Energy required by the zone
+HeatingInput = []       #Energy required by the supply system to provide HeatingDemand
+CoolingDemand = []      #Energy surplus of the zone
+CoolingInput = []       #Energy required by the supply system to get rid of CoolingDemand
 IndoorAir = []
+outTemp = []
+
 
 offOcc = pd.read_csv('schedules_el_OFFICE.csv')
 sunPos = pd.read_csv('SunPosition.csv', skiprows=1)
@@ -79,27 +89,54 @@ for hour in range(8760):
             ill = 0.5*weather['difhorillum_lux'][hour]
     Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
     theta_m_prev = Office.theta_m_t
-    HeatingDemand.append(Office.heatingEnergy)
-    CoolingDemand.append(Office.coolingEnergy)
+    HeatingDemand.append(Office.heatingDemand)
+    HeatingInput.append(Office.heatingEnergy)
+    CoolingDemand.append(Office.coolingDemand)
+    CoolingInput.append(Office.coolingEnergy)
     ElectricityOut.append(Office.electricityOut)
     IndoorAir.append(Office.theta_air)
+    outTemp.append(theta_e)
     
     
     
-    
+#%%
 
 #t = range(4300,4400)
 
-mp.plot(HeatingDemand)
+
+mp.figure(figsize=(15,5))
+mp.plot(HeatingDemand, color = (0.8,0.2,0.1))
+mp.plot(CoolingDemand, color = (0.1, 0.4, 0.8))
+mp.xlabel('Time (h)')
+mp.ylabel('Power (W)')
+mp.title('Zone Power Demand Over One Year (2013)')
+mp.grid(False)
+mp.savefig("Heating.png", dpi=300)
+mp.show()
+
+
+#deg = u'\u2103'
+#
+#mp.figure(figsize=(15,5))
+#mp.plot(outTemp, color = '0.4')
+#mp.xlabel('Time (h)')
+#mp.ylabel('Outdoor Temperature ('+deg+')')
+#mp.title('Outdoor Temperature Over One Year (2013)')
+#mp.grid(False)
+#mp.savefig("Temperature.png", dpi=300)
+#mp.show()
 
 
 
-
-
-
-
-
-
+#mp.figure(figsize=(15,6))
+#mp.plot(CoolingDemand, color = (0.1, 0.4, 0.8))
+#mp.xlabel('Time (h)')
+#mp.ylabel('Cooling Power (W)')
+#mp.title('Cooling Power Over One Year (2013)')
+#mp.grid(False)
+#mp.savefig("Cooling.png", dpi=300)
+#mp.show()
+#
 
 
 

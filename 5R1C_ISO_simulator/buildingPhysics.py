@@ -464,14 +464,12 @@ class Building(object):
             # --> rc_model_function_1(...)
             self.phi_hc_nd_ac=0
             self.calc_temperatures_crank_nicolson(self.phi_hc_nd_ac, phi_int, phi_sol, theta_e, theta_m_prev)
-            self.heatingEnergy=0
-            self.coolingEnergy=0
-<<<<<<< HEAD
-            self.electricityOut=0
-=======
->>>>>>> refs/remotes/origin/SP_michael
+            self.heatingDemand=0        #Energy required by the zone
+            self.coolingDemand=0        #Energy surplus of the zone   
+            self.heatingEnergy=0        #Energy required by the supply system to provide HeatingDemand
+            self.coolingEnergy=0        #Energy required by the supply system to get rid of CoolingDemand
+            self.electricityOut=0       #Electricity produced by the supply system (e.g. CHP)
 
-           
 
         else:
 
@@ -493,6 +491,8 @@ class Building(object):
                 self.heatingEnergy=supplyOut.energyIn
                 self.electricityOut=supplyOut.electricityOut
                 self.coolingEnergy=0
+                self.heatingDemand=self.phi_hc_nd_ac
+                self.coolingDemand=0
 
             elif self.has_cooling_demand:
                 supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, theta_m=self.theta_m, supplyTemperature=self.supplyTemperature))
@@ -500,7 +500,8 @@ class Building(object):
                 self.heatingEnergy=0
                 self.electricityOut=supplyOut.electricityOut
                 self.coolingEnergy=supplyOut.energyIn
-
+                self.heatingDemand=0
+                self.coolingDemand=self.phi_hc_nd_ac
 
             
 
