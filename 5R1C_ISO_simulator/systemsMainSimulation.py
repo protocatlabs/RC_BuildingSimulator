@@ -11,6 +11,10 @@ import numpy as np
 from buildingPhysics import Building #Importing Building Class
 from epwreader import epw_reader #Weather file reader
 import matplotlib.pyplot as mp
+import plotly.plotly as py
+import plotly.graph_objs as go
+#from matplotlib import rcParams
+#rcParams.update({'figure.autolayout': False})
 
 from supplySystem import *
 from emissionSystem import *
@@ -37,15 +41,24 @@ __status__ = "Production"
 
 #%%
 
-for supSys in [OilBoilerOld, OilBoilerMed, OilBoilerNew, HeatPumpAir, HeatPumpWater, HeatPumpGround, ElectricHeating, CHP]:
+
+fossilsSum = []
+electricitySum = []
+electricityCoolSum = []
+eOut = []
+
+supSystems = [OilBoilerOld, OilBoilerMed, OilBoilerNew, HeatPumpAir, HeatPumpWater, HeatPumpGround, ElectricHeating, CHP]
+emSystems = [OldRadiators, NewRadiators, ChilledBeams, AirConditioning, FloorHeating, TABS]
+
+for emSys in emSystems:
     
     
     #Initialise an instance of the building. Empty brackets take on the default parameters. See buildingPhysics.py to see the default values
     Office=Building(
-        heatingSupplySystem=OilBoilerMed,
+        heatingSupplySystem=HeatPumpAir,
         coolingSupplySystem=HeatPumpAir,
-        heatingEmissionSystem=NewRadiators,
-        coolingEmissionSystem=AirConditioning,
+        heatingEmissionSystem=emSys,
+        coolingEmissionSystem=emSys,
         phi_c_max_A_f=-100.0,
         phi_h_max_A_f=100.0)
     
@@ -66,6 +79,7 @@ for supSys in [OilBoilerOld, OilBoilerMed, OilBoilerNew, HeatPumpAir, HeatPumpWa
     CoolingElectricity = []         #Electricity required by the supply system to get rid of CoolingDemand
     IndoorAir = []
     outTemp = []
+
     
     
     offOcc = pd.read_csv('schedules_el_OFFICE.csv')
@@ -102,20 +116,99 @@ for supSys in [OilBoilerOld, OilBoilerMed, OilBoilerNew, HeatPumpAir, HeatPumpWa
         ElectricityOut.append(Office.electricityOut)
         IndoorAir.append(Office.theta_air)
         outTemp.append(theta_e)
+    
+    fossilsSum.append(np.sum(HeatingFossils))
+    electricitySum.append(np.sum(HeatingElectricity))
+    eOut.append(np.sum(ElectricityOut))
+    electricityCoolSum.append(np.sum(CoolingElectricity))
+
+#%%
 
 
-mp.figure(figsize=(15,5))
-mp.plot(HeatingDemand, color = (0.8,0.2,0.1))
-mp.plot(CoolingDemand, color = (0.1, 0.4, 0.8))
-mp.xlabel('Time (h)')
-mp.ylabel('Power (W)')
-mp.title('Zone Power Demand Over One Year (2013)')
-mp.grid(False)
-mp.savefig("Heating.png", dpi=300)
+#n = len(supSystems)
+#ind = range(n)
+#
+#eOutNegkWh = []
+#fossilsSumkWh = []
+#electricitySumkWh = []
+#names =[]
+#
+#for i in ind:
+#    eOutNegkWh.append(-eOut[i]/1000)
+#    fossilsSumkWh.append(fossilsSum[i]/1000)
+#    electricitySumkWh.append(electricitySum[i]/1000)
+#    names.append(supSystems[i].name)
+#
+#mp.figure(figsize=(7,7))
+# 
+#p1 = mp.bar(ind, fossilsSumkWh, color = (0.7, 0.4,0), edgecolor = 'k', width = 0.6)
+#p2 = mp.bar(ind, electricitySumkWh, color = (1, 0.9, 0.1), edgecolor = 'k', width = 0.6)
+#p3 = mp.bar(ind, eOutNegkWh, color = (0.5,0.9,0), edgecolor = 'k', width = 0.6)
+#
+#mp.ylabel('kWh/a')
+#mp.title('Supply System Yearly Energy Consumption')
+#mp.xticks(ind, names, rotation='vertical')
+#mp.yticks(np.arange(-2000, 7001, 1000))
+#mp.legend((p1[0], p2[0], p3[0]), ('Fossils Consumption', 'Electricity Consumption', 'Electricity Production'))
+#mp.ylim([-3000,7500])
+#mp.margins(0.05)
+#mp.axhline(0, color='k')
+#mp.tight_layout()
+#
+#mp.savefig('YearlySupSys.png', dpi=300)
+#
+#mp.show()
+
+
+#%%
+
+
+n = len(emSystems)
+ind = range(n)
+
+eOutNegkWh = []
+fossilsSumkWh = []
+electricitySumkWh = []
+electricityCoolSumkWh = []
+names =[]
+
+for i in ind:
+    eOutNegkWh.append(-eOut[i]/1000)
+    fossilsSumkWh.append(fossilsSum[i]/1000)
+    electricitySumkWh.append(electricitySum[i]/1000)
+    names.append(emSystems[i].name)
+    electricityCoolSumkWh.append(-electricityCoolSum[i]/1000)
+
+mp.figure(figsize=(5,7))
+ 
+p1 = mp.bar(ind, electricitySumkWh, color = (1, 0.8, 0.3), edgecolor = 'k', width = 0.6)
+p2 = mp.bar(ind, electricityCoolSumkWh, color =(0.3, 0.8, 1), edgecolor = 'k', width = 0.6)
+
+mp.ylabel('kWh/a')
+mp.title('Impact of the Emission System on Energy Consumption')
+mp.xticks(ind, names, rotation='vertical')
+mp.yticks(np.arange(0, 4001, 1000))
+mp.legend((p1[0], p2[0]), ('Heating', 'Cooling'))
+mp.ylim([-500,5000])
+mp.margins(0.1)
+mp.axhline(0, color='k', linewidth=0.5)
+mp.tight_layout()
+
+mp.savefig('YearlyEmSys.png', dpi=300)
+
 mp.show()
 
 
-#TODO Energy sum of various systems, maybe Name attribute in systems
+
+#mp.figure(figsize=(7,5))
+#mp.plot(HeatingDemand, color = (0.8,0.2,0.1))
+#mp.plot(CoolingDemand, color = (0.1, 0.4, 0.8))
+#mp.xlabel('Time (h)')
+#mp.ylabel('Power (W)')
+#mp.title('Heating Supply System Power Demand ' + supSys.name)
+#mp.grid(False)
+#mp.savefig(str(supSys)+'.png', dpi=300)
+#mp.show()
 
 
 #deg = u'\u2103'
@@ -140,21 +233,5 @@ mp.show()
 #mp.savefig("Cooling.png", dpi=300)
 #mp.show()
 #
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

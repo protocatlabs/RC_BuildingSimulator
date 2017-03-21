@@ -64,7 +64,7 @@ class EmissionBuilder:
 
     def heatFlows(self): pass
 
-
+    name = None
 
 
 
@@ -79,6 +79,7 @@ class OldRadiators(EmissionBuilder):
         flows.supplyTemperature = 44.67 - 1.23*self.theta_e
         return flows
 
+    name = 'Old Radiators'
 
 class NewRadiators(EmissionBuilder):
     #Newer building with radiators and medium supply temperature
@@ -90,6 +91,8 @@ class NewRadiators(EmissionBuilder):
         flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
         flows.supplyTemperature = 36.0 - 0.8*self.theta_e
         return flows
+    
+    name = 'New Radiators'
 
 class ChilledBeams(EmissionBuilder):
     #Chilled beams: identical to newRadiators but used for cooling 
@@ -102,6 +105,7 @@ class ChilledBeams(EmissionBuilder):
         flows.supplyTemperature = 36.0 - 0.8*self.theta_e
         return flows
 
+    name = 'Chilled Beams'
 
 class AirConditioning(EmissionBuilder):
     #All heat is given to the air via an AC-unit. HC input via the air node as in the ISO standard.
@@ -114,7 +118,8 @@ class AirConditioning(EmissionBuilder):
         flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
         flows.supplyTemperature = 36.0 - 0.8*self.theta_e
         return flows
-    
+
+    name = 'Air Conditioning'
 
 class FloorHeating(EmissionBuilder):
     #All HC energy goes into the surface node, supplyTemperature low
@@ -127,6 +132,8 @@ class FloorHeating(EmissionBuilder):
         flows.supplyTemperature = 32.0 - 0.6*self.theta_e
         return flows
 
+    name = 'Floor Heating'
+
 class TABS(EmissionBuilder):
     #Thermally activated Building systems. HC energy input into bulk node. Supply Temperature low.
 
@@ -138,6 +145,7 @@ class TABS(EmissionBuilder):
         flows.supplyTemperature = 32.0 - 0.6*self.theta_e
         return flows
 
+    name = 'TABS'
 
 class EmissionOut:
     #The System class which is used to output the final results

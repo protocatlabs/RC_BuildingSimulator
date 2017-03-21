@@ -57,7 +57,7 @@ class SupplyBuilder:
         self.theta_e=theta_e                        #Outdoor Air Temperature
         self.supplyTemperature = supplyTemperature  #Temperature required by the emission system
         
-
+    name = None
 
     def calcLoads(self): pass
 #    def calcCoolingLoads(self): pass
@@ -73,7 +73,8 @@ class OilBoilerOld(SupplyBuilder):
         heater.electricityIn = 0
         heater.electricityOut = 0
         return heater
-
+    
+    name = 'Old Oil Boiler'
 
 class OilBoilerMed(SupplyBuilder):
     #Classic oil boiler with fuel efficiency of 82 percent (medium of range in report of semester project M. Fehr)
@@ -86,6 +87,8 @@ class OilBoilerMed(SupplyBuilder):
         heater.electricityOut = 0
         return heater
 
+    name = 'Standard Oil Boiler'
+
 
 class OilBoilerNew(SupplyBuilder):
     #New oil boiler with fuel efficiency of 98 percent (value from report of semester project M. Fehr)
@@ -97,7 +100,8 @@ class OilBoilerNew(SupplyBuilder):
         heater.electricityIn = 0
         heater.electricityOut = 0
         return heater
-
+    
+    name = 'Top-Notch Oil Boiler'
 
 class HeatPumpAir(SupplyBuilder):
     #Air-Water heat pump. epsilon_carnot = 0.4. Outside Temperature as reservoir temperature.
@@ -112,6 +116,7 @@ class HeatPumpAir(SupplyBuilder):
         heater.electricityOut = 0
         return heater
 
+    name = 'Air Source Heat Pump'
 
 class HeatPumpWater(SupplyBuilder):
     #Water-Water heat pump. epsilon_carnot = 0.5. Reservoir temperatures 7 degC (winter) and 12 degC (summer).
@@ -129,6 +134,7 @@ class HeatPumpWater(SupplyBuilder):
         heater.electricityOut = 0
         return heater
 
+    name = 'Ground Water Source Heat Pump'
 
 class HeatPumpGround(SupplyBuilder):
     #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
@@ -146,6 +152,7 @@ class HeatPumpGround(SupplyBuilder):
         heater.fossilsIn = 0
         return heater
 
+    name = 'Ground Source Heat Pump'
 
 class ElectricHeating(SupplyBuilder):
     #Straight forward electric heating. 100 percent conversion to heat.
@@ -157,10 +164,10 @@ class ElectricHeating(SupplyBuilder):
         heater.electricityOut = 0
         return heater
     
-
+    name = 'Electric Heating'
 
 class CHP(SupplyBuilder):
-    #Combined heat and power unit with 60 percent thermal and 33 percent electrical fuel conversion.
+    #Combined heat and power unit with 60 percent thermal and 33 percent electrical fuel conversion. 93 percent overall
     
     def calcLoads(self):
         heater=SupplyOut()
@@ -169,6 +176,7 @@ class CHP(SupplyBuilder):
         heater.electricityOut = heater.fossilsIn*0.33
         return heater
 
+    name = 'Combined Heat and Power'
 
 class DirectHeater(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
@@ -180,6 +188,7 @@ class DirectHeater(SupplyBuilder):
         heater.electricityOut = 0
         return heater
 
+    name = 'Direct Heater'
 
 class DirectCooler(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
@@ -191,7 +200,7 @@ class DirectCooler(SupplyBuilder):
         heater.electricityOut = 0
         return heater
 
-
+    name = 'Direct Cooler'
 
 class SupplyOut:
     #The System class which is used to output the final results
