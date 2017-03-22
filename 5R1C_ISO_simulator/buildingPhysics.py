@@ -195,14 +195,15 @@ class Building(object):
        emDirector = EmissionDirector()
        #Emission System Director is called to action (setBuilder and calcFlows available)
        
-       emDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd, A_m=self.A_m, A_t=self.A_t, h_tr_w=self.h_tr_w))  #heatingEmissionSystem chosen
+       emDirector.setBuilder(self.heatingEmissionSystem(theta_e=theta_e, phi_int=phi_int, phi_sol=phi_sol, phi_hc_nd=phi_hc_nd, A_m=self.A_m, A_t=self.A_t, h_tr_w=self.h_tr_w, theta_int_h_set=self.theta_int_h_set, theta_int_c_set=self.theta_int_c_set))  #heatingEmissionSystem chosen
        
        flows = emDirector.calcFlows()
        
        self.phi_ia = flows.phi_ia 
        self.phi_st = flows.phi_st 
        self.phi_m = flows.phi_m 
-       self.supplyTemperature = flows.supplyTemperature
+       self.heatingSupplyTemperature = flows.heatingSupplyTemperature
+       self.coolingSupplyTemperature = flows.coolingSupplyTemperature
        
        
        
@@ -487,7 +488,7 @@ class Building(object):
             supDirector = SupplyDirector() #Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e, supplyTemperature=self.supplyTemperature, has_heating_demand=self.has_heating_demand))  
+                supDirector.setBuilder(self.heatingSupplySystem(Load=self.phi_hc_nd_ac, theta_e=theta_e, heatingSupplyTemperature =self.heatingSupplyTemperature, coolingSupplyTemperature = self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand))  
                 supplyOut = supDirector.calcSystem()
                 self.heatingDemand=self.phi_hc_nd_ac                       #All Variables explained underneath line 467
                 self.heatingSysElectricity=supplyOut.electricityIn
@@ -498,7 +499,7 @@ class Building(object):
                 self.electricityOut=supplyOut.electricityOut
 
             elif self.has_cooling_demand:
-                supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, supplyTemperature=self.supplyTemperature, has_heating_demand=self.has_heating_demand))
+                supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, heatingSupplyTemperature =self.heatingSupplyTemperature, coolingSupplyTemperature = self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand))
                 supplyOut = supDirector.calcSystem()
                 self.heatingDemand=0
                 self.heatingSysElectricity=0

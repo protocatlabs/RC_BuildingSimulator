@@ -53,7 +53,7 @@ class EmissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd, A_m, A_t, h_tr_w):
+    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd, A_m, A_t, h_tr_w, theta_int_h_set, theta_int_c_set):
       self.theta_e = theta_e   #Outdoor Air Temperature
       self.phi_int = phi_int
       self.phi_sol = phi_sol
@@ -61,6 +61,8 @@ class EmissionBuilder:
       self.A_m = A_m
       self.A_t = A_t
       self.h_tr_w = h_tr_w
+      self.theta_int_h_set = theta_int_h_set
+      self.theta_int_c_set = theta_int_c_set
 
     def heatFlows(self): pass
 
@@ -76,7 +78,8 @@ class OldRadiators(EmissionBuilder):
         flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.supplyTemperature = 44.67 - 1.23*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 37.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 37.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'Old Radiators'
@@ -89,7 +92,8 @@ class NewRadiators(EmissionBuilder):
         flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
     
     name = 'New Radiators'
@@ -102,7 +106,8 @@ class ChilledBeams(EmissionBuilder):
         flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'Chilled Beams'
@@ -116,7 +121,8 @@ class AirConditioning(EmissionBuilder):
         flows.phi_ia = 0.5*self.phi_int+self.phi_hc_nd
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
-        flows.supplyTemperature = 36.0 - 0.8*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'Air Conditioning'
@@ -129,7 +135,8 @@ class FloorHeating(EmissionBuilder):
         flows.phi_ia = 0.5*self.phi_int
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
         flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
-        flows.supplyTemperature = 32.0 - 0.6*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 18.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 18.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'Floor Heating'
@@ -142,7 +149,8 @@ class TABS(EmissionBuilder):
         flows.phi_ia = 0.5*self.phi_int
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
-        flows.supplyTemperature = 32.0 - 0.6*self.theta_e
+        flows.heatingSupplyTemperature = self.theta_int_h_set - 18.0/30 * (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set - 18.0/30 * (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'TABS'
@@ -156,7 +164,8 @@ class EmissionOut:
 
     phi_st= None
 
-    supplyTemperature = None
+    heatingSupplyTemperature = None
+    coolingSupplyTemperature = None
 
 
 
