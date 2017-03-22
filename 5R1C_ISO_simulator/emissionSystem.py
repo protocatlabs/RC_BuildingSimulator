@@ -29,18 +29,20 @@ class EmissionDirector:
     The director sets what Emission system is being used, and runs that set Emission system
     """
 
-    __builder = None
+#    __builder = None
+    builder = None
 
     #Sets what Emission system is used
     def setBuilder(self, builder):
-        self.__builder = builder
-
+#        self.__builder = builder
+        self.builder = builder
     # Calcs the energy load of that system. This is the main() fu
     def calcFlows(self):
 
         # Director asks the builder to produce the system body. self.__builder is an instance of the class
 
-        body = self.__builder.heatFlows()
+#        body = self.__builder.heatFlows()
+        body = self.builder.heatFlows()
 
         return body
 

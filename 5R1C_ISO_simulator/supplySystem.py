@@ -56,7 +56,7 @@ class SupplyBuilder:
         self.Load=Load                              #Energy Demand of the building at that time step
         self.theta_e=theta_e                        #Outdoor Air Temperature
         self.heatingSupplyTemperature = heatingSupplyTemperature  #Temperature required by the emission system
-        self.coolingSupplyTemperature = coolingSupplyTemperature,
+        self.coolingSupplyTemperature = coolingSupplyTemperature
         self.has_heating_demand = has_heating_demand
         
     name = None
@@ -110,10 +110,13 @@ class HeatPumpAir(SupplyBuilder):
 
     def calcLoads(self):
         heater = SupplyOut()
+        elCool = self.Load/(0.4*(self.coolingSupplyTemperature+273.0)/(self.theta_e-self.coolingSupplyTemperature))
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.4*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-self.theta_e))
-        else:                                               #Cooling
-            heater.electricityIn = self.Load/(0.4*(self.coolingSupplyTemperature+273.0)/(self.theta_e-self.coolingSupplyTemperature))
+        elif elCool > self.Load*0.1:                                               #Cooling
+            heater.electricityIn = elCool
+        else:
+            heater.electricityIn = self.Load*0.1
         heater.fossilsIn = 0    
         heater.electricityOut = 0
         return heater
@@ -128,7 +131,7 @@ class HeatPumpWater(SupplyBuilder):
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.5*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
         else:                                               #Cooling 
-            if self.supplyTemperature > 11.9:                 #Only by pumping 
+            if self.coolingSupplyTemperature > 11.9:                 #Only by pumping 
                 heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
                 heater.electricityIn = self.Load/(0.5*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
@@ -146,7 +149,7 @@ class HeatPumpGround(SupplyBuilder):
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.45*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
         else:                                              #Cooling 
-            if self.supplyTemperature > 11.9:                 #Only by pumping 
+            if self.coolingSupplyTemperature > 11.9:                 #Only by pumping 
                 heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
                 heater.electricityIn = self.Load/(0.45*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
