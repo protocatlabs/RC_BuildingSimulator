@@ -47,16 +47,17 @@ eOut = []
 
 supSystems = [OilBoilerOld, OilBoilerMed, OilBoilerNew, HeatPumpAir, HeatPumpWater, HeatPumpGround, ElectricHeating, CHP]
 emSystems = [OldRadiators, NewRadiators, ChilledBeams, AirConditioning, FloorHeating, TABS]
+heatPumps = [HeatPumpAir, HeatPumpWater, HeatPumpGround]
     
 sysMapHeat = []
 sysMapCool = []
 
-for emSys in emSystems:
+for supSys in heatPumps:
 
     heatingLine = []
     coolingLine = []
     
-    for supSys in supSystems:
+    for emSys in emSystems:
     
         #Initialise an instance of the building. Empty brackets take on the default parameters. See buildingPhysics.py to see the default values
         Office=Building(
@@ -130,47 +131,58 @@ for emSys in emSystems:
     sysMapCool.append(coolingLine)
 
 
-mp.figure(figsize=(7,7))    
-mp.imshow(sysMapHeat, cmap='plasma', interpolation='nearest')
-mp.show()
+#mp.figure(figsize=(7,7))    
+#mp.imshow(sysMapHeat, cmap='plasma', interpolation='nearest')
+#mp.show()
 
 
 #%%
 
+heatPumps = [HeatPumpAir, HeatPumpWater, HeatPumpGround]
 
-#n = len(supSystems)
-#ind = range(n)
-#
-#eOutNegkWh = []
-#fossilsSumkWh = []
-#electricitySumkWh = []
-#names =[]
-#
-#for i in ind:
-#    eOutNegkWh.append(-eOut[i]/1000)
-#    fossilsSumkWh.append(fossilsSum[i]/1000)
-#    electricitySumkWh.append(electricitySum[i]/1000)
-#    names.append(supSystems[i].name)
-#
-#mp.figure(figsize=(7,7))
-# 
-#p1 = mp.bar(ind, fossilsSumkWh, color = (0.7, 0.4,0), edgecolor = 'k', width = 0.6)
-#p2 = mp.bar(ind, electricitySumkWh, color = (1, 0.9, 0.1), edgecolor = 'k', width = 0.6)
-#p3 = mp.bar(ind, eOutNegkWh, color = (0.5,0.9,0), edgecolor = 'k', width = 0.6)
-#
-#mp.ylabel('kWh/a')
-#mp.title('Supply System Yearly Energy Consumption')
-#mp.xticks(ind, names, rotation='vertical')
-#mp.yticks(np.arange(-2000, 7001, 1000))
-#mp.legend((p1[0], p2[0], p3[0]), ('Fossils Consumption', 'Electricity Consumption', 'Electricity Production'))
-#mp.ylim([-3000,7500])
-#mp.margins(0.05)
-#mp.axhline(0, color='k')
-#mp.tight_layout()
-#
-#mp.savefig('YearlySupSys.png', dpi=300)
-#
-#mp.show()
+
+n = len(heatPumps)
+ind = range(n)
+
+for hp in ind:
+
+    eOutNegkWh = []
+    fossilsSumkWh = []
+    electricitySumkWh = []
+    names =[]
+    heatingkWh = []
+    coolingkWh = []
+    
+    nem = len(emSystems)
+    indem = range(nem)
+    
+    for i in indem:
+    #    eOutNegkWh.append(-eOut[i]/1000)
+    #    fossilsSumkWh.append(fossilsSum[i]/1000)
+    #    electricitySumkWh.append(electricitySum[i]/1000)
+        names.append(emSystems[i].name)
+        heatingkWh.append(sysMapHeat[hp][i]/1000)
+        coolingkWh.append(sysMapCool[hp][i]/1000)
+    
+    mp.figure(figsize=(4,7))
+     
+    p1 = mp.bar(indem, coolingkWh, color = (1, 0.8, 0.3), edgecolor = 'k', width = 0.6)
+#    p2 = mp.bar(indem, coolingkWh, color = (1, 0.9, 0.1), edgecolor = 'k', width = 0.6)
+#    p3 = mp.bar(indem, eOutNegkWh, color = (0.5,0.9,0), edgecolor = 'k', width = 0.6)
+    
+    mp.ylabel('kWh/a')
+    mp.title(heatPumps[hp].name)
+    mp.xticks(indem, names, rotation='vertical')
+    mp.yticks(np.arange(0, 1301, 100))
+#    mp.legend((p1[0], p2[0]), ('Fossils Consumption', 'Electricity Consumption'))
+    mp.ylim([-100,1400])
+    mp.margins(0.05)
+    mp.axhline(0, color='k', linewidth=0.5)
+    mp.tight_layout()
+    
+    mp.savefig(heatPumps[hp].name + '.png', dpi=300)
+    
+    mp.show()
 
 
 #%%
