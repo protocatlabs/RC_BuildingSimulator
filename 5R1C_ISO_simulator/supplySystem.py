@@ -112,7 +112,7 @@ class HeatPumpAir(SupplyBuilder):
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.supplyTemperature-self.theta_e))
         else:                                               #Cooling
-            heater.electricityIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.theta_e-self.SupplyTemperature))
+            heater.electricityIn = self.Load/(0.4*(self.supplyTemperature+273)/(self.theta_e-self.supplyTemperature))
         heater.fossilsIn = 0    
         heater.electricityOut = 0
         return heater
@@ -127,7 +127,7 @@ class HeatPumpWater(SupplyBuilder):
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.5*(self.supplyTemperature+273)/(self.supplyTemperature-7))
         else:                                               #Cooling 
-            if self.supplyTemperature > 12:                 #Only by pumping 
+            if self.supplyTemperature > 11.9:                 #Only by pumping 
                 heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
                 heater.electricityIn = self.Load/(0.5*(self.supplyTemperature+273)/(12-self.supplyTemperature))
@@ -145,7 +145,7 @@ class HeatPumpGround(SupplyBuilder):
         if self.has_heating_demand:                                   #Heating
             heater.electricityIn = self.Load/(0.45*(self.supplyTemperature+273)/(self.supplyTemperature-7))
         else:                                              #Cooling 
-            if self.supplyTemperature > 12:                 #Only by pumping 
+            if self.supplyTemperature > 11.9:                 #Only by pumping 
                 heater.electricityIn = self.Load*0.1
             else:                                           #Heat Pump active
                 heater.electricityIn = self.Load/(0.45*(self.supplyTemperature+273)/(12-self.supplyTemperature))

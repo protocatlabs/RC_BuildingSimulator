@@ -166,16 +166,16 @@ for hp in ind:
     
     mp.figure(figsize=(4,7))
      
-    p1 = mp.bar(indem, coolingkWh, color = (1, 0.8, 0.3), edgecolor = 'k', width = 0.6)
+    p1 = mp.bar(indem, coolingkWh, color = (0.3, 0.8, 1), edgecolor = 'k', width = 0.6)
 #    p2 = mp.bar(indem, coolingkWh, color = (1, 0.9, 0.1), edgecolor = 'k', width = 0.6)
 #    p3 = mp.bar(indem, eOutNegkWh, color = (0.5,0.9,0), edgecolor = 'k', width = 0.6)
     
     mp.ylabel('kWh/a')
     mp.title(heatPumps[hp].name)
     mp.xticks(indem, names, rotation='vertical')
-    mp.yticks(np.arange(0, 1301, 100))
+    mp.yticks(np.arange(0, 11, 5))
 #    mp.legend((p1[0], p2[0]), ('Fossils Consumption', 'Electricity Consumption'))
-    mp.ylim([-100,1400])
+    mp.ylim([-2,15])
     mp.margins(0.05)
     mp.axhline(0, color='k', linewidth=0.5)
     mp.tight_layout()
