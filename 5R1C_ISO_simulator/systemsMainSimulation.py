@@ -90,7 +90,7 @@ for supSys in heatPumps:
         theta_m_prev = 20
         
         
-        for hour in range(8760):
+        for hour in range(4000,4501):
             phi_int = offOcc.loc[hour,'People']*(maxIntGain+maxPeopGain)
             occupancy = offOcc.loc[hour,'People']/A_person
             theta_e = weather['drybulb_C'][hour]

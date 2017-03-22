@@ -121,8 +121,8 @@ class AirConditioning(EmissionBuilder):
         flows.phi_ia = 0.5*self.phi_int+self.phi_hc_nd
         flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
         flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.heatingSupplyTemperature = self.theta_int_h_set-24.0/30* (self.theta_e-self.theta_int_h_set)
+        flows.coolingSupplyTemperature = self.theta_int_c_set-24.0/30* (self.theta_e-self.theta_int_c_set)
         return flows
 
     name = 'Air Conditioning'
