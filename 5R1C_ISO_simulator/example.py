@@ -25,7 +25,7 @@ theta_e=10
 theta_m_prev=22
 phi_int=10 #Internal heat gains, in Watts
 phi_sol=2000 #Solar heat gains after transmitting through the winow [Watts]
-ill=44000 #Illuminance after transmitting through the window [Lumens]
+ill=44000 #Illuminance after before transmitting through the window [Lumens]
 occupancy = 0.1 #Occupancy for the timestep [people/hour/square_meter]
 
 
