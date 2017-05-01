@@ -1,3 +1,9 @@
+import sys
+import os
+
+#Set root folder one level up, just for this example
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..')))
+
 import unittest
 import numpy as np
 from buildingPhysics import Building #Importing Building Class
