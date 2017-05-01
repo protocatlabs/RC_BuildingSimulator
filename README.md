@@ -10,7 +10,6 @@ There are two models available
 
 `5R1C_ISO_Simulator`: A simulation engine based off ISO 13790 Standards
 
-I don't understand dwhat is going on
 
 
 ##Documentation 
