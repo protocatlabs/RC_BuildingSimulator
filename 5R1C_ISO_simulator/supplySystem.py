@@ -52,12 +52,13 @@ class SupplyBuilder:
     """ The base class in which Supply systems are built from 
     """
 
-    def __init__(self, Load, theta_e, heatingSupplyTemperature, coolingSupplyTemperature, has_heating_demand):
+    def __init__(self, Load, theta_e, heatingSupplyTemperature, coolingSupplyTemperature, has_heating_demand, has_cooling_demand):
         self.Load=Load                              #Energy Demand of the building at that time step
         self.theta_e=theta_e                        #Outdoor Air Temperature
         self.heatingSupplyTemperature = heatingSupplyTemperature  #Temperature required by the emission system
         self.coolingSupplyTemperature = coolingSupplyTemperature
         self.has_heating_demand = has_heating_demand
+        self.has_cooling_demand=has_cooling_demand
         
     name = None
 
@@ -110,13 +111,19 @@ class HeatPumpAir(SupplyBuilder):
 
     def calcLoads(self):
         heater = SupplyOut()
-        elCool = self.Load/(0.4*(self.coolingSupplyTemperature+273.0)/(self.theta_e-self.coolingSupplyTemperature))
-        if self.has_heating_demand:                                   #Heating
-            heater.electricityIn = self.Load/(0.4*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-self.theta_e))
-        elif elCool > self.Load*0.1:                                               #Cooling
-            heater.electricityIn = elCool
-        else:
-            heater.electricityIn = self.Load*0.1
+        COP_heating=(0.4*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-self.theta_e))        
+        COP_cooling=(0.4*(self.coolingSupplyTemperature+273.0)/(self.theta_e-self.coolingSupplyTemperature))
+
+
+        if self.has_heating_demand:                                  
+            heater.electricityIn = self.Load/COP_heating
+
+        elif self.has_cooling_demand:
+            if 0 < COP_cooling < 10: 
+                heater.electricityIn = self.Load/COP_cooling
+            else:
+                #For large COPs we assume only pumping energy is required
+                heater.electricityIn = self.Load*0.1
         heater.fossilsIn = 0    
         heater.electricityOut = 0
         return heater
