@@ -27,10 +27,10 @@ __status__ = "Production"
 
 
 #Example Inpiuts
-theta_e=10
-theta_m_prev=22
-phi_int=10 #Internal heat gains, in Watts
-phi_sol=2000 #Solar heat gains after transmitting through the winow [Watts]
+T_air=10
+T_m_prev=22
+internal_gains=10 #Internal heat gains, in Watts
+solar_gains=2000 #Solar heat gains after transmitting through the winow [Watts]
 ill=44000 #Illuminance after before transmitting through the window [Lumens]
 occupancy = 0.1 #Occupancy for the timestep [people/hour/square_meter]
 
@@ -39,22 +39,22 @@ occupancy = 0.1 #Occupancy for the timestep [people/hour/square_meter]
 Office=Building()
 
 #Solve for building energy
-Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+Office.solve_building_energy(internal_gains, solar_gains, T_air, T_m_prev)
 
 #Solve for building lighting
 Office.solve_building_lighting(ill, occupancy)
 
 
-print Office.theta_m #Printing Room Temperature of the medium
+print Office.T_m #Printing Room Temperature of the medium
 print Office.lighting_demand #Print Lighting Demand
-print Office.phi_hc_nd_ac #Print heating/cooling loads
+print Office.energy_demand #Print heating/cooling loads
 
 #Example of how to change the set point temperature after running a simulation
 Office.theta_int_h_set = 20.0
 
 #Solve again for the new set point temperature
-Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+Office.solve_building_energy(internal_gains, solar_gains, T_air, T_m_prev)
 
-print Office.theta_m #Print the new internal temperature
+print Office.T_m #Print the new internal temperature
 
 print Office.has_heating_demand #Print a boolean of whether there is a heating demand

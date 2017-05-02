@@ -20,7 +20,7 @@ __maintainer__ = "Daren Thomas"
 __email__ = "thomas@arch.ethz.ch"
 __status__ = "Production"
 
-def epw_reader(weather_path):
+def epwReader(weather_path):
 
     epw_labels = ['year', 'month', 'day', 'hour', 'minute', 'datasource', 'drybulb_C', 'dewpoint_C', 'relhum_percent',
                        'atmos_Pa', 'exthorrad_Whm2', 'extdirrad_Whm2', 'horirsky_Whm2', 'glohorrad_Whm2',
@@ -36,7 +36,7 @@ def epw_reader(weather_path):
     
     return result
 
-def test_reader():
+def testReader():
     
     locator = cea.inputlocator.InputLocator(r'C:\reference-case\baseline')
     # for the interface, the user should pick a file out of of those in ...DB/Weather/...

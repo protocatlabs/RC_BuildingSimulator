@@ -20,7 +20,7 @@ __status__ = "Production"
 
 
 
-def SunPosition_reader(SunPosition_path):
+def sunPositionReader(SunPosition_path):
 
     sun_labels = ['altitude', 'azimuth'] #'HOY', 
 #

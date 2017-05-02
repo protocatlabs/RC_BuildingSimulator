@@ -41,7 +41,7 @@ VARIABLE DEFINITION
 	T_out: Outdoor air temperature [C]
 	T_m_prev: Thermal mass temperature from the previous time step 
 	ill: Illuminance in contact with the total outdoor window surface [lumens]
-	occupancy: Occupancy [people/m2]
+	occupancy: Occupancy [people]
 
 	T_m_next: Medium temperature of the enxt time step [C]
 	T_m: Some wierd average between the previous and current timestep of the medium  [C] #TODO: Check this 
@@ -119,8 +119,8 @@ class Building(object):
 				 thermal_capacitance_per_floor_area = 165000,
 				 T_set_heating = 20.0,
 				 T_set_cooling = 26.0,
-				 max_cooling_energy_per_floor_area=-20.0,
-				 max_heating_energy_per_floor_area=40.0,
+				 max_cooling_energy_per_floor_area=-np.inf,
+				 max_heating_energy_per_floor_area=np.inf,
 				 heatingSupplySystem=OilBoilerMed,
 				 coolingSupplySystem=HeatPumpAir,
 				 heatingEmissionSystem=NewRadiators,
@@ -143,14 +143,14 @@ class Building(object):
 		self.lighting_maintenance_factor= lighting_maintenance_factor #How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
 
 		#Calculated Properties
-		self.A_f=room_depth*room_width #[m2] Floor Area
-		self.A_m=self.A_f* 2.5 #[m2] Effective Mass Area assuming a medium weight building #12.3.1.2
+		self.floor_area=room_depth*room_width #[m2] Floor Area
+		self.mass_area=self.floor_area* 2.5 #[m2] Effective Mass Area assuming a medium weight building #12.3.1.2
 		self.Room_Vol=room_width*room_depth*room_height #[m3] Room Volume
-		self.A_tot=self.A_f*2 + room_width*room_height*2 + room_depth*room_height*2
-		self.A_t=self.A_tot #TODO: Not sure what A_t is, check it out
+		self.total_internal_area=self.floor_area*2 + room_width*room_height*2 + room_depth*room_height*2
+		self.A_t=self.total_internal_area #TODO: Standard doesn't explain what A_t is. Needs to be checked
 
 		#Single Capacitance  5 conductance Model Parameters
-		self.c_m= thermal_capacitance_per_floor_area * self.A_f #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
+		self.c_m= thermal_capacitance_per_floor_area * self.floor_area #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
 		self.h_tr_em = U_walls*(room_height*room_width-window_area) #Conductance of opaque surfaces to exterior [W/K]
 		self.h_tr_w = U_windows*window_area  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
 		
@@ -158,8 +158,8 @@ class Building(object):
 		ACH_tot=ACH_infl+ACH_vent #Total Air Changes Per Hour
 		b_ek=(1-(ACH_vent/(ACH_tot))*ventilation_efficiency) #temperature adjustement factor taking ventilation and inflimtration [ISO: E -27]
 		self.h_ve_adj =    1200*b_ek*self.Room_Vol*(ACH_tot/3600)  #Conductance through ventilation [W/M]
-		self.h_tr_ms =     9.1 * self.A_m #transmittance from the internal air to the thermal mass of the building
-		self.h_tr_is =     self.A_tot * 3.45 # Conductance from the conditioned air to interior building surface
+		self.h_tr_ms =     9.1 * self.mass_area #transmittance from the internal air to the thermal mass of the building
+		self.h_tr_is =     self.total_internal_area * 3.45 # Conductance from the conditioned air to interior building surface
 
 		#Thermal set points
 		self.T_set_heating = T_set_heating
@@ -168,8 +168,8 @@ class Building(object):
 		#Thermal Properties
 		self.has_heating_demand=False #Boolean for if heating is required
 		self.has_cooling_demand=False #Boolean for if cooling is required
-		self.max_cooling_energy = max_cooling_energy_per_floor_area*self.A_f #max cooling load (W/m2)
-		self.max_heating_energy = max_heating_energy_per_floor_area*self.A_f #max heating load (W/m2)
+		self.max_cooling_energy = max_cooling_energy_per_floor_area*self.floor_area #max cooling load (W/m2)
+		self.max_heating_energy = max_heating_energy_per_floor_area*self.floor_area #max heating load (W/m2)
 
 		#Building System Properties
 		self.heatingSupplySystem=heatingSupplySystem
@@ -186,7 +186,7 @@ class Building(object):
 		emDirector = EmissionDirector()
 		
 		
-		emDirector.setBuilder(self.heatingEmissionSystem(T_out=T_out, internal_gains=internal_gains, solar_gains=solar_gains, energy_demand=energy_demand, A_m=self.A_m, A_t=self.A_t, h_tr_w=self.h_tr_w, T_set_heating=self.T_set_heating, T_set_cooling=self.T_set_cooling))  #heatingEmissionSystem chosen
+		emDirector.setBuilder(self.heatingEmissionSystem(T_out=T_out, internal_gains=internal_gains, solar_gains=solar_gains, energy_demand=energy_demand, mass_area=self.mass_area, A_t=self.A_t, h_tr_w=self.h_tr_w, T_set_heating=self.T_set_heating, T_set_cooling=self.T_set_cooling))  #heatingEmissionSystem chosen
 		
 		flows = emDirector.calcFlows()
 		
@@ -353,7 +353,7 @@ class Building(object):
 			raise ValueError('heating function has been called even though no heating is required')
 
 		#Set a heating case where the heating load is 10x the floor area (10 W/m2)
-		energy_floorAx10 = 10 * self.A_f
+		energy_floorAx10 = 10 * self.floor_area
 
 		#Calculate the air temperature obtained by having this 10 W/m2 setpoint
 		T_air_10=self.calc_temperatures_crank_nicolson(energy_floorAx10, internal_gains, solar_gains, T_out, T_m_prev)[1]
@@ -464,10 +464,10 @@ class Building(object):
 	def solve_building_lighting(self, ill, occupancy, probLighting=1):
 
 		#Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
-		Lux=(ill*self.lighting_utilisation_factor*self.lighting_maintenance_factor*self.glass_light_transmittance)/self.A_f #[Lux]
+		Lux=(ill*self.lighting_utilisation_factor*self.lighting_maintenance_factor*self.glass_light_transmittance)/self.floor_area #[Lux]
 
 		if Lux < self.lighting_control and occupancy>0 and probLighting>0.1:
-			self.lighting_demand=self.lighting_load*self.A_f #Lighting demand for the hour
+			self.lighting_demand=self.lighting_load*self.floor_area #Lighting demand for the hour
 		else:
 			self.lighting_demand=0
 
