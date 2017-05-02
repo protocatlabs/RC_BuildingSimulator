@@ -15,13 +15,13 @@ class TestBuildingSim(unittest.TestCase):
 
 
     def test_NoHVACNoLight(self):
-        theta_e=10
-        theta_m_prev=22
+        T_out=10
+        T_m_prev=22
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -30,51 +30,51 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
 
-        self.assertEqual(round(Office.theta_m,2), 22.33)
-        self.assertEqual(Office.phi_hc_nd_ac,0)
+        self.assertEqual(round(Office.T_m,2), 22.33)
+        self.assertEqual(Office.energy_demand,0)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
 
 
     def test_CoolingRequired(self):
-        theta_e=25
-        theta_m_prev=24
+        T_out=25
+        T_m_prev=24
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=4000
+        solar_gains=4000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -83,39 +83,39 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -264.75)
+        self.assertEqual(round(Office.energy_demand,2), -264.75)
         self.assertEqual(round(Office.coolingSysElectricity,2),264.75)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.theta_m,2), 25.15)
+        self.assertEqual(round(Office.T_m,2), 25.15)
         self.assertTrue(Office.has_cooling_demand)
         
         self.assertEqual(Office.lighting_demand,0)
@@ -123,13 +123,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_HeatingRequired(self):
 
 
-        theta_e=10
-        theta_m_prev=20
+        T_out=10
+        T_m_prev=20
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -138,50 +138,50 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 20.46)
+        self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 328.09)
+        self.assertEqual(round(Office.energy_demand,2), 328.09)
         self.assertEqual(round(Office.heatingSysElectricity,2),328.09)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_MaxCoolingRequired(self):
-        theta_e=30
-        theta_m_prev=25
+        T_out=30
+        T_m_prev=25
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=5000
+        solar_gains=5000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -190,38 +190,38 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 26.49)
+        self.assertEqual(round(Office.T_m,2), 26.49)
         self.assertTrue(Office.has_cooling_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -411.6)
+        self.assertEqual(round(Office.energy_demand,2), -411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),411.6)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
@@ -229,13 +229,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_MaxHeatingRequired(self):
 
 
-        theta_e=5
-        theta_m_prev=19
+        T_out=5
+        T_m_prev=19
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -244,51 +244,51 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 19.39)
+        self.assertEqual(round(Office.T_m,2), 19.39)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 411.6)
+        self.assertEqual(round(Office.energy_demand,2), 411.6)
         self.assertEqual(round(Office.heatingSysElectricity,2),411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_lightingrequired(self):
 
-        theta_e=10
-        theta_m_prev=22
+        T_out=10
+        T_m_prev=22
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=4000 #Lumens
@@ -297,37 +297,37 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20.0,
-        theta_int_c_set = 26.0,
-        phi_c_max_A_f=-12.0,
-        phi_h_max_A_f=12.0,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20.0,
+        T_set_cooling = 26.0,
+        max_cooling_energy_per_floor_area=-12.0,
+        max_heating_energy_per_floor_area=12.0,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 22.33)
-        self.assertEqual(Office.phi_hc_nd_ac,0)
+        self.assertEqual(round(Office.T_m,2), 22.33)
+        self.assertEqual(Office.energy_demand,0)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.lighting_demand,2),401.31)
@@ -336,13 +336,13 @@ class TestBuildingSim(unittest.TestCase):
 #     ###############################Tests with infiltration variation###############################
 
     def test_NoHVACNoLight_infl(self):
-        theta_e=10
-        theta_m_prev=22
+        T_out=10
+        T_m_prev=22
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -351,49 +351,49 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.66,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 22.44)
-        self.assertEqual(Office.phi_hc_nd_ac,0)
+        self.assertEqual(round(Office.T_m,2), 22.44)
+        self.assertEqual(Office.energy_demand,0)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_CoolingRequired_infl(self):
-        theta_e=25
-        theta_m_prev=24
+        T_out=25
+        T_m_prev=24
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=4000
+        solar_gains=4000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -402,39 +402,39 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -296.65)
+        self.assertEqual(round(Office.energy_demand,2), -296.65)
         self.assertEqual(round(Office.coolingSysElectricity,2),296.65)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.theta_m,2), 25.15)
+        self.assertEqual(round(Office.T_m,2), 25.15)
         self.assertTrue(Office.has_cooling_demand)
         
         self.assertEqual(Office.lighting_demand,0)
@@ -442,13 +442,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_HeatingRequired_infl(self):
 
 
-        theta_e=10
-        theta_m_prev=20
+        T_out=10
+        T_m_prev=20
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -457,50 +457,50 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 20.46)
+        self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 9.1)
+        self.assertEqual(round(Office.energy_demand,2), 9.1)
         self.assertEqual(round(Office.heatingSysElectricity,2),9.1)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_MaxCoolingRequired_infl(self):
-        theta_e=30
-        theta_m_prev=25
+        T_out=30
+        T_m_prev=25
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=5000
+        solar_gains=5000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -509,38 +509,38 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 26.48)
+        self.assertEqual(round(Office.T_m,2), 26.48)
         self.assertTrue(Office.has_cooling_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -411.6)
+        self.assertEqual(round(Office.energy_demand,2), -411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),411.6)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(Office.lighting_demand,0)
@@ -548,13 +548,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_MaxHeatingRequired_infl(self):
 
 
-        theta_e=5
-        theta_m_prev=19
+        T_out=5
+        T_m_prev=19
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -563,51 +563,51 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 19.51)
+        self.assertEqual(round(Office.T_m,2), 19.51)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 411.6)
+        self.assertEqual(round(Office.energy_demand,2), 411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.heatingSysElectricity,2),411.6)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_lightingrequired_infl(self):
 
-        theta_e=10
-        theta_m_prev=22
+        T_out=10
+        T_m_prev=22
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=14000 #Lumens
@@ -616,50 +616,50 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20.0,
-        theta_int_c_set = 26.0,
-        phi_c_max_A_f=-12.0,
-        phi_h_max_A_f=12.0,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20.0,
+        T_set_cooling = 26.0,
+        max_cooling_energy_per_floor_area=-12.0,
+        max_heating_energy_per_floor_area=12.0,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 22.43)
-        self.assertEqual(Office.phi_hc_nd_ac,0)
+        self.assertEqual(round(Office.T_m,2), 22.43)
+        self.assertEqual(Office.energy_demand,0)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.lighting_demand,2),401.31)
 
     def test_lightingrequired_probabiltyOff(self):
 
-        theta_e=10
-        theta_m_prev=22
+        T_out=10
+        T_m_prev=22
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=14000 #Lumens
@@ -670,37 +670,37 @@ class TestBuildingSim(unittest.TestCase):
         probLighting=0.01
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20.0,
-        theta_int_c_set = 26.0,
-        phi_c_max_A_f=-12.0,
-        phi_h_max_A_f=12.0,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20.0,
+        T_set_cooling = 26.0,
+        max_cooling_energy_per_floor_area=-12.0,
+        max_heating_energy_per_floor_area=12.0,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy, probLighting)
 
-        self.assertEqual(round(Office.theta_m,2), 22.43)
-        self.assertEqual(Office.phi_hc_nd_ac,0)
+        self.assertEqual(round(Office.T_m,2), 22.43)
+        self.assertEqual(Office.energy_demand,0)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.lighting_demand,2),0)
@@ -710,13 +710,13 @@ class TestBuildingSim(unittest.TestCase):
 
     def test_HeatPumpCoolingRequiredMaxCOP(self):
         """Warning! Not validated yet and may have errors"""
-        theta_e=25
-        theta_m_prev=24
+        T_out=25
+        T_m_prev=24
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=4000
+        solar_gains=4000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -725,39 +725,39 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=HeatPumpAir,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -264.75)
+        self.assertEqual(round(Office.energy_demand,2), -264.75)
         self.assertEqual(round(Office.coolingSysElectricity,2),38.88)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.theta_m,2), 25.15)
+        self.assertEqual(round(Office.T_m,2), 25.15)
         self.assertEqual(round(Office.COP,2), 6.81)
         self.assertTrue(Office.has_cooling_demand)
         
@@ -765,13 +765,13 @@ class TestBuildingSim(unittest.TestCase):
 
     def test_HeatPumpCoolingRequired(self):
         """Warning! Not validated yet and may have errors"""
-        theta_e=35
-        theta_m_prev=24
+        T_out=35
+        T_m_prev=24
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=4000
+        solar_gains=4000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -780,39 +780,39 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=HeatPumpAir,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -411.6)
+        self.assertEqual(round(Office.energy_demand,2), -411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),82.07)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.theta_m,2), 25.33)
+        self.assertEqual(round(Office.T_m,2), 25.33)
         self.assertEqual(round(Office.COP,2), 5.02)
         self.assertTrue(Office.has_cooling_demand)
         
@@ -820,13 +820,13 @@ class TestBuildingSim(unittest.TestCase):
 
     def test_WaterHeatPumpCoolingRequired(self):
         """Warning! Not validated yet and may have errors"""
-        theta_e=35
-        theta_m_prev=24
+        T_out=35
+        T_m_prev=24
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=4000
+        solar_gains=4000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -835,39 +835,39 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=DirectHeater,
         coolingSupplySystem=HeatPumpWater,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), -411.6)
+        self.assertEqual(round(Office.energy_demand,2), -411.6)
         self.assertEqual(round(Office.coolingSysElectricity,2),46.93)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.theta_m,2), 25.33)
+        self.assertEqual(round(Office.T_m,2), 25.33)
         self.assertEqual(round(Office.COP,2), 8.77)
         self.assertTrue(Office.has_cooling_demand)
         
@@ -876,13 +876,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_AirHeatPump_HeatingRequired_infl(self):
 
 
-        theta_e=10
-        theta_m_prev=20
+        T_out=10
+        T_m_prev=20
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -891,38 +891,38 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=HeatPumpAir,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 20.46)
+        self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 9.1)
+        self.assertEqual(round(Office.energy_demand,2), 9.1)
         self.assertEqual(round(Office.heatingSysElectricity,2),1.88)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.COP,2), 4.84)
@@ -931,13 +931,13 @@ class TestBuildingSim(unittest.TestCase):
     def test_WaterHeatPump_HeatingRequired_infl(self):
 
 
-        theta_e=10
-        theta_m_prev=20
+        T_out=10
+        T_m_prev=20
         #Internal heat gains, in Watts
-        phi_int=10
+        internal_gains=10
 
         #Solar heat gains after transmitting through the winow, in Watts
-        phi_sol=2000
+        solar_gains=2000
 
         #Illuminance after transmitting through the window 
         ill=44000 #Lumens
@@ -946,38 +946,38 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         #Set Building Parameters
-        Office=Building(Fenst_A=13.5 ,
-        Room_Depth=7 ,
-        Room_Width=4.9 ,
-        Room_Height=3.1 ,
+        Office=Building(window_area=13.5 ,
+        room_depth=7 ,
+        room_width=4.9 ,
+        room_height=3.1 ,
         glass_solar_transmittance=0.687 ,
         glass_light_transmittance=0.744 ,
         lighting_load=11.7 ,
         lighting_control = 300,
-        Lighting_Utilisation_Factor=0.45,
-        Lighting_Maintenance_Factor=0.9,
-        U_em = 0.2 , 
-        U_w = 1.1,
+        lighting_utilisation_factor=0.45,
+        lighting_maintenance_factor=0.9,
+        U_walls = 0.2 , 
+        U_windows = 1.1,
         ACH_vent=1.5,
         ACH_infl=0.5,
         ventilation_efficiency=0.6,
-        c_m_A_f = 165000,
-        theta_int_h_set = 20,
-        theta_int_c_set = 26,
-        phi_c_max_A_f=-12,
-        phi_h_max_A_f=12,
+        thermal_capacitance_per_floor_area = 165000,
+        T_set_heating = 20,
+        T_set_cooling = 26,
+        max_cooling_energy_per_floor_area=-12,
+        max_heating_energy_per_floor_area=12,
         heatingSupplySystem=HeatPumpWater,
         coolingSupplySystem=DirectCooler,
         heatingEmissionSystem=AirConditioning,
         coolingEmissionSystem=AirConditioning,
         )
 
-        Office.solve_building_energy(phi_int, phi_sol, theta_e, theta_m_prev)
+        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
         Office.solve_building_lighting(ill, occupancy)
 
-        self.assertEqual(round(Office.theta_m,2), 20.46)
+        self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
-        self.assertEqual(round(Office.phi_hc_nd_ac,2), 9.1)
+        self.assertEqual(round(Office.energy_demand,2), 9.1)
         self.assertEqual(round(Office.heatingSysElectricity,2),1.53)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
         self.assertEqual(round(Office.COP,2), 5.94)

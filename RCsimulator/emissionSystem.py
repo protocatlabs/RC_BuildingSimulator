@@ -15,7 +15,7 @@ __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
 __email__ = "jayathissa@arch.ethz.ch"
-__status__ = "Production"
+__status__ = "BETA"
 
 
 
@@ -55,16 +55,16 @@ class EmissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, theta_e, phi_int, phi_sol, phi_hc_nd, A_m, A_t, h_tr_w, theta_int_h_set, theta_int_c_set):
-      self.theta_e = theta_e   #Outdoor Air Temperature
-      self.phi_int = phi_int
-      self.phi_sol = phi_sol
-      self.phi_hc_nd = phi_hc_nd
+    def __init__(self, T_out, internal_gains, solar_gains, energy_demand, A_m, A_t, h_tr_w, T_set_heating, T_set_cooling):
+      self.T_out = T_out   #Outdoor Air Temperature
+      self.internal_gains = internal_gains
+      self.solar_gains = solar_gains
+      self.energy_demand = energy_demand
       self.A_m = A_m
       self.A_t = A_t
       self.h_tr_w = h_tr_w
-      self.theta_int_h_set = theta_int_h_set
-      self.theta_int_c_set = theta_int_c_set
+      self.T_set_heating = T_set_heating
+      self.T_set_cooling = T_set_cooling
 
     def heatFlows(self): pass
 
@@ -77,11 +77,11 @@ class OldRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 37.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 37.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.heatingSupplyTemperature = self.T_set_heating - 37.0/30 * (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling - 37.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
     name = 'Old Radiators'
@@ -91,11 +91,11 @@ class NewRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.heatingSupplyTemperature = self.T_set_heating - 24.0/30 * (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling - 24.0/30 * (self.T_out-self.T_set_cooling)
         return flows
     
     name = 'New Radiators'
@@ -105,11 +105,11 @@ class ChilledBeams(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.phi_int+self.phi_hc_nd)
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.phi_int+self.phi_hc_nd)+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 24.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 24.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.heatingSupplyTemperature = self.T_set_heating - 24.0/30 * (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling - 24.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
     name = 'Chilled Beams'
@@ -120,11 +120,11 @@ class AirConditioning(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.phi_int+self.phi_hc_nd
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set-24.0/30* (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set-24.0/30* (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*self.internal_gains+self.energy_demand
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.internal_gains+self.solar_gains)
+        flows.heatingSupplyTemperature = self.T_set_heating-24.0/30* (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling-24.0/30* (self.T_out-self.T_set_cooling)
         return flows
 
     name = 'Air Conditioning'
@@ -134,11 +134,11 @@ class FloorHeating(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.phi_int
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 18.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 18.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*self.internal_gains
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)+self.energy_demand
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.internal_gains+self.solar_gains)
+        flows.heatingSupplyTemperature = self.T_set_heating - 18.0/30 * (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling - 18.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
     name = 'Floor Heating'
@@ -148,11 +148,11 @@ class TABS(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.phi_int
-        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.phi_int+self.phi_sol)
-        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.phi_int+self.phi_sol)+self.phi_hc_nd
-        flows.heatingSupplyTemperature = self.theta_int_h_set - 18.0/30 * (self.theta_e-self.theta_int_h_set)
-        flows.coolingSupplyTemperature = self.theta_int_c_set - 18.0/30 * (self.theta_e-self.theta_int_c_set)
+        flows.phi_ia = 0.5*self.internal_gains
+        flows.phi_st = (1-(self.A_m/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)
+        flows.phi_m = (self.A_m/self.A_t)*(0.5*self.internal_gains+self.solar_gains)+self.energy_demand
+        flows.heatingSupplyTemperature = self.T_set_heating - 18.0/30 * (self.T_out-self.T_set_heating)
+        flows.coolingSupplyTemperature = self.T_set_cooling - 18.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
     name = 'TABS'
@@ -169,16 +169,5 @@ class EmissionOut:
     heatingSupplyTemperature = None
     coolingSupplyTemperature = None
 
-
-
-#if __name__ == "__main__":
-#    print "Resistive Office Heater"
-#    director = Director()
-#    director.setBuilder(HeatPumpHeater(Load=100, theta_e=10,theta_m_prev=20,efficiency=0.8))
-#    system = director.calcSystem()
-#
-#
-#    print system.electricity
-#    print system.COP
 
 

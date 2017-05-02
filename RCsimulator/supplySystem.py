@@ -16,7 +16,7 @@ __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
 __email__ = "jayathissa@arch.ethz.ch"
-__status__ = "Production"
+__status__ = "BETA"
 
 
 
@@ -52,9 +52,9 @@ class SupplyBuilder:
     """ The base class in which Supply systems are built from 
     """
 
-    def __init__(self, Load, theta_e, heatingSupplyTemperature, coolingSupplyTemperature, has_heating_demand, has_cooling_demand):
+    def __init__(self, Load, T_out, heatingSupplyTemperature, coolingSupplyTemperature, has_heating_demand, has_cooling_demand):
         self.Load=Load                              #Energy Demand of the building at that time step
-        self.theta_e=theta_e                        #Outdoor Air Temperature
+        self.T_out=T_out                        #Outdoor Air Temperature
         self.heatingSupplyTemperature = heatingSupplyTemperature  #Temperature required by the emission system
         self.coolingSupplyTemperature = coolingSupplyTemperature
         self.has_heating_demand = has_heating_demand
@@ -121,13 +121,13 @@ class HeatPumpAir(SupplyBuilder):
 
         if self.has_heating_demand:
             #determine the temperature difference, if negative, set to 0
-            deltaT=max(0,self.heatingSupplyTemperature-self.theta_e)
+            deltaT=max(0,self.heatingSupplyTemperature-self.T_out)
             system.COP=6.81 - 0.121*deltaT + 0.000630*deltaT**2 #Eq (4) in Staggell et al.
             system.electricityIn=self.Load/system.COP
 
         elif self.has_cooling_demand:
             #determine the temperature difference, if negative, set to 0
-            deltaT=max(0,self.theta_e-self.coolingSupplyTemperature)
+            deltaT=max(0,self.T_out-self.coolingSupplyTemperature)
             system.COP=6.81 - 0.121*deltaT + 0.000630*deltaT**2 #Eq (4) in Staggell et al.
             system.electricityIn = self.Load/system.COP
 
