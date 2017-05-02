@@ -63,7 +63,7 @@ class SupplyBuilder:
     name = None
 
     def calcLoads(self): pass
-#    def calcCoolingLoads(self): pass
+
 
 
 class OilBoilerOld(SupplyBuilder):
@@ -71,11 +71,11 @@ class OilBoilerOld(SupplyBuilder):
     #No condensation, pilot light
 
     def calcLoads(self):
-        heater = SupplyOut()
-        heater.fossilsIn = self.Load/0.63
-        heater.electricityIn = 0
-        heater.electricityOut = 0
-        return heater
+        system = SupplyOut()
+        system.fossilsIn = self.Load/0.63
+        system.electricityIn = 0
+        system.electricityOut = 0
+        return system
     
     name = 'Old Oil Boiler'
 
@@ -84,11 +84,11 @@ class OilBoilerMed(SupplyBuilder):
     #No condensation, but better nozzles etc.
     
     def calcLoads(self):
-        heater = SupplyOut()
-        heater.fossilsIn = self.Load/0.82
-        heater.electricityIn = 0
-        heater.electricityOut = 0
-        return heater
+        system = SupplyOut()
+        system.fossilsIn = self.Load/0.82
+        system.electricityIn = 0
+        system.electricityOut = 0
+        return system
 
     name = 'Standard Oil Boiler'
 
@@ -98,20 +98,22 @@ class OilBoilerNew(SupplyBuilder):
     #Condensation boiler, latest generation
 
     def calcLoads(self):
-        heater = SupplyOut()
-        heater.fossilsIn = self.Load/0.98
-        heater.electricityIn = 0
-        heater.electricityOut = 0
-        return heater
+        system = SupplyOut()
+        system.fossilsIn = self.Load/0.98
+        system.electricityIn = 0
+        system.electricityOut = 0
+        return system
     
     name = 'Top-Notch Oil Boiler'
 
 class HeatPumpAir(SupplyBuilder):
-    #Air-Water heat pump. Outside Temperature as reservoir temperature.
-    #COP based off regression anlysis of manufacturers data
-    #Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
-    #http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
-
+    """
+    BETA Version
+    Air-Water heat pump. Outside Temperature as reservoir temperature.
+    COP based off regression anlysis of manufacturers data
+    Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
+    http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
+    """
     #TODO: Validate this methodology 
 
     def calcLoads(self):
@@ -122,7 +124,6 @@ class HeatPumpAir(SupplyBuilder):
             deltaT=max(0,self.heatingSupplyTemperature-self.theta_e)
             system.COP=6.81 - 0.121*deltaT + 0.000630*deltaT**2 #Eq (4) in Staggell et al.
             system.electricityIn=self.Load/system.COP
-            print 'has heating demand'
 
         elif self.has_cooling_demand:
             #determine the temperature difference, if negative, set to 0
@@ -131,7 +132,7 @@ class HeatPumpAir(SupplyBuilder):
             system.electricityIn = self.Load/system.COP
 
         else:
-            raise ValueError('HeatPumpAir called although there is no demand')
+            raise ValueError('HeatPumpAir called although there is no heating/cooling demand')
 
         system.fossilsIn = 0    
         system.electricityOut = 0
@@ -140,30 +141,32 @@ class HeatPumpAir(SupplyBuilder):
     name = 'Air Source Heat Pump'
 
 class HeatPumpWater(SupplyBuilder):
-    #Reservoir temperatures 7 degC (winter) and 12 degC (summer).
-    #Air-Water heat pump. Outside Temperature as reservoir temperature.
-    #COP based off regression anlysis of manufacturers data
-    #Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
-    #http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
-
+    """"
+    BETA Version
+    Reservoir temperatures 7 degC (winter) and 12 degC (summer).
+    Air-Water heat pump. Outside Temperature as reservoir temperature.
+    COP based off regression anlysis of manufacturers data
+    Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
+    http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
+    """
     #TODO: Validate this methodology 
 
     def calcLoads(self):
-        heater = SupplyOut()
+        system = SupplyOut()
         if self.has_heating_demand:   
             deltaT=max(0,self.heatingSupplyTemperature-7.0)
-            heater.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
-            heater.electricityIn = self.Load/heater.COP
+            system.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
+            system.electricityIn = self.Load/system.COP
 
         elif self.has_cooling_demand:
             deltaT=max(0,12.0-self.coolingSupplyTemperature)
-            heater.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
-            heater.electricityIn = self.Load/heater.COP
+            system.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
+            system.electricityIn = self.Load/system.COP
 
-        print self.coolingSupplyTemperature
-        heater.fossilsIn = 0
-        heater.electricityOut = 0
-        return heater
+
+        system.fossilsIn = 0
+        system.electricityOut = 0
+        return system
 
     name = 'Ground Water Source Heat Pump'
 
@@ -189,11 +192,11 @@ class ElectricHeating(SupplyBuilder):
     #Straight forward electric heating. 100 percent conversion to heat.
     
     def calcLoads(self):
-        heater=SupplyOut()
-        heater.electricityIn = self.Load
-        heater.fossilsIn = 0
-        heater.electricityOut = 0
-        return heater
+        system=SupplyOut()
+        system.electricityIn = self.Load
+        system.fossilsIn = 0
+        system.electricityOut = 0
+        return system
     
     name = 'Electric Heating'
 
@@ -201,11 +204,11 @@ class CHP(SupplyBuilder):
     #Combined heat and power unit with 60 percent thermal and 33 percent electrical fuel conversion. 93 percent overall
     
     def calcLoads(self):
-        heater=SupplyOut()
-        heater.fossilsIn = self.Load/0.6
-        heater.electricityIn = 0
-        heater.electricityOut = heater.fossilsIn*0.33
-        return heater
+        system=SupplyOut()
+        system.fossilsIn = self.Load/0.6
+        system.electricityIn = 0
+        system.electricityOut = system.fossilsIn*0.33
+        return system
 
     name = 'Combined Heat and Power'
 
@@ -213,11 +216,11 @@ class DirectHeater(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
     
     def calcLoads(self):
-        heater=SupplyOut()
-        heater.electricityIn = self.Load
-        heater.fossilsIn = 0
-        heater.electricityOut = 0
-        return heater
+        system=SupplyOut()
+        system.electricityIn = self.Load
+        system.fossilsIn = 0
+        system.electricityOut = 0
+        return system
 
     name = 'Direct Heater'
 
@@ -225,11 +228,11 @@ class DirectCooler(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
     
     def calcLoads(self):
-        heater=SupplyOut()
-        heater.electricityIn = self.Load
-        heater.fossilsIn = 0
-        heater.electricityOut = 0
-        return heater
+        system=SupplyOut()
+        system.electricityIn = self.Load
+        system.fossilsIn = 0
+        system.electricityOut = 0
+        return system
 
     name = 'Direct Cooler'
 
@@ -239,17 +242,4 @@ class SupplyOut:
     electricityIn = None
     electricityOut = None
     COP = None
-
-
-
-#if __name__ == "__main__":
-#    print "Resistive Office Heater"
-#    director = Director()
-#    director.setBuilder(HeatPumpHeater(Load=100, theta_e=10,theta_m_prev=20,efficiency=0.8))
-#    system = director.calcSystem()
-#
-#
-#    print system.electricity
-#    print system.COP
-
 
