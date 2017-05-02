@@ -107,64 +107,83 @@ class OilBoilerNew(SupplyBuilder):
     name = 'Top-Notch Oil Boiler'
 
 class HeatPumpAir(SupplyBuilder):
-    #Air-Water heat pump. epsilon_carnot = 0.4. Outside Temperature as reservoir temperature.
+    #Air-Water heat pump. Outside Temperature as reservoir temperature.
+    #COP based off regression anlysis of manufacturers data
+    #Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
+    #http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
+
+    #TODO: Validate this methodology 
 
     def calcLoads(self):
-        heater = SupplyOut()
-        COP_heating=(0.4*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-self.theta_e))        
-        COP_cooling=(0.4*(self.coolingSupplyTemperature+273.0)/(self.theta_e-self.coolingSupplyTemperature))
+        system = SupplyOut()
 
-
-        if self.has_heating_demand:                                  
-            heater.electricityIn = self.Load/COP_heating
+        if self.has_heating_demand:
+            #determine the temperature difference, if negative, set to 0
+            deltaT=max(0,self.heatingSupplyTemperature-self.theta_e)
+            system.COP=6.81 - 0.121*deltaT + 0.000630*deltaT**2 #Eq (4) in Staggell et al.
+            system.electricityIn=self.Load/system.COP
+            print 'has heating demand'
 
         elif self.has_cooling_demand:
-            if 0 < COP_cooling < 10: 
-                heater.electricityIn = self.Load/COP_cooling
-            else:
-                #For large COPs we assume only pumping energy is required
-                heater.electricityIn = self.Load*0.1
-        heater.fossilsIn = 0    
-        heater.electricityOut = 0
-        return heater
+            #determine the temperature difference, if negative, set to 0
+            deltaT=max(0,self.theta_e-self.coolingSupplyTemperature)
+            system.COP=6.81 - 0.121*deltaT + 0.000630*deltaT**2 #Eq (4) in Staggell et al.
+            system.electricityIn = self.Load/system.COP
+
+        else:
+            raise ValueError('HeatPumpAir called although there is no demand')
+
+        system.fossilsIn = 0    
+        system.electricityOut = 0
+        return system
 
     name = 'Air Source Heat Pump'
 
 class HeatPumpWater(SupplyBuilder):
-    #Water-Water heat pump. epsilon_carnot = 0.5. Reservoir temperatures 7 degC (winter) and 12 degC (summer).
+    #Reservoir temperatures 7 degC (winter) and 12 degC (summer).
+    #Air-Water heat pump. Outside Temperature as reservoir temperature.
+    #COP based off regression anlysis of manufacturers data
+    #Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
+    #http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
+
+    #TODO: Validate this methodology 
 
     def calcLoads(self):
         heater = SupplyOut()
-        if self.has_heating_demand:                                   #Heating
-            heater.electricityIn = self.Load/(0.5*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
-        else:                                               #Cooling 
-            if self.coolingSupplyTemperature > 11.9:                 #Only by pumping 
-                heater.electricityIn = self.Load*0.1
-            else:                                           #Heat Pump active
-                heater.electricityIn = self.Load/(0.5*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
+        if self.has_heating_demand:   
+            deltaT=max(0,self.heatingSupplyTemperature-7.0)
+            heater.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
+            heater.electricityIn = self.Load/heater.COP
+
+        elif self.has_cooling_demand:
+            deltaT=max(0,12.0-self.coolingSupplyTemperature)
+            heater.COP=8.77 - 0.150*deltaT + 0.000734*deltaT**2 #Eq (4) in Staggell et al.
+            heater.electricityIn = self.Load/heater.COP
+
+        print self.coolingSupplyTemperature
         heater.fossilsIn = 0
         heater.electricityOut = 0
         return heater
 
     name = 'Ground Water Source Heat Pump'
 
-class HeatPumpGround(SupplyBuilder):
-    #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
+# class HeatPumpGround(SupplyBuilder):
+#     #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
 
-    def calcLoads(self):
-        heater = SupplyOut()
-        if self.has_heating_demand:                                   #Heating
-            heater.electricityIn = self.Load/(0.45*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
-        else:                                              #Cooling 
-            if self.coolingSupplyTemperature > 11.9:                 #Only by pumping 
-                heater.electricityIn = self.Load*0.1
-            else:                                           #Heat Pump active
-                heater.electricityIn = self.Load/(0.45*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
-        heater.electricityOut = 0
-        heater.fossilsIn = 0
-        return heater
+#     def calcLoads(self):
+#         heater = SupplyOut()
+#         if self.has_heating_demand:                                   #Heating
+#             heater.electricityIn = self.Load/(0.45*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
+#         else:                                              #Cooling 
+#             if self.coolingSupplyTemperature > 11.9:                 #Only by pumping 
+#                 heater.electricityIn = self.Load*0.1
+#             else:                                           #Heat Pump active
+#                 heater.electricityIn = self.Load/(0.45*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
+#         heater.electricityOut = 0
+#         heater.fossilsIn = 0
+#         return heater
 
-    name = 'Ground Source Heat Pump'
+#     name = 'Ground Source Heat Pump'
 
 class ElectricHeating(SupplyBuilder):
     #Straight forward electric heating. 100 percent conversion to heat.
@@ -219,6 +238,7 @@ class SupplyOut:
     fossilsIn = None
     electricityIn = None
     electricityOut = None
+    COP = None
 
 
 

@@ -498,6 +498,7 @@ class Building(object):
                 self.coolingSysFossils=0
                 self.electricityOut=supplyOut.electricityOut
 
+
             elif self.has_cooling_demand:
                 supDirector.setBuilder(self.coolingSupplySystem(Load=self.phi_hc_nd_ac*(-1), theta_e=theta_e, heatingSupplyTemperature=self.heatingSupplyTemperature, coolingSupplyTemperature=self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand, has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supDirector.calcSystem()
@@ -508,6 +509,8 @@ class Building(object):
                 self.coolingSysElectricity=supplyOut.electricityIn
                 self.coolingSysFossils=supplyOut.fossilsIn
                 self.electricityOut=supplyOut.electricityOut
+            
+            self.COP=supplyOut.COP
 
         self.sysTotalEnergy = self.heatingSysElectricity + self.heatingSysFossils + self.coolingSysElectricity + self.coolingSysFossils
         self.heatingEnergy = self.heatingSysElectricity + self.heatingSysFossils
