@@ -182,19 +182,31 @@ class Building(object):
 		
 	def calc_heat_flow(self,T_out, internal_gains, solar_gains, energy_demand):
 		#C.1 - C.3 in [C.3 ISO 13790]
+		#Note that this equation has diverged slightly from the standard based as it can set the heating node to any spot on the building
 
 		#Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3
-		#Emission System Director is called to action (setBuilder and calcFlows available)
+		#Heat flow to the air node
+		self.phi_ia = 0.5*internal_gains
+		#Heat flow to the surface node
+		self.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*internal_gains+solar_gains)
+		#Heatflow to the thermal mass node
+		self.phi_m = (self.mass_area/self.A_t)*(0.5*internal_gains+solar_gains)
+
+
+		#We call the EmissionDirector to modify these flows depending on the system and the energy demand
 		emDirector = EmissionDirector()
-		
-		
-		emDirector.setBuilder(self.heatingEmissionSystem(T_out=T_out, internal_gains=internal_gains, solar_gains=solar_gains, energy_demand=energy_demand, mass_area=self.mass_area, A_t=self.A_t, h_tr_w=self.h_tr_w, T_set_heating=self.T_set_heating, T_set_cooling=self.T_set_cooling))  #heatingEmissionSystem chosen
-		
+		#Set the emission system to the type specified by the user
+		emDirector.setBuilder(self.heatingEmissionSystem(building=self, energy_demand=energy_demand))
+		#Calculate the new flows to each node based on the heating system
 		flows = emDirector.calcFlows()
 		
+		#Set modified flows to building object
 		self.phi_ia = flows.phi_ia 
 		self.phi_st = flows.phi_st 
 		self.phi_m = flows.phi_m 
+
+		#Set supply temperature to building object
+		#TODO: This currently is constant for all emission systems, to be modified in the future
 		self.heatingSupplyTemperature = flows.heatingSupplyTemperature
 		self.coolingSupplyTemperature = flows.coolingSupplyTemperature
 
@@ -336,12 +348,11 @@ class Building(object):
 		# Crank-nicolson calculation procedure if heating/cooling system is active
 		# Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
 
-		# Step 1: Check if heating or cooling is needed (Michael: check isn't needed, is in calling function)
+		# Step 1: Check if heating or cooling is needed (Not needed, but doing so for readability when comparing with the standard)
 		#Set heating/cooling to 0
 		energy_demand_0 = 0
 		#Calculate the air temperature with no heating/cooling
-		T_air_0=self.calc_temperatures_crank_nicolson(energy_demand_0, internal_gains, solar_gains, T_out, T_m_prev)[1] #This is more stable
-		#T_air_0 = self.T_air #This should return the same value
+		T_air_0=self.calc_temperatures_crank_nicolson(energy_demand_0, internal_gains, solar_gains, T_out, T_m_prev)[1] 
 
 
 		# Step 2: Calculate the unrestricted heating/cooling required
@@ -391,6 +402,7 @@ class Building(object):
 
 
 	def solve_building_energy(self,internal_gains, solar_gains,T_out, T_m_prev):
+		#Main File
 
 
 		#Calculate the heat transfer definitions for formula simplification

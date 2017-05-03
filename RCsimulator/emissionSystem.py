@@ -59,16 +59,13 @@ class EmissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, T_out, internal_gains, solar_gains, energy_demand, mass_area, A_t, h_tr_w, T_set_heating, T_set_cooling):
-      self.T_out = T_out   #Outdoor Air Temperature
-      self.internal_gains = internal_gains
-      self.solar_gains = solar_gains
+    def __init__(self, building, energy_demand):
+
       self.energy_demand = energy_demand
-      self.mass_area = mass_area
-      self.A_t = A_t
-      self.h_tr_w = h_tr_w
-      self.T_set_heating = T_set_heating
-      self.T_set_cooling = T_set_cooling
+
+      self.phi_ia=building.phi_ia
+      self.phi_st=building.phi_st
+      self.phi_m = building.phi_m
 
     def heatFlows(self): pass
 
@@ -80,9 +77,10 @@ class OldRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_ia = self.phi_ia+self.energy_demand
+        flows.phi_st = self.phi_st
+        flows.phi_m = self.phi_m
+
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
 
@@ -96,9 +94,9 @@ class NewRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_ia = self.phi_ia+self.energy_demand
+        flows.phi_st = self.phi_st
+        flows.phi_m = self.phi_m
         
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
@@ -115,9 +113,9 @@ class ChilledBeams(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*(self.internal_gains+self.energy_demand)
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*(self.internal_gains+self.energy_demand)+self.solar_gains)
+        flows.phi_ia = self.phi_ia+self.energy_demand
+        flows.phi_st = self.phi_st
+        flows.phi_m = self.phi_m
 
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
@@ -133,9 +131,9 @@ class AirConditioning(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.internal_gains+self.energy_demand
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*self.internal_gains+self.solar_gains)
+        flows.phi_ia = self.phi_ia+self.energy_demand
+        flows.phi_st = self.phi_st
+        flows.phi_m = self.phi_m
 
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
@@ -151,9 +149,9 @@ class FloorHeating(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.internal_gains
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)+self.energy_demand
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*self.internal_gains+self.solar_gains)
+        flows.phi_ia = self.phi_ia
+        flows.phi_st = self.phi_st+self.energy_demand
+        flows.phi_m = self.phi_m
 
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
@@ -169,9 +167,9 @@ class TABS(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = 0.5*self.internal_gains
-        flows.phi_st = (1-(self.mass_area/self.A_t)-(self.h_tr_w/(9.1*self.A_t)))*(0.5*self.internal_gains+self.solar_gains)
-        flows.phi_m = (self.mass_area/self.A_t)*(0.5*self.internal_gains+self.solar_gains)+self.energy_demand
+        flows.phi_ia = self.phi_ia
+        flows.phi_st = self.phi_st
+        flows.phi_m = self.phi_m+self.energy_demand
 
         flows.heatingSupplyTemperature=50
         flows.coolingSupplyTemperature=12
@@ -185,9 +183,7 @@ class EmissionOut:
     #The System class which is used to output the final results
 
     phi_ia= None
-
     phi_m= None
-
     phi_st= None
 
     heatingSupplyTemperature = None
