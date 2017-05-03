@@ -36,7 +36,7 @@ ElectricityOut = []
 HeatingDemand = []      #Energy required by the zone
 HeatingEnergy = []       #Energy required by the supply system to provide HeatingDemand
 CoolingDemand = []      #Energy surplus of the zone
-CoolingInput = []       #Energy required by the supply system to get rid of CoolingDemand
+CoolingEnergy = []       #Energy required by the supply system to get rid of CoolingDemand
 IndoorAir = []
 OutsideTemp = []
 SolarGains=[]
@@ -97,6 +97,7 @@ for hour in range(8760):
 
 
 
+
 	Office.solve_building_energy(internal_gains=internal_gains, solar_gains=solar_gains,T_out=T_out, T_m_prev=T_m_prev)
 
 	T_m_prev=Office.T_m_next
@@ -105,7 +106,7 @@ for hour in range(8760):
 	HeatingDemand.append(Office.heatingDemand)
 	HeatingEnergy.append(Office.heatingEnergy)
 	CoolingDemand.append(Office.coolingDemand)
-	CoolingInput.append(Office.coolingEnergy)
+	CoolingEnergy.append(Office.coolingEnergy)
 	ElectricityOut.append(Office.electricityOut)
 	IndoorAir.append(Office.T_air)
 	OutsideTemp.append(T_out)
@@ -113,10 +114,10 @@ for hour in range(8760):
 	COP.append(Office.COP)
 
 annualResults=pd.DataFrame({
-	'ElectricityOut' : ElectricityOut, 
 	'HeatingDemand' : HeatingDemand,
 	'HeatingEnergy' : HeatingEnergy, 
 	'CoolingDemand' : CoolingDemand, 
+	'CoolingEnergy' : CoolingEnergy,
 	'IndoorAir' : IndoorAir,
 	'OutsideTemp' :  OutsideTemp,
 	'SolarGains': SolarGains,
@@ -124,5 +125,5 @@ annualResults=pd.DataFrame({
 	})
 
 
-annualResults['COP'].plot()
+annualResults[['HeatingEnergy','CoolingEnergy']].plot()
 plt.show()
