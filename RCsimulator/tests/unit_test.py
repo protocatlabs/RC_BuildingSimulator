@@ -31,6 +31,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -84,6 +85,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -139,6 +141,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -191,6 +194,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -245,6 +249,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -298,6 +303,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -352,6 +358,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -403,6 +410,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -458,6 +466,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -510,6 +519,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -564,6 +574,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -617,6 +628,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -671,6 +683,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -708,7 +721,7 @@ class TestBuildingSim(unittest.TestCase):
     
 # ############################ System Variations ########################
 
-    def test_HeatPumpCoolingRequiredMaxCOP(self):
+    def test_HeatPumpCoolingRequiredHighCOP(self):
         """Warning! Not validated yet and may have errors"""
         T_out=25
         T_m_prev=24
@@ -726,6 +739,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -755,10 +769,10 @@ class TestBuildingSim(unittest.TestCase):
         Office.solve_building_lighting(ill, occupancy)
 
         self.assertEqual(round(Office.energy_demand,2), -264.75)
-        self.assertEqual(round(Office.coolingSysElectricity,2),38.88)
+        self.assertEqual(round(Office.coolingSysElectricity,2),49.55)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.T_m,2), 25.15)
-        self.assertEqual(round(Office.COP,2), 6.81)
+        self.assertEqual(round(Office.COP,2), 5.34)
         self.assertTrue(Office.has_cooling_demand)
         
         self.assertEqual(Office.lighting_demand,0)
@@ -781,6 +795,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -810,10 +825,10 @@ class TestBuildingSim(unittest.TestCase):
         Office.solve_building_lighting(ill, occupancy)
 
         self.assertEqual(round(Office.energy_demand,2), -411.6)
-        self.assertEqual(round(Office.coolingSysElectricity,2),82.07)
+        self.assertEqual(round(Office.coolingSysElectricity,2),94.4)
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.T_m,2), 25.33)
-        self.assertEqual(round(Office.COP,2), 5.02)
+        self.assertEqual(round(Office.COP,2), 4.36)
         self.assertTrue(Office.has_cooling_demand)
         
         self.assertEqual(Office.lighting_demand,0)
@@ -836,6 +851,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -892,6 +908,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -923,9 +940,9 @@ class TestBuildingSim(unittest.TestCase):
         self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
         self.assertEqual(round(Office.energy_demand,2), 9.1)
-        self.assertEqual(round(Office.heatingSysElectricity,2),1.88)
+        self.assertEqual(round(Office.heatingSysElectricity,2),3.06)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
-        self.assertEqual(round(Office.COP,2), 4.84)
+        self.assertEqual(round(Office.COP,2), 2.98)
         self.assertEqual(Office.lighting_demand,0)
 
     def test_WaterHeatPump_HeatingRequired_infl(self):
@@ -947,6 +964,7 @@ class TestBuildingSim(unittest.TestCase):
 
         #Set Building Parameters
         Office=Building(window_area=13.5 ,
+        external_envelope_area=15.19,
         room_depth=7 ,
         room_width=4.9 ,
         room_height=3.1 ,
@@ -978,9 +996,9 @@ class TestBuildingSim(unittest.TestCase):
         self.assertEqual(round(Office.T_m,2), 20.46)
         self.assertTrue(Office.has_heating_demand)
         self.assertEqual(round(Office.energy_demand,2), 9.1)
-        self.assertEqual(round(Office.heatingSysElectricity,2),1.53)
+        self.assertEqual(round(Office.heatingSysElectricity,2),2.48)
         self.assertEqual(round(Office.coolingSysElectricity,2),0)
-        self.assertEqual(round(Office.COP,2), 5.94)
+        self.assertEqual(round(Office.COP,2), 3.68)
         self.assertEqual(Office.lighting_demand,0)
 
 if __name__ == '__main__':

@@ -60,7 +60,6 @@ class SupplyBuilder:
         self.has_heating_demand = has_heating_demand
         self.has_cooling_demand=has_cooling_demand
         
-    name = None
 
     def calcLoads(self): pass
 
@@ -76,8 +75,7 @@ class OilBoilerOld(SupplyBuilder):
         system.electricityIn = 0
         system.electricityOut = 0
         return system
-    
-    name = 'Old Oil Boiler'
+
 
 class OilBoilerMed(SupplyBuilder):
     #Classic oil boiler with fuel efficiency of 82 percent (medium of range in report of semester project M. Fehr)
@@ -90,7 +88,6 @@ class OilBoilerMed(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-    name = 'Standard Oil Boiler'
 
 
 class OilBoilerNew(SupplyBuilder):
@@ -103,8 +100,7 @@ class OilBoilerNew(SupplyBuilder):
         system.electricityIn = 0
         system.electricityOut = 0
         return system
-    
-    name = 'Top-Notch Oil Boiler'
+
 
 class HeatPumpAir(SupplyBuilder):
     """
@@ -138,7 +134,6 @@ class HeatPumpAir(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-    name = 'Air Source Heat Pump'
 
 class HeatPumpWater(SupplyBuilder):
     """"
@@ -168,7 +163,6 @@ class HeatPumpWater(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-    name = 'Ground Water Source Heat Pump'
 
 # class HeatPumpGround(SupplyBuilder):
 #     #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
@@ -197,8 +191,7 @@ class ElectricHeating(SupplyBuilder):
         system.fossilsIn = 0
         system.electricityOut = 0
         return system
-    
-    name = 'Electric Heating'
+
 
 class CHP(SupplyBuilder):
     #Combined heat and power unit with 60 percent thermal and 33 percent electrical fuel conversion. 93 percent overall
@@ -210,7 +203,6 @@ class CHP(SupplyBuilder):
         system.electricityOut = system.fossilsIn*0.33
         return system
 
-    name = 'Combined Heat and Power'
 
 class DirectHeater(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
@@ -222,7 +214,6 @@ class DirectHeater(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-    name = 'Direct Heater'
 
 class DirectCooler(SupplyBuilder):
     #Created by PJ to check accuracy against previous simulation
@@ -234,7 +225,6 @@ class DirectCooler(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-    name = 'Direct Cooler'
 
 class SupplyOut:
     #The System class which is used to output the final results

@@ -40,6 +40,7 @@ CoolingInput = []       #Energy required by the supply system to get rid of Cool
 IndoorAir = []
 OutsideTemp = []
 SolarGains=[]
+COP=[]
 
 
 
@@ -86,7 +87,9 @@ for hour in range(8760):
 			dir_solar_gains = 0
 
 		diffuse_solar_gains = weatherData['difhorrad_Whm2'][hour] / 2.0 
-		solar_gains=dir_solar_gains + diffuse_solar_gains
+
+		solar_gains=(dir_solar_gains + diffuse_solar_gains) * Office.window_area
+
 
 	else:
 		#Sun is below the horizon (night time)
@@ -107,6 +110,7 @@ for hour in range(8760):
 	IndoorAir.append(Office.T_air)
 	OutsideTemp.append(T_out)
 	SolarGains.append(solar_gains)
+	COP.append(Office.COP)
 
 annualResults=pd.DataFrame({
 	'ElectricityOut' : ElectricityOut, 
@@ -116,8 +120,9 @@ annualResults=pd.DataFrame({
 	'IndoorAir' : IndoorAir,
 	'OutsideTemp' :  OutsideTemp,
 	'SolarGains': SolarGains,
+	'COP': COP
 	})
 
-print ElectricityOut
-annualResults.plot()
+
+annualResults['COP'].plot()
 plt.show()

@@ -68,7 +68,8 @@ VARIABLE DEFINITION
 	
 INPUT PARAMETER DEFINITION 
 
-	window_area: Area of the Glazed Surface  [m2]
+	window_area: Area of the Glazed Surface in contact with the outside [m2]
+	external_envelope_area: Area of all envelope surfaces, including windows in contact with the outside
 	room_depth=7.0 Depth of the modeled room [m]
 	room_width=4.9 Width of the modeled room [m]
 	room_height=3.1 Height of the modeled room [m]
@@ -101,21 +102,22 @@ class Building(object):
 	'''Sets the parameters of the building. '''
 
 	def __init__(self,
-				 window_area=13.5,
+				 window_area=4.0,
+				 external_envelope_area=15.0,
 				 room_depth=7.0,
-				 room_width=4.9,
-				 room_height=3.1,
-				 glass_solar_transmittance=0.687,
-				 glass_light_transmittance=0.744,
+				 room_width=5.0,
+				 room_height=3.0,
+				 glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8,
 				 lighting_load=11.7,
-				 lighting_control = 300,
+				 lighting_control = 300.0,
 				 lighting_utilisation_factor=0.45,
 				 lighting_maintenance_factor=0.9,
 				 U_walls = 0.2,
 				 U_windows = 1.1,
 				 ACH_vent=1.5,
 				 ACH_infl=0.5,
-				 ventilation_efficiency=.6,
+				 ventilation_efficiency=0.6,
 				 thermal_capacitance_per_floor_area = 165000,
 				 T_set_heating = 20.0,
 				 T_set_cooling = 26.0,
@@ -151,7 +153,7 @@ class Building(object):
 
 		#Single Capacitance  5 conductance Model Parameters
 		self.c_m= thermal_capacitance_per_floor_area * self.floor_area #[kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
-		self.h_tr_em = U_walls*(room_height*room_width-window_area) #Conductance of opaque surfaces to exterior [W/K]
+		self.h_tr_em = U_walls*(external_envelope_area-window_area) #Conductance of opaque surfaces to exterior [W/K]
 		self.h_tr_w = U_windows*window_area  #Conductance to exterior through glazed surfaces [W/K], based on U-wert of 1W/m2K
 		
 		#Determine the ventilation conductance
