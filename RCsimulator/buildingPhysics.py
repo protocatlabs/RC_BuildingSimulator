@@ -488,9 +488,3 @@ class Building(object):
 
 
 
-
-
-
-
-
-

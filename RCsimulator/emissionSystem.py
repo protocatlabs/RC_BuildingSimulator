@@ -15,12 +15,14 @@ __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
 __email__ = "jayathissa@arch.ethz.ch"
-__status__ = "Production"
+__status__ = "Development"
 
 
 
 """
 Model of different Emission systems. New Emission Systems can be introduced by adding new classes
+
+Note that this is currently in a very basic form, and has been created to allow for more complex expansion 
 
 TODO: 
 - find a way to accurately calculate the supply temperatures. For now we set constants for each system
@@ -74,6 +76,7 @@ class EmissionBuilder:
 
 class OldRadiators(EmissionBuilder):
     #Old building with radiators and high supply temperature
+    #Heat is emitted to the air node
 
     def heatFlows(self):
         flows = EmissionOut()
@@ -91,6 +94,7 @@ class OldRadiators(EmissionBuilder):
 
 class NewRadiators(EmissionBuilder):
     #Newer building with radiators and medium supply temperature
+    #Heat is emitted to the air node
 
     def heatFlows(self):
         flows = EmissionOut()
@@ -109,7 +113,8 @@ class NewRadiators(EmissionBuilder):
     
 
 class ChilledBeams(EmissionBuilder):
-    #Chilled beams: identical to newRadiators but used for cooling 
+    #Chilled beams: identical to newRadiators but used for cooling
+    #Heat is emitted to the air node 
 
     def heatFlows(self):
         flows = EmissionOut()
@@ -128,6 +133,7 @@ class ChilledBeams(EmissionBuilder):
 class AirConditioning(EmissionBuilder):
     #All heat is given to the air via an AC-unit. HC input via the air node as in the ISO standard.
     #supplyTemperature as with new radiators (assumption)
+    #Heat is emitted to the air node
 
     def heatFlows(self):
         flows = EmissionOut()
@@ -146,6 +152,7 @@ class AirConditioning(EmissionBuilder):
 
 class FloorHeating(EmissionBuilder):
     #All HC energy goes into the surface node, supplyTemperature low
+    #Heat is emitted to the surface node
 
     def heatFlows(self):
         flows = EmissionOut()
@@ -164,6 +171,7 @@ class FloorHeating(EmissionBuilder):
 
 class TABS(EmissionBuilder):
     #Thermally activated Building systems. HC energy input into bulk node. Supply Temperature low.
+    #Heat is emitted to the thermal mass node
 
     def heatFlows(self):
         flows = EmissionOut()
