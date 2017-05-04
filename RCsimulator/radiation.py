@@ -78,17 +78,7 @@ class Location(object):
 		
 		azimuth_rad = math.asin(math.cos(declination_rad) * math.sin(hour_angle_rad) / math.cos(altitude_rad))
 
-		# print 'day', day_of_year
-		# print 'declination_rad', declination_rad
-		# print 'equation_of_time', equation_of_time
-		# print 'angle_of_day', angle_of_day
-		
-		# print 'solar_time', solar_time
-		# print 'hour_angle_rad', hour_angle_rad
-		# print utc_datetime.minute
-
-		#return math.degrees(altitude_rad), 180-math.degrees(azimuth_rad)
-
+		#I don't really know what this code does, it has been copied from PySolar
 		if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
 			return math.degrees(altitude_rad), math.degrees(azimuth_rad)
 		else:
@@ -101,27 +91,28 @@ if __name__  ==  '__main__':
 
 	Azimuth = []
 	Altitude = []
+	SunnyHOY=[]
 
 
 	for HOY in range (8760):
 		sun= Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
 		Altitude.append(sun[0])
-		Azimuth.append(math.sin(math.radians(sun[1])))
+		Azimuth.append(sun[1])
+		SunnyHOY.append(HOY+1)
 		
 		
 
 	sunPosition=pd.read_csv(os.path.join(os.path.dirname( __file__ ),'auxillary','SunPosition.csv'), skiprows=1)
+
 	transSunPos=sunPosition.transpose()
 	HOY_check=transSunPos.index.tolist()
+	HOY_check =  [float(ii) for ii in HOY_check]
+	Azimuth_check= (180-transSunPos[1]).tolist()
 
 	Altitude_check= transSunPos[0].tolist()
-	Azimuth_check = (180-transSunPos[1]).as_matrix()
-	Azimuth_check = np.sin(np.radians(Azimuth_check))
-	print Altitude_check
-	# altitude_check=sunPosition.loc[0]
-	# azimuth_check=180-sunPosition.loc[1]
 
 
-	#plt.plot(range(1,8761), Altitude, HOY_check, Altitude_check )
-	plt.plot(range(1,8761), Azimuth, HOY_check, Azimuth_check )
+	plt.plot(SunnyHOY, Azimuth, HOY_check, Azimuth_check, SunnyHOY, Altitude, HOY_check, Altitude_check )
+	plt.legend(['Azimuth','Azimuth Check','Altitude','Altitude_check'])
+
 	plt.show()
