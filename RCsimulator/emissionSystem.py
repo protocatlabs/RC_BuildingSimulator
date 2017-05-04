@@ -10,7 +10,7 @@ import numpy as np
 
 __author__ = "Prageeth Jayathissa, Michael Fehr"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
-__credits__ = [""]
+__credits__ = ["CEA Toolbox"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
@@ -24,8 +24,12 @@ Model of different Emission systems. New Emission Systems can be introduced by a
 
 Note that this is currently in a very basic form, and has been created to allow for more complex expansion 
 
-TODO: 
-- find a way to accurately calculate the supply temperatures. For now we set constants for each system
+Supply temperatures are taken from the CEA Toolbox 
+https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/databases/CH/Systems/emission_systems.xls
+
+TODO: Validation is still required
+TODO: Need to double check supply temperatures, waiting on reply from the CEA team
+
 """
 
 class EmissionDirector:
@@ -84,11 +88,11 @@ class OldRadiators(EmissionBuilder):
         flows.phi_st = self.phi_st
         flows.phi_m = self.phi_m
 
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
+        flows.heatingSupplyTemperature = 65
+        flows.heatingReturnTemperature = 45
+        flows.coolingSupplyTemperature = 12
+        flows.coolingReturnTemperature = 21
 
-        # flows.heatingSupplyTemperature = self.T_set_heating - 37.0/30 * (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling - 37.0/30 * (self.T_out-self.T_set_cooling)
 
         return flows
 
@@ -102,12 +106,11 @@ class NewRadiators(EmissionBuilder):
         flows.phi_st = self.phi_st
         flows.phi_m = self.phi_m
         
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
+        flows.heatingSupplyTemperature = 50
+        flows.heatingReturnTemperature = 35
+        flows.coolingSupplyTemperature = 12
+        flows.coolingReturnTemperature = 21
 
-
-        # flows.heatingSupplyTemperature = self.T_set_heating - 24.0/30 * (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling - 24.0/30 * (self.T_out-self.T_set_cooling)
 
         return flows
     
@@ -122,11 +125,11 @@ class ChilledBeams(EmissionBuilder):
         flows.phi_st = self.phi_st
         flows.phi_m = self.phi_m
 
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
+        flows.heatingSupplyTemperature = 50
+        flows.heatingReturnTemperature = 35
+        flows.coolingSupplyTemperature = 18
+        flows.coolingReturnTemperature = 21
 
-        # flows.heatingSupplyTemperature = self.T_set_heating - 24.0/30 * (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling - 24.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
 
@@ -141,10 +144,10 @@ class AirConditioning(EmissionBuilder):
         flows.phi_st = self.phi_st
         flows.phi_m = self.phi_m
 
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
-        # flows.heatingSupplyTemperature = self.T_set_heating-24.0/30* (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling-24.0/30* (self.T_out-self.T_set_cooling)
+        flows.heatingSupplyTemperature = 40
+        flows.heatingReturnTemperature = 20
+        flows.coolingSupplyTemperature = 6
+        flows.coolingReturnTemperature = 15
         
 
         return flows
@@ -160,11 +163,11 @@ class FloorHeating(EmissionBuilder):
         flows.phi_st = self.phi_st+self.energy_demand
         flows.phi_m = self.phi_m
 
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
+        flows.heatingSupplyTemperature = 40
+        flows.heatingReturnTemperature = 5
+        flows.coolingSupplyTemperature = 12
+        flows.coolingReturnTemperature = 21
 
-        # flows.heatingSupplyTemperature = self.T_set_heating - 18.0/30 * (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling - 18.0/30 * (self.T_out-self.T_set_cooling)
 
         return flows
 
@@ -179,11 +182,11 @@ class TABS(EmissionBuilder):
         flows.phi_st = self.phi_st
         flows.phi_m = self.phi_m+self.energy_demand
 
-        flows.heatingSupplyTemperature=50
-        flows.coolingSupplyTemperature=12
+        flows.heatingSupplyTemperature = 50
+        flows.heatingReturnTemperature = 35
+        flows.coolingSupplyTemperature = 12
+        flows.coolingReturnTemperature = 21
 
-        # flows.heatingSupplyTemperature = self.T_set_heating - 18.0/30 * (self.T_out-self.T_set_heating)
-        # flows.coolingSupplyTemperature = self.T_set_cooling - 18.0/30 * (self.T_out-self.T_set_cooling)
         return flows
 
 

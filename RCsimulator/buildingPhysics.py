@@ -6,9 +6,8 @@ EN-13970
 """
 
 import numpy as np
-#from SupplySystem import SupplyDirector
-from supplySystem import *
-from emissionSystem import * 
+import supplySystem
+import emissionSystem
 
 
 __authors__ = "Prageeth Jayathissa"
@@ -123,10 +122,10 @@ class Building(object):
 				 T_set_cooling = 26.0,
 				 max_cooling_energy_per_floor_area=-np.inf,
 				 max_heating_energy_per_floor_area=np.inf,
-				 heatingSupplySystem=OilBoilerMed,
-				 coolingSupplySystem=HeatPumpAir,
-				 heatingEmissionSystem=NewRadiators,
-				 coolingEmissionSystem=AirConditioning,
+				 heatingSupplySystem=supplySystem.OilBoilerMed,
+				 coolingSupplySystem=supplySystem.HeatPumpAir,
+				 heatingEmissionSystem=emissionSystem.NewRadiators,
+				 coolingEmissionSystem=emissionSystem.AirConditioning,
 				 ):
 		
 
@@ -194,7 +193,7 @@ class Building(object):
 
 
 		#We call the EmissionDirector to modify these flows depending on the system and the energy demand
-		emDirector = EmissionDirector()
+		emDirector = emissionSystem.EmissionDirector()
 		#Set the emission system to the type specified by the user
 		emDirector.setBuilder(self.heatingEmissionSystem(building=self, energy_demand=energy_demand))
 		#Calculate the new flows to each node based on the heating system
@@ -441,7 +440,7 @@ class Building(object):
 
 			##Calculate the Heating/Cooling Input Energy Required
 
-			supDirector = SupplyDirector() #Initialise Heating System Manager
+			supDirector = supplySystem.SupplyDirector() #Initialise Heating System Manager
 
 			if self.has_heating_demand:
 				supDirector.setBuilder(self.heatingSupplySystem(Load=self.energy_demand, T_out=T_out, heatingSupplyTemperature=self.heatingSupplyTemperature, coolingSupplyTemperature=self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand, has_cooling_demand=self.has_cooling_demand))  

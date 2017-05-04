@@ -22,6 +22,8 @@ __status__ = "BETA"
 
 """
 Model of different Supply systems. New Supply Systems can be introduced by adding new classes
+
+TODO: Have a look at CEA calculation methodology https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
 """
 
 class SupplyDirector:
@@ -53,8 +55,8 @@ class SupplyBuilder:
     """
 
     def __init__(self, Load, T_out, heatingSupplyTemperature, coolingSupplyTemperature, has_heating_demand, has_cooling_demand):
-        self.Load=Load                              #Energy Demand of the building at that time step
-        self.T_out=T_out                        #Outdoor Air Temperature
+        self.Load=Load  #Energy Demand of the building at that time step
+        self.T_out=T_out  #Outdoor Air Temperature
         self.heatingSupplyTemperature = heatingSupplyTemperature  #Temperature required by the emission system
         self.coolingSupplyTemperature = coolingSupplyTemperature
         self.has_heating_demand = has_heating_demand
