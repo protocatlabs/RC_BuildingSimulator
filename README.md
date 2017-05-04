@@ -1,5 +1,4 @@
 ##5R1C Building Simulation Model
-First commit 
 
 
 * `buildingPhysics.py`: Is the RC model class
