@@ -10,6 +10,7 @@ import os
 import sys
 import math
 import datetime
+import matplotlib.pyplot as plt
 
 
 __authors__ = "Prageeth Jayathissa"
@@ -53,9 +54,12 @@ class Location(object):
 		self.weather_data = pd.read_csv(epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
 
 
-	def calcSunPosition(self,latitude_deg, longitude_deg, utc_datetime):
+	def calcSunPosition(self,latitude_deg, longitude_deg, year, HOY):
 		latitude_rad = math.radians(latitude_deg)
 		longitude_rad = math.radians(longitude_deg)
+
+		start_of_year = datetime.datetime(year, 1, 1, 0, 0, 0, 0)
+		utc_datetime = start_of_year + datetime.timedelta(hours=HOY)
 
 		#Angular distance of the sun north or south of the earths equator
 		day_of_year = utc_datetime.timetuple().tm_yday #Determine the day of the year.
@@ -83,17 +87,41 @@ class Location(object):
 		# print 'hour_angle_rad', hour_angle_rad
 		# print utc_datetime.minute
 
-		return math.degrees(altitude_rad), 180-math.degrees(azimuth_rad)
+		#return math.degrees(altitude_rad), 180-math.degrees(azimuth_rad)
 
-		# if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
-		# 	return math.degrees(altitude_rad), math.degrees(azimuth_rad)
-		# else:
-		# 	return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
+		if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
+			return math.degrees(altitude_rad), math.degrees(azimuth_rad)
+		else:
+			return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
 
 if __name__  ==  '__main__':
-    Zurich = Location(epwfile_path=os.path.join(os.path.dirname( __file__ ),'auxillary','Zurich-Kloten_2013.epw'))
-    azimuth= Zurich.calcSunPosition(47.480,8.536,datetime.datetime(2015, 1, 1, 9, 0, 0, 0))
-    print azimuth
+	Zurich = Location(epwfile_path=os.path.join(os.path.dirname( __file__ ),'auxillary','Zurich-Kloten_2013.epw'))
+
+	print Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
+
+	Azimuth = []
+	Altitude = []
 
 
+	for HOY in range (8760):
+		sun= Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
+		Altitude.append(sun[0])
+		Azimuth.append(math.sin(math.radians(sun[1])))
+		
+		
 
+	sunPosition=pd.read_csv(os.path.join(os.path.dirname( __file__ ),'auxillary','SunPosition.csv'), skiprows=1)
+	transSunPos=sunPosition.transpose()
+	HOY_check=transSunPos.index.tolist()
+
+	Altitude_check= transSunPos[0].tolist()
+	Azimuth_check = (180-transSunPos[1]).as_matrix()
+	Azimuth_check = np.sin(np.radians(Azimuth_check))
+	print Altitude_check
+	# altitude_check=sunPosition.loc[0]
+	# azimuth_check=180-sunPosition.loc[1]
+
+
+	#plt.plot(range(1,8761), Altitude, HOY_check, Altitude_check )
+	plt.plot(range(1,8761), Azimuth, HOY_check, Azimuth_check )
+	plt.show()
