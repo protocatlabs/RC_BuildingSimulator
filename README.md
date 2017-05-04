@@ -1,4 +1,6 @@
 ##5R1C Building Simulation Model
+First commit 
+
 
 * `buildingPhysics.py`: Is the RC model class
 * `supplySystem.py`: Is a builder pattern class to define the building system 
