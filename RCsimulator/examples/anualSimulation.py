@@ -88,6 +88,9 @@ for hour in range(8760):
 
 		diffuse_solar_gains = weatherData['difhorrad_Whm2'][hour] / 2.0 
 
+		if hour == 3994:
+			print dir_solar_gains + diffuse_solar_gains
+
 		solar_gains=(dir_solar_gains + diffuse_solar_gains) * Office.window_area
 
 

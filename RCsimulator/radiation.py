@@ -13,6 +13,7 @@ import datetime
 import matplotlib.pyplot as plt
 
 
+
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
 __credits__ = ["pysolar"]
@@ -51,13 +52,16 @@ class Location(object):
 					   'ceiling_hgt_m', 'presweathobs', 'presweathcodes', 'precip_wtr_mm', 'aerosol_opt_thousandths',
 					   'snowdepth_cm', 'days_last_snow', 'Albedo', 'liq_precip_depth_mm', 'liq_precip_rate_Hour']
 
+		#Import EPW file
 		self.weather_data = pd.read_csv(epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
+
 
 
 	def calcSunPosition(self,latitude_deg, longitude_deg, year, HOY):
 		latitude_rad = math.radians(latitude_deg)
 		longitude_rad = math.radians(longitude_deg)
 
+		#Set the date in UTC based off the hour of year and the year itself
 		start_of_year = datetime.datetime(year, 1, 1, 0, 0, 0, 0)
 		utc_datetime = start_of_year + datetime.timedelta(hours=HOY)
 
@@ -74,8 +78,11 @@ class Location(object):
 		#Angle between the local longitude and longitude where the sun is at highers altitude
 		hour_angle_rad = math.radians(15 * (12 - solar_time))
 
-		altitude_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad) + math.sin(latitude_rad) * math.sin(declination_rad))
-		
+		#Alititude Position of the Sun in Radians
+		altitude_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad) + \
+			math.sin(latitude_rad) * math.sin(declination_rad))
+	
+		#Azimuth Position fo the sun in radians	
 		azimuth_rad = math.asin(math.cos(declination_rad) * math.sin(hour_angle_rad) / math.cos(altitude_rad))
 
 		#I don't really know what this code does, it has been copied from PySolar
@@ -83,6 +90,37 @@ class Location(object):
 			return math.degrees(altitude_rad), math.degrees(azimuth_rad)
 		else:
 			return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
+
+
+class Window(object):
+	"""docstring for Window"""
+	def __init__(self, azimuth_tilt, alititude_tilt = 90):
+		super(Window, self).__init__()
+		self.alititude_tilt_rad = math.radians(alititude_tilt)
+		self.azimuth_tilt_rad = math.radians(azimuth_tilt)
+
+	def calcIncidentSolar(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
+		sun_altitude_rad = math.radians(sun_altitude)
+		sun_azimuth_rad = math.radians(sun_azimuth)
+
+		#If the sun is infront of the window surface 
+		if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
+			#Proportion of the radiation incident on the window (inverse cos of the incident ray)
+			acos_i = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
+		 	math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+
+			direct_solar = acos_i * normal_direct_radiation
+
+		else:
+			direct_solar = 0
+
+		diffuse_solar = horizontal_diffuse_radiation * (1 + math.cos(self.alititude_tilt_rad))/2
+
+		self.incident_solar = direct_solar + diffuse_solar
+
+			
+		
+
 
 if __name__  ==  '__main__':
 	Zurich = Location(epwfile_path=os.path.join(os.path.dirname( __file__ ),'auxillary','Zurich-Kloten_2013.epw'))
@@ -111,6 +149,7 @@ if __name__  ==  '__main__':
 
 	Altitude_check= transSunPos[0].tolist()
 
+	plt.style.use('ggplot')
 
 	plt.plot(SunnyHOY, Azimuth, HOY_check, Azimuth_check, SunnyHOY, Altitude, HOY_check, Altitude_check )
 	plt.legend(['Azimuth','Azimuth Check','Altitude','Altitude_check'])
