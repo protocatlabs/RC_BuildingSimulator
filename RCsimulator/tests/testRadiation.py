@@ -59,19 +59,40 @@ class TestRadiation(unittest.TestCase):
 	def test_windowSolarGains(self):
 
 		HOY = 3993
+		#9:00 am 16 June 2015
 
 		Zurich = Location(epwfile_path=os.path.join(mainPath,'auxillary','Zurich-Kloten_2013.epw'))
 		Altitude, Azimuth = Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
 
-		print Azimuth
 
-		SouthWindow = Window(azimuth_tilt=0, alititude_tilt = 90) 
+		SouthWindow = Window(azimuth_tilt=0, alititude_tilt = 90, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1) 
+		EastWindow = Window(azimuth_tilt=90, alititude_tilt = 90, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1)
+		WestWindow = Window(azimuth_tilt=180, alititude_tilt = 90, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1) 
+		NorthWindow = Window(azimuth_tilt=270, alititude_tilt = 90, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1)  
+		RoofAtrium = Window(azimuth_tilt=0, alititude_tilt = 0, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1)  
 
-		SouthWindow.calcIncidentSolar(sun_altitude = Altitude, sun_azimuth = Azimuth, 
+		for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAtrium]:
+
+			selected_window.calcIncidentSolar(sun_altitude = Altitude, sun_azimuth = Azimuth, 
 			normal_direct_radiation= Zurich.weather_data['dirnorrad_Whm2'][HOY], 
 			horizontal_diffuse_radiation = Zurich.weather_data['difhorrad_Whm2'][HOY])
 
-		print SouthWindow.incident_solar
+		self.assertEqual(round(SouthWindow.incident_solar,2), 315.85)
+		self.assertEqual(round(EastWindow.incident_solar,2), 570.06)
+		self.assertEqual(round(WestWindow.incident_solar,2), 58.0)
+		self.assertEqual(round(NorthWindow.incident_solar,2), 58.0)
+		self.assertEqual(round(RoofAtrium.incident_solar,2), 1113.72)
+
+		self.assertEqual(round(SouthWindow.solar_gains,2), 221.1)
+		self.assertEqual(round(EastWindow.solar_gains,2), 399.04)
+		self.assertEqual(round(WestWindow.solar_gains,2), 40.6)
+		self.assertEqual(round(NorthWindow.solar_gains,2), 40.6)
+		self.assertEqual(round(RoofAtrium.solar_gains,2), 779.61)		
 
 
 

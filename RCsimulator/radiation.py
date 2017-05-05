@@ -94,10 +94,14 @@ class Location(object):
 
 class Window(object):
 	"""docstring for Window"""
-	def __init__(self, azimuth_tilt, alititude_tilt = 90):
+	def __init__(self, azimuth_tilt, alititude_tilt = 90, glass_solar_transmittance=0.7,
+				 glass_light_transmittance=0.8, area = 1):
 		super(Window, self).__init__()
 		self.alititude_tilt_rad = math.radians(alititude_tilt)
 		self.azimuth_tilt_rad = math.radians(azimuth_tilt)
+		self.glass_solar_transmittance = glass_solar_transmittance
+		self.glass_light_transmittance = glass_light_transmittance
+		self.area=area
 
 	def calcIncidentSolar(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
 		sun_altitude_rad = math.radians(sun_altitude)
@@ -116,7 +120,9 @@ class Window(object):
 
 		diffuse_solar = horizontal_diffuse_radiation * (1 + math.cos(self.alititude_tilt_rad))/2
 
-		self.incident_solar = direct_solar + diffuse_solar
+		self.incident_solar = (direct_solar + diffuse_solar) * self.area
+
+		self.solar_gains = self.incident_solar * self.glass_solar_transmittance
 
 			
 		
