@@ -56,7 +56,7 @@ class Location(object):
 
 
 
-	def calcSunPosition(self,latitude_deg, longitude_deg, year, HOY):
+	def calc_sun_position(self,latitude_deg, longitude_deg, year, HOY):
 		"""
 		Calculates the Sun Position for a specific hour and location
 
@@ -127,7 +127,7 @@ class Window(object):
 
 
 
-	def calcSolarGains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
+	def calc_solar_gains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
 		"""
 		Calculates the Solar Gains in the building zone through the set Window
 
@@ -155,7 +155,7 @@ class Window(object):
 		self.solar_gains = self.incident_solar * self.glass_solar_transmittance
 
 
-	def calcIlluminance(self, sun_altitude, sun_azimuth, normal_direct_illuminance, horizontal_diffuse_illuminance):
+	def calc_illuminance(self, sun_altitude, sun_azimuth, normal_direct_illuminance, horizontal_diffuse_illuminance):
 		"""
 		Calculates the Illuminance in the building zone through the set Window
 		

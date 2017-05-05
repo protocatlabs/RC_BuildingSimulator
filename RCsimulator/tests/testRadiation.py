@@ -20,6 +20,7 @@ class TestRadiation(unittest.TestCase):
 	def test_sunPosition(self):
 
 		Zurich = Location(epwfile_path=os.path.join(mainPath,'auxillary','Zurich-Kloten_2013.epw'))
+		print Zurich.weather_data['drybulb_C'][0]
 
 
 		Azimuth = []
@@ -28,7 +29,7 @@ class TestRadiation(unittest.TestCase):
 
 
 		for HOY in range (8760):
-			angles= Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
+			angles= Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
 
 			Altitude.append(angles[0])
 			Azimuth.append(angles[1])
@@ -61,7 +62,7 @@ class TestRadiation(unittest.TestCase):
 		#9:00 am 16 June 2015
 
 		Zurich = Location(epwfile_path=os.path.join(mainPath,'auxillary','Zurich-Kloten_2013.epw'))
-		Altitude, Azimuth = Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
+		Altitude, Azimuth = Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
 
 
 		SouthWindow = Window(azimuth_tilt=0, alititude_tilt = 90, glass_solar_transmittance=0.7,
@@ -77,11 +78,11 @@ class TestRadiation(unittest.TestCase):
 
 		for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAtrium]:
 
-			selected_window.calcSolarGains(sun_altitude = Altitude, sun_azimuth = Azimuth, 
+			selected_window.calc_solar_gains(sun_altitude = Altitude, sun_azimuth = Azimuth, 
 											normal_direct_radiation= Zurich.weather_data['dirnorrad_Whm2'][HOY], 
 											horizontal_diffuse_radiation = Zurich.weather_data['difhorrad_Whm2'][HOY])
 
-			selected_window.calcIlluminance(sun_altitude = Altitude, sun_azimuth = Azimuth, 
+			selected_window.calc_illuminance(sun_altitude = Altitude, sun_azimuth = Azimuth, 
 											normal_direct_illuminance = Zurich.weather_data['dirnorillum_lux'][HOY], 
 											horizontal_diffuse_illuminance = Zurich.weather_data['difhorillum_lux'][HOY])
 
