@@ -4,6 +4,7 @@
 * `buildingPhysics.py`: Is the RC model class
 * `supplySystem.py`: Is a builder pattern class to define the building system 
 * `emissionSystem.py`: Is a builder pattern class to define the emission system of the building (work in progress)
+* `radiation.py`: Calculates the sun position, and radiation through window surfaces
 * `examples` : Folder containing two examples
 * `tests` : Is the unittest folder. 
 
