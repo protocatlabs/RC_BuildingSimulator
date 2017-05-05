@@ -9,7 +9,6 @@ sys.path.insert(0, mainPath)
 import unittest
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from radiation import Location
 from radiation import Window
 import math

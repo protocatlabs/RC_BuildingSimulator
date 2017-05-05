@@ -10,7 +10,6 @@ import os
 import sys
 import math
 import datetime
-import matplotlib.pyplot as plt
 
 
 
@@ -210,35 +209,4 @@ class Window(object):
 
 
 if __name__  ==  '__main__':
-	Zurich = Location(epwfile_path=os.path.join(os.path.dirname( __file__ ),'auxillary','Zurich-Kloten_2013.epw'))
-
-	print Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
-
-	Azimuth = []
-	Altitude = []
-	SunnyHOY=[]
-
-
-	for HOY in range (8760):
-		sun= Zurich.calcSunPosition(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
-		Altitude.append(sun[0])
-		Azimuth.append(sun[1])
-		SunnyHOY.append(HOY+1)
-		
-		
-
-	sunPosition=pd.read_csv(os.path.join(os.path.dirname( __file__ ),'auxillary','SunPosition.csv'), skiprows=1)
-
-	transSunPos=sunPosition.transpose()
-	HOY_check=transSunPos.index.tolist()
-	HOY_check =  [float(ii) for ii in HOY_check]
-	Azimuth_check= (180-transSunPos[1]).tolist()
-
-	Altitude_check= transSunPos[0].tolist()
-
-	plt.style.use('ggplot')
-
-	plt.plot(SunnyHOY, Azimuth, HOY_check, Azimuth_check, SunnyHOY, Altitude, HOY_check, Altitude_check )
-	plt.legend(['Azimuth','Azimuth Check','Altitude','Altitude_check'])
-
-	plt.show()
+	pass
