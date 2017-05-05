@@ -36,10 +36,10 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 VARIABLE DEFINITION
 
 	internal_gains: Internal Heat Gains [W]
-	solar_gains: Solar Heat Gains [W]
+	solar_gains: Solar Heat Gains after transmitting through the window [W]
 	T_out: Outdoor air temperature [C]
 	T_m_prev: Thermal mass temperature from the previous time step 
-	ill: Illuminance in contact with the total outdoor window surface [lumens]
+	ill: Illuminance transmitting through the window [lumens]
 	occupancy: Occupancy [people]
 
 	T_m_next: Medium temperature of the enxt time step [C]
@@ -106,8 +106,6 @@ class Building(object):
 				 room_depth=7.0,
 				 room_width=5.0,
 				 room_height=3.0,
-				 glass_solar_transmittance=0.7,
-				 glass_light_transmittance=0.8,
 				 lighting_load=11.7,
 				 lighting_control = 300.0,
 				 lighting_utilisation_factor=0.45,
@@ -136,8 +134,6 @@ class Building(object):
 		self.room_height=room_height #[m] Room Height
 
 		#Fenstration and Lighting Properties
-		self.glass_solar_transmittance=glass_solar_transmittance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
-		self.glass_light_transmittance=glass_light_transmittance #Dbl LoE (e=0.2) Clr 3mm/13mm Air
 		self.lighting_load=lighting_load #[kW/m2] lighting load
 		self.lighting_control = lighting_control #[lux] Lighting setpoint
 		self.lighting_utilisation_factor=lighting_utilisation_factor #How the light entering the window is transmitted to the working plane
@@ -477,7 +473,7 @@ class Building(object):
 	def solve_building_lighting(self, ill, occupancy, probLighting=1):
 
 		#Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
-		Lux=(ill*self.lighting_utilisation_factor*self.lighting_maintenance_factor*self.glass_light_transmittance)/self.floor_area #[Lux]
+		Lux=(ill*self.lighting_utilisation_factor*self.lighting_maintenance_factor)/self.floor_area #[Lux]
 
 		if Lux < self.lighting_control and occupancy>0 and probLighting>0.1:
 			self.lighting_demand=self.lighting_load*self.floor_area #Lighting demand for the hour
