@@ -639,59 +639,6 @@ class TestBuildingSim(unittest.TestCase):
         self.assertEqual(round(Office.heatingSysElectricity,2),0)
         self.assertEqual(round(Office.lighting_demand,2),401.31)
 
-    def test_lightingrequired_probabiltyOff(self):
-
-        T_out = 10
-        T_m_prev = 22
-        #Internal heat gains, in Watts
-        internal_gains = 10
-
-        #Solar heat gains after transmitting through the winow, in Watts
-        solar_gains = 2000
-
-        #Illuminance after transmitting through the window 
-        ill = 14000 #Lumens
-
-        #Occupancy for the timestep [people/hour/square_meter]
-        occupancy = 0.1
-
-        probLighting = 0.01
-
-        #Set Building Parameters
-        Office = Building(window_area = 13.5 ,
-        external_envelope_area = 15.19,
-        room_depth = 7 ,
-        room_width = 4.9 ,
-        room_height = 3.1 ,
-        lighting_load = 11.7 ,
-        lighting_control = 300,
-        lighting_utilisation_factor = 0.45,
-        lighting_maintenance_factor = 0.9,
-        U_walls = 0.2 , 
-        U_windows = 1.1,
-        ACH_vent = 1.5,
-        ACH_infl = 0.5,
-        ventilation_efficiency = 0.6,
-        thermal_capacitance_per_floor_area = 165000,
-        T_set_heating = 20.0,
-        T_set_cooling = 26.0,
-        max_cooling_energy_per_floor_area = -12.0,
-        max_heating_energy_per_floor_area = 12.0,
-        heatingSupplySystem = supplySystem.DirectHeater,
-        coolingSupplySystem = supplySystem.DirectCooler,
-        heatingEmissionSystem = emissionSystem.AirConditioning,
-        coolingEmissionSystem = emissionSystem.AirConditioning,
-        )
-
-        Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev)
-        Office.solve_building_lighting(ill, occupancy, probLighting)
-
-        self.assertEqual(round(Office.T_m,2), 22.43)
-        self.assertEqual(Office.energy_demand,0)
-        self.assertEqual(round(Office.coolingSysElectricity,2),0)
-        self.assertEqual(round(Office.heatingSysElectricity,2),0)
-        self.assertEqual(round(Office.lighting_demand,2),0)
-
     
 # ############################ System Variations ########################
 

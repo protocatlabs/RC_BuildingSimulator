@@ -25,16 +25,16 @@ __status__ = "BETA"
 
 
 """
-Workflow
+Workflow for PJ to think (To be deleted)
 
 initialise a location with weatherfile
 	calculate sun positions based on location for the whole year
 
 initialise a window class for people to create windows
+	solve for solar gains and illuminance transmitted
 
 initalise a PV panel class to create PV modules
-
-	
+	solve for PV electricity produced 
 
 """
 
