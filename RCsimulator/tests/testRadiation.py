@@ -78,9 +78,13 @@ class TestRadiation(unittest.TestCase):
 
 		for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAtrium]:
 
-			selected_window.calcIncidentSolar(sun_altitude = Altitude, sun_azimuth = Azimuth, 
-			normal_direct_radiation= Zurich.weather_data['dirnorrad_Whm2'][HOY], 
-			horizontal_diffuse_radiation = Zurich.weather_data['difhorrad_Whm2'][HOY])
+			selected_window.calcSolarGains(sun_altitude = Altitude, sun_azimuth = Azimuth, 
+											normal_direct_radiation= Zurich.weather_data['dirnorrad_Whm2'][HOY], 
+											horizontal_diffuse_radiation = Zurich.weather_data['difhorrad_Whm2'][HOY])
+
+			selected_window.calcIlluminance(sun_altitude = Altitude, sun_azimuth = Azimuth, 
+											normal_direct_illuminance = Zurich.weather_data['dirnorillum_lux'][HOY], 
+											horizontal_diffuse_illuminance = Zurich.weather_data['difhorillum_lux'][HOY])
 
 		self.assertEqual(round(SouthWindow.incident_solar,2), 315.85)
 		self.assertEqual(round(EastWindow.incident_solar,2), 570.06)
@@ -94,7 +98,11 @@ class TestRadiation(unittest.TestCase):
 		self.assertEqual(round(NorthWindow.solar_gains,2), 40.6)
 		self.assertEqual(round(RoofAtrium.solar_gains,2), 779.61)		
 
-
+		self.assertEqual(round(SouthWindow.transmitted_illuminance,2), 27330.46)
+		self.assertEqual(round(EastWindow.transmitted_illuminance,2), 47989.19)
+		self.assertEqual(round(WestWindow.transmitted_illuminance,2), 6375.2)
+		self.assertEqual(round(NorthWindow.transmitted_illuminance,2), 6375.2)
+		self.assertEqual(round(RoofAtrium.transmitted_illuminance,2), 93833.62)	
 
 
 if __name__  ==  '__main__':

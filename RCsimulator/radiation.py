@@ -40,7 +40,7 @@ initalise a PV panel class to create PV modules
 
 
 class Location(object):
-	"""docstring for Location"""
+	"""Set the Locaiton of the Simulation with an Energy Plus Weather File"""
 	def __init__(self, epwfile_path):
 		super(Location, self).__init__()
 
@@ -58,34 +58,57 @@ class Location(object):
 
 
 	def calcSunPosition(self,latitude_deg, longitude_deg, year, HOY):
+		"""
+		Calculates the Sun Position for a specific hour and location
+
+		:param latitude_deg: Geographical Latitude in Degrees
+		:type latitude_deg: float
+		:param longitude_deg: Geographical Longitude in Degrees
+		:type longitude_deg: float
+		:param year: year
+		:type year: int
+		:param HOY: Hour of the year from the start. The first hour of January is 1
+		:type HOY: int
+		:return: self.incident_solar, Incident Solar Radiation on window
+		:return: sun_altitude and sun_azimuth: Sun angles in degrees
+		:rtype: float
+		"""
+
+		# Convert to Radians
 		latitude_rad = math.radians(latitude_deg)
 		longitude_rad = math.radians(longitude_deg)
 
-		#Set the date in UTC based off the hour of year and the year itself
+		# Set the date in UTC based off the hour of year and the year itself
 		start_of_year = datetime.datetime(year, 1, 1, 0, 0, 0, 0)
 		utc_datetime = start_of_year + datetime.timedelta(hours=HOY)
 
-		#Angular distance of the sun north or south of the earths equator
+		# Angular distance of the sun north or south of the earths equator
 		day_of_year = utc_datetime.timetuple().tm_yday #Determine the day of the year.
-		declination_rad = math.radians(23.45 * math.sin((2 * math.pi / 365.0) * (day_of_year-81))) #TODO: Change to 81
 
-		angle_of_day = (day_of_year-81) * (2 * math.pi/364) #Adjusted Nomilisation to 2pi of the day. change to 81, 365.25
+		# Calculate the declination angle: The variation due to the earths tilt
+		# http://www.pveducation.org/pvcdrom/properties-of-sunlight/declination-angle
+		declination_rad = math.radians(23.45 * math.sin((2 * math.pi / 365.0) * (day_of_year-81))) 
 
+		# Normalise the day to 2*pi
+		angle_of_day = (day_of_year-81) * (2 * math.pi/364) #There is some reason as to why it is 364 and not 365.26
+
+		#The deviation between local standard time and true solar time 
 		equation_of_time = (9.87 * math.sin(2 *angle_of_day)) - (7.53 * math.cos(angle_of_day)) - (1.5 * math.sin(angle_of_day))
 
+		#True Solar Time
 		solar_time = ((utc_datetime.hour * 60) + utc_datetime.minute + (4 * longitude_deg) + equation_of_time)/60.0
 
-		#Angle between the local longitude and longitude where the sun is at highers altitude
+		# Angle between the local longitude and longitude where the sun is at highers altitude
 		hour_angle_rad = math.radians(15 * (12 - solar_time))
 
-		#Alititude Position of the Sun in Radians
+		# Alititude Position of the Sun in Radians
 		altitude_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad) + \
 			math.sin(latitude_rad) * math.sin(declination_rad))
 	
-		#Azimuth Position fo the sun in radians	
+		# Azimuth Position fo the sun in radians	
 		azimuth_rad = math.asin(math.cos(declination_rad) * math.sin(hour_angle_rad) / math.cos(altitude_rad))
 
-		#I don't really know what this code does, it has been copied from PySolar
+		# I don't really know what this code does, it has been imported from PySolar
 		if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
 			return math.degrees(altitude_rad), math.degrees(azimuth_rad)
 		else:
@@ -103,28 +126,86 @@ class Window(object):
 		self.glass_light_transmittance = glass_light_transmittance
 		self.area=area
 
-	def calcIncidentSolar(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
-		sun_altitude_rad = math.radians(sun_altitude)
-		sun_azimuth_rad = math.radians(sun_azimuth)
 
-		#If the sun is infront of the window surface 
-		if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
-			#Proportion of the radiation incident on the window (inverse cos of the incident ray)
-			acos_i = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
-		 	math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
 
-			direct_solar = acos_i * normal_direct_radiation
+	def calcSolarGains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
+		"""
+		Calculates the Solar Gains in the building zone through the set Window
 
-		else:
-			direct_solar = 0
+		:param sun_altitude: Altitude Angle of the Sun in Degrees
+		:type sun_altitude: float
+		:param sun_azimuth: Azimuth angle of the sun in degrees
+		:type sun_azimuth: float
+		:param normal_direct_radiation: Normal Direct Radiation from weather file
+		:type normal_direct_radiation: float
+		:param horizontal_diffuse_radiation: Horizontal Diffuse Radiation from weather file
+		:type horizontal_diffuse_radiation: float
+		:return: self.incident_solar, Incident Solar Radiation on window
+		:return: self.solar_gains - Solar gains in building after transmitting through the window
+		:rtype: float
+		"""
+		
+		direct_factor = self.calcDirectSolarFactor(sun_altitude, sun_azimuth,)
+		diffuse_factor = self.calcDiffuseSolarFactor()
 
-		diffuse_solar = horizontal_diffuse_radiation * (1 + math.cos(self.alititude_tilt_rad))/2
 
+		direct_solar = direct_factor * normal_direct_radiation
+		diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
 		self.incident_solar = (direct_solar + diffuse_solar) * self.area
 
 		self.solar_gains = self.incident_solar * self.glass_solar_transmittance
 
-			
+
+	def calcIlluminance(self, sun_altitude, sun_azimuth, normal_direct_illuminance, horizontal_diffuse_illuminance):
+		"""
+		Calculates the Illuminance in the building zone through the set Window
+		
+		:param sun_altitude: Altitude Angle of the Sun in Degrees
+		:type sun_altitude: float
+		:param sun_azimuth: Azimuth angle of the sun in degrees
+		:type sun_azimuth: float
+		:param normal_direct_illuminance: Normal Direct Illuminance from weather file [Lx]
+		:type normal_direct_illuminance: float
+		:param horizontal_diffuse_illuminance: Horizontal Diffuse Illuminance from weather file [Lx]
+		:type horizontal_diffuse_illuminance: float
+		:return: self.incident_illuminance, Incident Illuminance on window [Lumens]
+		:return: self.transmitted_illuminance - Illuminance in building after transmitting through the window [Lumens]
+		:rtype: float
+		"""
+
+		direct_factor = self.calcDirectSolarFactor(sun_altitude, sun_azimuth,)
+		diffuse_factor = self.calcDiffuseSolarFactor()
+
+		direct_illuminance = direct_factor * normal_direct_illuminance
+		diffuse_illuminance = diffuse_factor * horizontal_diffuse_illuminance
+
+		self.incident_illuminance = (direct_illuminance + diffuse_illuminance) * self.area
+		self.transmitted_illuminance = self.incident_illuminance * self.glass_light_transmittance
+
+		
+	def calcDirectSolarFactor(self, sun_altitude, sun_azimuth):
+		"""
+		Calculates the cosine of the angle of incidence on the window 
+		"""
+		sun_altitude_rad = math.radians(sun_altitude)
+		sun_azimuth_rad = math.radians(sun_azimuth)
+
+		# If the sun is infront of the window surface 
+		if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
+			# Proportion of the radiation incident on the window (cos of the incident ray)
+			direct_factor = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
+			math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+
+		else:
+			# If sun is behind the window surface
+			direct_factor = 0
+
+		return direct_factor
+
+	def calcDiffuseSolarFactor(self):
+		"""Calculates the proportion of diffuse radiation"""
+		# Proportion of incident light on the window surface
+		return (1 + math.cos(self.alititude_tilt_rad))/2
 		
 
 
