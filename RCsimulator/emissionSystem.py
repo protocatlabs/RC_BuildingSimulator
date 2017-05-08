@@ -65,13 +65,9 @@ class EmissionBuilder:
     """ The base class in which systems are built from
     """
 
-    def __init__(self, building, energy_demand):
+    def __init__(self, energy_demand):
 
       self.energy_demand = energy_demand
-
-      self.phi_ia=building.phi_ia
-      self.phi_st=building.phi_st
-      self.phi_m = building.phi_m
 
     def heatFlows(self): pass
 
@@ -84,9 +80,9 @@ class OldRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia+self.energy_demand
-        flows.phi_st = self.phi_st
-        flows.phi_m = self.phi_m
+        flows.phi_ia_plus = self.energy_demand
+        flows.phi_st_plus = 0 
+        flows.phi_m_plus = 0 
 
         flows.heatingSupplyTemperature = 65
         flows.heatingReturnTemperature = 45
@@ -102,9 +98,9 @@ class NewRadiators(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia+self.energy_demand
-        flows.phi_st = self.phi_st
-        flows.phi_m = self.phi_m
+        flows.phi_ia_plus = self.energy_demand
+        flows.phi_st_plus = 0 
+        flows.phi_m_plus = 0 
         
         flows.heatingSupplyTemperature = 50
         flows.heatingReturnTemperature = 35
@@ -121,9 +117,9 @@ class ChilledBeams(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia+self.energy_demand
-        flows.phi_st = self.phi_st
-        flows.phi_m = self.phi_m
+        flows.phi_ia_plus = self.energy_demand
+        flows.phi_st_plus = 0 
+        flows.phi_m_plus = 0 
 
         flows.heatingSupplyTemperature = 50
         flows.heatingReturnTemperature = 35
@@ -140,9 +136,9 @@ class AirConditioning(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia+self.energy_demand
-        flows.phi_st = self.phi_st
-        flows.phi_m = self.phi_m
+        flows.phi_ia_plus = self.energy_demand
+        flows.phi_st_plus = 0 
+        flows.phi_m_plus = 0 
 
         flows.heatingSupplyTemperature = 40
         flows.heatingReturnTemperature = 20
@@ -159,9 +155,9 @@ class FloorHeating(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia
-        flows.phi_st = self.phi_st+self.energy_demand
-        flows.phi_m = self.phi_m
+        flows.phi_ia_plus = 0 
+        flows.phi_st_plus = self.energy_demand
+        flows.phi_m_plus = 0 
 
         flows.heatingSupplyTemperature = 40
         flows.heatingReturnTemperature = 5
@@ -178,9 +174,9 @@ class TABS(EmissionBuilder):
 
     def heatFlows(self):
         flows = EmissionOut()
-        flows.phi_ia = self.phi_ia
-        flows.phi_st = self.phi_st
-        flows.phi_m = self.phi_m+self.energy_demand
+        flows.phi_ia_plus = 0 
+        flows.phi_st_plus = 0 
+        flows.phi_m_plus = self.energy_demand
 
         flows.heatingSupplyTemperature = 50
         flows.heatingReturnTemperature = 35
@@ -193,9 +189,9 @@ class TABS(EmissionBuilder):
 class EmissionOut:
     #The System class which is used to output the final results
 
-    phi_ia= None
-    phi_m= None
-    phi_st= None
+    phi_ia_plus= None
+    phi_m_plus= None
+    phi_st_plus= None
 
     heatingSupplyTemperature = None
     coolingSupplyTemperature = None
