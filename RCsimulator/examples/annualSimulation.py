@@ -46,7 +46,7 @@ COP = []
 
 # Initialise the Location with a weather file
 Zurich = Location(epwfile_path=os.path.join(
-    mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+    mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
 # Initialise an instance of the building. Empty spaces take on the default
 # parameters. See buildingPhysics.py to see the default values
@@ -87,7 +87,7 @@ max_occupancy = 3.0
 
 # Read Occupancy Profile
 occupancyProfile = pd.read_csv(os.path.join(
-    mainPath, 'auxillary', 'schedules_el_OFFICE.csv'))
+    mainPath, 'auxiliary', 'schedules_el_OFFICE.csv'))
 
 # Starting temperature of the builidng
 T_m_prev = 20

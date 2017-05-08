@@ -19,7 +19,7 @@ class TestRadiation(unittest.TestCase):
     def test_sunPosition(self):
 
         Zurich = Location(epwfile_path=os.path.join(
-            mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+            mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
         Azimuth = []
         Altitude = []
@@ -34,7 +34,7 @@ class TestRadiation(unittest.TestCase):
             SunnyHOY.append(HOY + 1)
 
         sunPosition = pd.read_csv(os.path.join(
-            mainPath, 'auxillary', 'SunPosition.csv'), skiprows=1)
+            mainPath, 'auxiliary', 'SunPosition.csv'), skiprows=1)
 
         transSunPos = sunPosition.transpose()
         HOY_check = transSunPos.index.tolist()
@@ -66,7 +66,7 @@ class TestRadiation(unittest.TestCase):
         # 9:00 am 16 June 2015
 
         Zurich = Location(epwfile_path=os.path.join(
-            mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+            mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
         Altitude, Azimuth = Zurich.calc_sun_position(
             latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
 
