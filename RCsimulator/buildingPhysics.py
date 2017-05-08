@@ -181,7 +181,7 @@ class Building(object):
 		:param occupancy: Probability of full occupancy
 		:type occupancy: float
 		
-		:return: self.lighting_deman, Lighting Energy Required for the timestep
+		:return: self.lighting_demand, Lighting Energy Required for the timestep
 		:rtype: float
 
 		"""
