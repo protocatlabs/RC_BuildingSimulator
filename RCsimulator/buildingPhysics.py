@@ -436,14 +436,14 @@ class Building(object):
 		#We call the EmissionDirector to modify these flows depending on the system and the energy demand
 		emDirector = emissionSystem.EmissionDirector()
 		#Set the emission system to the type specified by the user
-		emDirector.setBuilder(self.heatingEmissionSystem(building=self, energy_demand=energy_demand))
+		emDirector.setBuilder(self.heatingEmissionSystem(energy_demand=energy_demand))
 		#Calculate the new flows to each node based on the heating system
 		flows = emDirector.calcFlows()
 		
 		#Set modified flows to building object
-		self.phi_ia = flows.phi_ia 
-		self.phi_st = flows.phi_st 
-		self.phi_m = flows.phi_m 
+		self.phi_ia += flows.phi_ia_plus 
+		self.phi_st += flows.phi_st_plus 
+		self.phi_m += flows.phi_m_plus 
 
 		#Set supply temperature to building object
 		#TODO: This currently is constant for all emission systems, to be modified in the future

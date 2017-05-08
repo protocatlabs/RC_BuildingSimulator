@@ -20,8 +20,6 @@ class TestRadiation(unittest.TestCase):
 	def test_sunPosition(self):
 
 		Zurich = Location(epwfile_path=os.path.join(mainPath,'auxillary','Zurich-Kloten_2013.epw'))
-		print Zurich.weather_data['drybulb_C'][0]
-
 
 		Azimuth = []
 		Altitude = []
