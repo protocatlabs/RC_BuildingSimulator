@@ -34,62 +34,64 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 
 VARIABLE DEFINITION
 
-	internal_gains: Internal Heat Gains [W]
-	solar_gains: Solar Heat Gains after transmitting through the window [W]
-	T_out: Outdoor air temperature [C]
-	T_m_prev: Thermal mass temperature from the previous time step 
-	ill: Illuminance transmitting through the window [lumens]
-	occupancy: Occupancy [people]
+    internal_gains: Internal Heat Gains [W]
+    solar_gains: Solar Heat Gains after transmitting through the window [W]
+    T_out: Outdoor air temperature [C]
+    T_m_prev: Thermal mass temperature from the previous time step 
+    ill: Illuminance transmitting through the window [lumen]
+    occupancy: Occupancy [people]
 
-	T_m_next: Medium temperature of the enxt time step [C]
-	T_m: Some wierd average between the previous and current timestep of the medium  [C] #TODO: Check this 
+    T_m_next: Medium temperature of the next time step [C]
+    T_m: Some weird average between the previous and current time-step of the medium  [C] #TODO: Check this 
 
-	Inputs to the 5R1C model:
-	c_m: Thermal Capacitance of the medium [J/K]
-	h_tr_is: Heat transfer coefficient between the air and the inside surface [W/K]
-	h_tr_w: Heat transfer from the outside through windows, doors [W/K]
-	H_tr_ms: Heat transfer coefficient between the internal surface temperature and the medium [W/K]
-	h_tr_em: Heat conductance from the outside through opaque elements [W/K]
-	h_ve_adj: Ventilation heat transmission coefficient [W/K]
+    Inputs to the 5R1C model:
+    c_m: Thermal Capacitance of the medium [J/K]
+    h_tr_is: Heat transfer coefficient between the air and the inside surface [W/K]
+    h_tr_w: Heat transfer from the outside through windows, doors [W/K]
+    H_tr_ms: Heat transfer coefficient between the internal surface temperature and the medium [W/K]
+    h_tr_em: Heat conductance from the outside through opaque elements [W/K]
+    h_ve_adj: Ventilation heat transmission coefficient [W/K]
 
-	phi_m_tot: see formula for the calculation, eq C.5 in standard [W]
-	phi_m: Combination of internal and solar gains directly to the medium [W]
-	phi_st: combination of internal and solar gains directly to the internal surface [W]
-	phi_ia: combination of internal and solar gains to the air [W]
-	energy_demand: Heating and Cooling of the Supply air [W]
+    phi_m_tot: see formula for the calculation, eq C.5 in standard [W]
+    phi_m: Combination of internal and solar gains directly to the medium [W]
+    phi_st: combination of internal and solar gains directly to the internal surface [W]
+    phi_ia: combination of internal and solar gains to the air [W]
+    energy_demand: Heating and Cooling of the Supply air [W]
 
-	h_tr_1: combined heat conductance, see function for definition [W/K]
-	h_tr_2: combined heat conductance, see function for definition [W/K]
-	h_tr_3: combined heat conductance, see function for definition [W/K]
+    h_tr_1: combined heat conductance, see function for definition [W/K]
+    h_tr_2: combined heat conductance, see function for definition [W/K]
+    h_tr_3: combined heat conductance, see function for definition [W/K]
 
 
-	
+    
 INPUT PARAMETER DEFINITION 
 
-	window_area: Area of the Glazed Surface in contact with the outside [m2]
-	external_envelope_area: Area of all envelope surfaces, including windows in contact with the outside
-	room_depth=7.0 Depth of the modeled room [m]
-	room_width=4.9 Width of the modeled room [m]
-	room_height=3.1 Height of the modeled room [m]
-	lighting_load: Lighting Load [W/m2] 
-	lighting_control: Lux threshold at which the lights turn on [Lx]
-	U_walls: U value of opaque surfaces  [W/m2K]
-	U_windows: U value of glazed surfaces [W/m2K]
-	ACH_vent: Air changes per hour through ventilation [Air Changes Per Hour]
-	ACH_infl: Air changes per hour through infiltration [Air Changes Per Hour]
-	ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat recovery []
-	thermal_capacitance_per_floor_area: Thermal capacitance of the room per floor area [J/m2K]
-	T_set_heating : Thermal heating set point [C]
-	T_set_cooling: Thermal cooling set point [C]
-	max_cooling_energy_per_floor_area: Maximum cooling load. Set to -np.inf for unresctricted cooling [C]
-	max_heating_energy_per_floor_area: Maximum heating load per floor area. Set to no.inf for unrestricted heating [C]
-	heatingSupplySystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. Direct heater 
-		has no changes to the heating demand load, a resistive heater takes an efficiency into account, and a HeatPumpHeater
-		calculates a COP based on the outdoor and system supply temperature 
-	coolingSupplySystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. DirectCooler
-		has no changes to the cooling demand load, a HeatPumpCooler calculates a COP based on the outdoor and system supply temperature 
-	heatingEmissionSystem: How the heat is distrubuted to the building
-	coolingEmissionSystem: How the cooling energy is distributed to the building
+    window_area: Area of the Glazed Surface in contact with the outside [m2]
+    external_envelope_area: Area of all envelope surfaces, including windows in contact with the outside
+    room_depth=7.0 Depth of the modelled room [m]
+    room_width=4.9 Width of the modelled room [m]
+    room_height=3.1 Height of the modelled room [m]
+    lighting_load: Lighting Load [W/m2] 
+    lighting_control: Lux threshold at which the lights turn on [Lx]
+    U_walls: U value of opaque surfaces  [W/m2K]
+    U_windows: U value of glazed surfaces [W/m2K]
+    ACH_vent: Air changes per hour through ventilation [Air Changes Per Hour]
+    ACH_infl: Air changes per hour through infiltration [Air Changes Per Hour]
+    ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat 
+        recovery []
+    thermal_capacitance_per_floor_area: Thermal capacitance of the room per floor area [J/m2K]
+    T_set_heating : Thermal heating set point [C]
+    T_set_cooling: Thermal cooling set point [C]
+    max_cooling_energy_per_floor_area: Maximum cooling load. Set to -np.inf for unrestricted cooling [C]
+    max_heating_energy_per_floor_area: Maximum heating load per floor area. Set to no.inf for unrestricted heating [C]
+    heatingSupplySystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. 
+        Direct heater has no changes to the heating demand load, a resistive heater takes an efficiency into account, 
+        HeatPumpHeatercalculates a COP based on the outdoor and system supply temperature 
+    coolingSupplySystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. 
+        DirectCooler has no changes to the cooling demand load, 
+        HeatPumpCooler calculates a COP based on the outdoor and system supply temperature 
+    heatingEmissionSystem: How the heat is distributed to the building
+    coolingEmissionSystem: How the cooling energy is distributed to the building
 """
 
 
@@ -128,9 +130,9 @@ class Building(object):
         self.room_width = room_width  # [m] Room Width
         self.room_height = room_height  # [m] Room Height
 
-        # Fenstration and Lighting Properties
+        # Fenestration and Lighting Properties
         self.lighting_load = lighting_load  # [kW/m2] lighting load
-        self.lighting_control = lighting_control  # [lux] Lighting setpoint
+        self.lighting_control = lighting_control  # [lux] Lighting set point
         # How the light entering the window is transmitted to the working plane
         self.lighting_utilisation_factor = lighting_utilisation_factor
         # How dirty the window is. Section 2.2.3.1 Environmental Science
@@ -159,7 +161,7 @@ class Building(object):
 
         # Determine the ventilation conductance
         ACH_tot = ACH_infl + ACH_vent  # Total Air Changes Per Hour
-        # temperature adjustement factor taking ventilation and inflimtration
+        # temperature adjustment factor taking ventilation and infiltration
         # [ISO: E -27]
         b_ek = (1 - (ACH_vent / (ACH_tot)) * ventilation_efficiency)
         self.h_ve_adj = 1200 * b_ek * self.Room_Vol * \
@@ -221,7 +223,7 @@ class Building(object):
         :type solar_gains: float
         :param T_out: Outdoor air temperature [C]
         :type T_out: float
-        :param T_m_prev: Prevous air temperature [C]
+        :param T_m_prev: Previous air temperature [C]
         :type T_m_prev: float
 
         :return: self.heatingDemand, space heating demand of the building
@@ -230,7 +232,7 @@ class Building(object):
         :return: self.coolingDemand, space cooling demand of the building
         :return: self.coolingSysElectricity, electricity consumption from cooling
         :return: self.coolingSysFossils, fossil fuel consumption from cooling
-        :return: self.electricityOut, electricty produced from combined heat pump systems
+        :return: self.electricityOut, electricity produced from combined heat pump systems
         :return: self.sysTotalEnergy, total exergy consumed (electricity + fossils) for heating and cooling
         :return: self.heatingEnergy, total exergy consumed (electricity + fossils) for heating 
         :return: self.coolingEnergy, total exergy consumed (electricity + fossils) for cooling
@@ -282,7 +284,7 @@ class Building(object):
                 internal_gains, solar_gains, T_out, T_m_prev)
 
             self.calc_temperatures_crank_nicolson(
-                self.energy_demand, internal_gains, solar_gains, T_out, T_m_prev)[1]
+                self.energy_demand, internal_gains, solar_gains, T_out, T_m_prev)
             # calculates the actual T_m resulting from the actual heating
             # demand (energy_demand)
 
@@ -291,8 +293,12 @@ class Building(object):
             supDirector = supplySystem.SupplyDirector()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supDirector.setBuilder(self.heatingSupplySystem(Load=self.energy_demand, T_out=T_out, heatingSupplyTemperature=self.heatingSupplyTemperature,
-                                                                coolingSupplyTemperature=self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand, has_cooling_demand=self.has_cooling_demand))
+                supDirector.setBuilder(self.heatingSupplySystem(Load=self.energy_demand, 
+                                                                T_out=T_out, 
+                                                                heatingSupplyTemperature=self.heatingSupplyTemperature,
+                                                                coolingSupplyTemperature=self.coolingSupplyTemperature, 
+                                                                has_heating_demand=self.has_heating_demand, 
+                                                                has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supDirector.calcSystem()
                 # All Variables explained underneath line 467
                 self.heatingDemand = self.energy_demand
@@ -304,8 +310,12 @@ class Building(object):
                 self.electricityOut = supplyOut.electricityOut
 
             elif self.has_cooling_demand:
-                supDirector.setBuilder(self.coolingSupplySystem(Load=self.energy_demand * (-1), T_out=T_out, heatingSupplyTemperature=self.heatingSupplyTemperature,
-                                                                coolingSupplyTemperature=self.coolingSupplyTemperature, has_heating_demand=self.has_heating_demand, has_cooling_demand=self.has_cooling_demand))
+                supDirector.setBuilder(self.coolingSupplySystem(Load=self.energy_demand * (-1), 
+                                                                T_out=T_out, 
+                                                                heatingSupplyTemperature=self.heatingSupplyTemperature,
+                                                                coolingSupplyTemperature=self.coolingSupplyTemperature, 
+                                                                has_heating_demand=self.has_heating_demand, 
+                                                                has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supDirector.calcSystem()
                 self.heatingDemand = 0
                 self.heatingSysElectricity = 0
@@ -330,7 +340,7 @@ class Building(object):
         # step 1 in section C.4.2 in [C.3 ISO 13790]
         """
 
-        # set energy demand to 0 and see if temperatures are within the confort
+        # set energy demand to 0 and see if temperatures are within the comfort
         # range
         energy_demand = 0
         # Solve for the internal temperature T_Air
@@ -382,7 +392,8 @@ class Building(object):
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
 
-        # Step 1: Check if heating or cooling is needed (Not needed, but doing so for readability when comparing with the standard)
+        # Step 1: Check if heating or cooling is needed 
+        #(Not needed, but doing so for readability when comparing with the standard)
         # Set heating/cooling to 0
         energy_demand_0 = 0
         # Calculate the air temperature with no heating/cooling
@@ -567,7 +578,8 @@ class Building(object):
 
         T_supply = T_out  # ASSUMPTION: Supply air comes straight from the outside air
 
-        self.T_s = (self.h_tr_ms * self.T_m + self.phi_st + self.h_tr_w * T_out + self.h_tr_1 * (T_supply + self.phi_ia / self.h_ve_adj)) / \
+        self.T_s = (self.h_tr_ms * self.T_m + self.phi_st + self.h_tr_w * T_out + self.h_tr_1 * \
+            (T_supply + self.phi_ia / self.h_ve_adj)) / \
             (self.h_tr_ms + self.h_tr_w + self.h_tr_1)
 
     def calc_T_air(self, T_out):

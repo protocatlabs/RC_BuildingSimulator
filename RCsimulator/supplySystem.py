@@ -20,7 +20,8 @@ __status__ = "BETA"
 """
 Model of different Supply systems. New Supply Systems can be introduced by adding new classes
 
-TODO: Have a look at CEA calculation methodology https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
+TODO: Have a look at CEA calculation methodology 
+https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
 """
 
 
@@ -104,7 +105,7 @@ class HeatPumpAir(SupplyBuilder):
     """
     BETA Version
     Air-Water heat pump. Outside Temperature as reservoir temperature.
-    COP based off regression anlysis of manufacturers data
+    COP based off regression analysis of manufacturers data
     Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
     http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
     """
@@ -141,7 +142,7 @@ class HeatPumpWater(SupplyBuilder):
     BETA Version
     Reservoir temperatures 7 degC (winter) and 12 degC (summer).
     Ground-Water heat pump. Outside Temperature as reservoir temperature.
-    COP based off regression anlysis of manufacturers data
+    COP based off regression analysis of manufacturers data
     Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
     http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
     """
@@ -165,24 +166,6 @@ class HeatPumpWater(SupplyBuilder):
         system.electricityOut = 0
         return system
 
-
-# class HeatPumpGround(SupplyBuilder):
-#     #Ground-Water heat pump. epsilon_carnot = 0.45. Reservoir temperatures 7 degC (winter) and 12 degC (summer). (Same as HeatPumpWater except for lower e_Carnot)
-
-#     def calcLoads(self):
-#         heater = SupplyOut()
-#         if self.has_heating_demand:                                   #Heating
-#             heater.electricityIn = self.Load/(0.45*(self.heatingSupplyTemperature+273.0)/(self.heatingSupplyTemperature-7.0))
-#         else:                                              #Cooling
-#             if self.coolingSupplyTemperature > 11.9:                 #Only by pumping
-#                 heater.electricityIn = self.Load*0.1
-#             else:                                           #Heat Pump active
-#                 heater.electricityIn = self.Load/(0.45*(self.coolingSupplyTemperature+273.0)/(12.0-self.coolingSupplyTemperature))
-#         heater.electricityOut = 0
-#         heater.fossilsIn = 0
-#         return heater
-
-#     name = 'Ground Source Heat Pump'
 
 class ElectricHeating(SupplyBuilder):
     # Straight forward electric heating. 100 percent conversion to heat.

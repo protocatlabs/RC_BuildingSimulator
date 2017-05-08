@@ -23,22 +23,13 @@ __status__ = "BETA"
 
 
 """
-Workflow for PJ to think (To be deleted)
-
-initialise a location with weatherfile
-	calculate sun positions based on location for the whole year
-
-initialise a window class for people to create windows
-	solve for solar gains and illuminance transmitted
-
-initalise a PV panel class to create PV modules
-	solve for PV electricity produced 
+TODO: Create a PV model
 
 """
 
 
 class Location(object):
-    """Set the Locaiton of the Simulation with an Energy Plus Weather File"""
+    """Set the Location of the Simulation with an Energy Plus Weather File"""
 
     def __init__(self, epwfile_path):
         super(Location, self).__init__()
@@ -67,7 +58,7 @@ class Location(object):
         :type year: int
         :param HOY: Hour of the year from the start. The first hour of January is 1
         :type HOY: int
-        :return: altitude, azimuth: Sun position in alitude and azimuth degrees [degrees]
+        :return: altitude, azimuth: Sun position in altitude and azimuth degrees [degrees]
         :rtype: tuple
         """
 
@@ -101,10 +92,10 @@ class Location(object):
                       (4 * longitude_deg) + equation_of_time) / 60.0
 
         # Angle between the local longitude and longitude where the sun is at
-        # highers altitude
+        # higher altitude
         hour_angle_rad = math.radians(15 * (12 - solar_time))
 
-        # Alititude Position of the Sun in Radians
+        # Altitude Position of the Sun in Radians
         altitude_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad) +
                                  math.sin(latitude_rad) * math.sin(declination_rad))
 
@@ -193,7 +184,7 @@ class Window(object):
         sun_altitude_rad = math.radians(sun_altitude)
         sun_azimuth_rad = math.radians(sun_azimuth)
 
-        # If the sun is infront of the window surface
+        # If the sun is in front of the window surface
         if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
             # Proportion of the radiation incident on the window (cos of the
             # incident ray)
