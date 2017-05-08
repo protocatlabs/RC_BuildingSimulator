@@ -1,4 +1,4 @@
-##5R1C Building Simulation Model
+## 5R1C Building Simulation Model
 
 
 * `buildingPhysics.py`: Is the RC model class
@@ -11,7 +11,7 @@
 
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
-###HOW TO USE
+### HOW TO USE
 See RCsimulator/examples/
 ```python
 from buildingPhysics import Building #Importing Building Class
@@ -21,7 +21,7 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 ```
 
 
-###VARIABLE DEFINITION
+### VARIABLE DEFINITION
 
 	internal_gains: Internal Heat Gains [W]
 	solar_gains: Solar Heat Gains [W]
@@ -53,7 +53,7 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 
 
 	
-###INPUT PARAMETER DEFINITION 
+### INPUT PARAMETER DEFINITION 
 
 	window_area: Area of the Glazed Surface in contact with the outside [m2]
 	external_envelope_area: Area of all envelope surfaces, including windows in contact with the outside
@@ -82,7 +82,7 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 	heatingEfficiency: Efficiency of the heating system (note for DirectHeater this is always 1)
 	coolingEfficiency: Efficiency of the cooling system (note for DirectCooler this is always 1)
 
-###CLASS ATTRIBUTES	
+### CLASS ATTRIBUTES	
 
 	self.T_m : Room medium temperature
 	self.T_air : Room air temperature
@@ -103,7 +103,7 @@ Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
 
 There are other attributes that are not very important, and can be found within buildingPhysics.py. Post an issue if you have any questions
 
-##References
+## References
 
 Madsen, Henrik, and Jan Holst. "Estimation of continuous-time models for the heat dynamics of a building." Energy and Buildings 22.1 (1995): 67-79.
 
