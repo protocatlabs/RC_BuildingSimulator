@@ -1,4 +1,4 @@
-## 5R1C Building Simulation Model
+# 5R1C Building Simulation Model
 
 ## 10min Guide to your first simulation
 
