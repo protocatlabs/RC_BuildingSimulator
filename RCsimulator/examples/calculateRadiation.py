@@ -53,6 +53,7 @@ NorthWindow = Window(azimuth_tilt=270, alititude_tilt = 90, glass_solar_transmit
 RoofAtrium = Window(azimuth_tilt=0, alititude_tilt = 0, glass_solar_transmittance=0.7,
 		 glass_light_transmittance=0.8, area = 1) 
 
+### Loop through all windows
 for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAtrium]:
 	selected_window.calc_solar_gains(sun_altitude = Altitude, sun_azimuth = Azimuth, 
 									normal_direct_radiation= Zurich.weather_data['dirnorrad_Whm2'][HOY], 

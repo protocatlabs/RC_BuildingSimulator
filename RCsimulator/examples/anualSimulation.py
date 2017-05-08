@@ -1,6 +1,6 @@
 """
 =========================================
-Example of an Anual Simulation
+Example of an Annual Simulation
 =========================================
 """
 __author__ = "Prageeth Jayathissa"
