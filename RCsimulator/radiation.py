@@ -68,9 +68,8 @@ class Location(object):
 		:type year: int
 		:param HOY: Hour of the year from the start. The first hour of January is 1
 		:type HOY: int
-		:return: self.incident_solar, Incident Solar Radiation on window
-		:return: sun_altitude and sun_azimuth: Sun angles in degrees
-		:rtype: float
+		:return: altitude, azimuth: Sun position in alitude and azimuth degrees [degrees]
+		:rtype: tuple
 		"""
 
 		# Convert to Radians

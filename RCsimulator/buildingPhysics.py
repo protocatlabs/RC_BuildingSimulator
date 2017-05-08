@@ -197,13 +197,13 @@ class Building(object):
 		"""
 		Calculates the heating and cooling consumption of a building for a set timestep
 
-		:param internal_gains: Altitude Angle of the Sun in Degrees
+		:param internal_gains: internal heat gains from people and appliances [W]
 		:type internal_gains: float
-		:param solar_gains: Azimuth angle of the sun in degrees
+		:param solar_gains: solar heat gains [W]
 		:type solar_gains: float
-		:param T_out: Normal Direct Illuminance from weather file [Lx]
+		:param T_out: Outdoor air temperature [C]
 		:type T_out: float
-		:param T_m_prev: Horizontal Diffuse Illuminance from weather file [Lx]
+		:param T_m_prev: Prevous air temperature [C]
 		:type T_m_prev: float
 
 		:return: self.heatingDemand, space heating demand of the building

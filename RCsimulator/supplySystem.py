@@ -141,7 +141,7 @@ class HeatPumpWater(SupplyBuilder):
     """"
     BETA Version
     Reservoir temperatures 7 degC (winter) and 12 degC (summer).
-    Air-Water heat pump. Outside Temperature as reservoir temperature.
+    Ground-Water heat pump. Outside Temperature as reservoir temperature.
     COP based off regression anlysis of manufacturers data
     Source: "A review of domestic heat pumps, Iain Staffell, Dan Brett, Nigel Brandonc and Adam Hawkes"
     http://pubs.rsc.org/en/content/articlepdf/2012/ee/c2ee22653g
