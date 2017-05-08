@@ -72,8 +72,6 @@ INPUT PARAMETER DEFINITION
 	room_depth=7.0 Depth of the modeled room [m]
 	room_width=4.9 Width of the modeled room [m]
 	room_height=3.1 Height of the modeled room [m]
-	glass_solar_transmittance: Fraction of Radiation transmitting through the window []
-	glass_light_transmittance: Fraction of visible light (luminance) transmitting through the window []
 	lighting_load: Lighting Load [W/m2] 
 	lighting_control: Lux threshold at which the lights turn on [Lx]
 	U_walls: U value of opaque surfaces  [W/m2K]
@@ -88,11 +86,11 @@ INPUT PARAMETER DEFINITION
 	max_heating_energy_per_floor_area: Maximum heating load per floor area. Set to no.inf for unrestricted heating [C]
 	heatingSupplySystem: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. Direct heater 
 		has no changes to the heating demand load, a resistive heater takes an efficiency into account, and a HeatPumpHeater
-		calculates a COP based on the outdoor and indoor temperature 
+		calculates a COP based on the outdoor and system supply temperature 
 	coolingSupplySystem: The type of cooling system. Choices are DirectCooler HeatPumpCooler. DirectCooler
-		has no changes to the cooling demand load, a HeatPumpCooler calculates a COP based on the outdoor and indoor temperature 
-	heatingEfficiency: Efficiency of the heating system (note for DirectHeater this is always 1)
-	coolingEfficiency: Efficiency of the cooling system (note for DirectCooler this is always 1)
+		has no changes to the cooling demand load, a HeatPumpCooler calculates a COP based on the outdoor and system supply temperature 
+	heatingEmissionSystem: How the heat is distrubuted to the building
+	coolingEmissionSystem: How the cooling energy is distributed to the building
 """
 
 
