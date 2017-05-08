@@ -11,8 +11,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from buildingPhysics import Building  # Importing Building Class
-from auxillary import epwReader
-from auxillary import sunPositionReader
+from auxiliary import epwReader
+from auxiliary import sunPositionReader
 
 from radiation import Location
 
@@ -21,7 +21,7 @@ matplotlib.style.use('ggplot')
 
 def calculate_sun_angles():
     Zurich = Location(epwfile_path=os.path.join(
-        mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+        mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
     print Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
 
@@ -37,7 +37,7 @@ def calculate_sun_angles():
         SunnyHOY.append(HOY + 1)
 
     sunPosition = pd.read_csv(os.path.join(
-        mainPath, 'auxillary', 'SunPosition.csv'), skiprows=1)
+        mainPath, 'auxiliary', 'SunPosition.csv'), skiprows=1)
 
     transSunPos = sunPosition.transpose()
     HOY_check = transSunPos.index.tolist()

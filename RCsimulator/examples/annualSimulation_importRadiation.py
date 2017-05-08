@@ -26,8 +26,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from buildingPhysics import Building  # Importing Building Class
-from auxillary import epwReader
-from auxillary import sunPositionReader
+from auxiliary import epwReader
+from auxiliary import sunPositionReader
 
 matplotlib.style.use('ggplot')
 
@@ -53,14 +53,14 @@ Office = Building()
 
 # Read Weather Data
 weatherData = epwReader.epwReader(os.path.join(
-    mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+    mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
 # print weatherData['drybulb_C']
 # print weatherData['glohorrad_Whm2']
 
 # Read Sunposition and Extract Azimuth and Alitutude Angles
 sunPosition = pd.read_csv(os.path.join(
-    mainPath, 'auxillary', 'SunPosition.csv'), skiprows=1)
+    mainPath, 'auxiliary', 'SunPosition.csv'), skiprows=1)
 
 altitude = sunPosition.loc[0]
 azimuth = 180 - sunPosition.loc[1]
@@ -68,7 +68,7 @@ azimuth = 180 - sunPosition.loc[1]
 
 # Read Occupancy Profile
 occupancyProfile = pd.read_csv(os.path.join(
-    mainPath, 'auxillary', 'schedules_el_OFFICE.csv'))
+    mainPath, 'auxiliary', 'schedules_el_OFFICE.csv'))
 
 T_m_prev = 20
 

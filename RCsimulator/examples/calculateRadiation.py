@@ -33,7 +33,7 @@ from radiation import Window
 
 # Initialise the Location with a weather file
 Zurich = Location(epwfile_path=os.path.join(
-    mainPath, 'auxillary', 'Zurich-Kloten_2013.epw'))
+    mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
 # Set the hour of the year for determination of the solar angles
 # 9:00 am 16 June
