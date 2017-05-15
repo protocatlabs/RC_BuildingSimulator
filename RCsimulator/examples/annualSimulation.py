@@ -147,6 +147,7 @@ annualResults = pd.DataFrame({
     'COP': COP
 })
 
+print sum(HeatingDemand)
 
-annualResults[['HeatingEnergy', 'CoolingEnergy']].plot()
-plt.show()
+# annualResults[['HeatingEnergy', 'CoolingEnergy']].plot()
+# plt.show()
