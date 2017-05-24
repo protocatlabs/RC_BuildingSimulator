@@ -1,3 +1,4 @@
+# why isn't this used in Location? also, this won't run...
 """
 ===========================
 Energyplus file reader

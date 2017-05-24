@@ -1,3 +1,4 @@
+# why the `====`? also, only one module level docstring. be like a sphinx...
 """
 =========================================
 Tool to Evaluate Radiation incident on a surface of a set angle
@@ -32,6 +33,7 @@ class Location(object):
     """Set the Location of the Simulation with an Energy Plus Weather File"""
 
     def __init__(self, epwfile_path):
+        # kinda overkill if super is `object`
         super(Location, self).__init__()
 
         # Set EPW Labels and import epw file
@@ -116,6 +118,7 @@ class Window(object):
 
     def __init__(self, azimuth_tilt, alititude_tilt=90, glass_solar_transmittance=0.7,
                  glass_light_transmittance=0.8, area=1):
+        # overkill if super is `object`
         super(Window, self).__init__()
         self.alititude_tilt_rad = math.radians(alititude_tilt)
         self.azimuth_tilt_rad = math.radians(azimuth_tilt)

@@ -24,7 +24,8 @@ TODO: Have a look at CEA calculation methodology
 https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
 """
 
-
+# i'm not sure if this is necessary... especially since a builder has a `calcLoads` why not just store the builder
+# instead of hiding it in a SupplyDirector???? one abstraction layer too many.
 class SupplyDirector:
 
     """
@@ -37,7 +38,7 @@ class SupplyDirector:
     def setBuilder(self, builder):
         self.__builder = builder
 
-    # Calcs the energy load of that system. This is the main() fu
+    # Calcs the energy load of that system. This is the main() function
     def calcSystem(self):
 
         # Director asks the builder to produce the system body. self.__builder

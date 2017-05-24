@@ -18,6 +18,7 @@ __email__ = "jayathissa@arch.ethz.ch"
 __status__ = "Development"
 
 
+# this should be at the top, replace the first docstring with this one.
 """
 Model of different Emission systems. New Emission Systems can be introduced by adding new classes
 
@@ -57,7 +58,8 @@ class EmissionDirector:
 
         return body
 
-
+# why not call it EmissionSystemBuilder?
+# also, why builder? it isn't a builder at all! instead, how about EmissionSystemBase? Or just EmissionSystem
 class EmissionBuilder:
 
     """ The base class in which systems are built from
@@ -67,9 +69,13 @@ class EmissionBuilder:
 
         self.energy_demand = energy_demand
 
+    # at the very least add a docstring here (don't need to repeat at every implementation)
+    # also, it looks like it returns a (constant?) `EmissionOut` object. Why is EmissionOut not called flows?
+    # name is not pep8, should be heat_flows. or heat_emission_out.
+    # also, could this be set in the constructor? idk yet - haven't read more of the code...
     def heatFlows(self): pass
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
 class OldRadiators(EmissionBuilder):
     # Old building with radiators and high supply temperature
     # Heat is emitted to the air node
@@ -87,7 +93,7 @@ class OldRadiators(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
 class NewRadiators(EmissionBuilder):
     # Newer building with radiators and medium supply temperature
     # Heat is emitted to the air node
@@ -105,7 +111,7 @@ class NewRadiators(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
 class ChilledBeams(EmissionBuilder):
     # Chilled beams: identical to newRadiators but used for cooling
     # Heat is emitted to the air node
@@ -123,7 +129,8 @@ class ChilledBeams(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
+# which ISO standard? there are (literally) thousands!
 class AirConditioning(EmissionBuilder):
     # All heat is given to the air via an AC-unit. HC input via the air node as in the ISO standard.
     # supplyTemperature as with new radiators (assumption)
@@ -142,7 +149,7 @@ class AirConditioning(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
 class FloorHeating(EmissionBuilder):
     # All HC energy goes into the surface node, supplyTemperature low
     # Heat is emitted to the surface node
@@ -160,7 +167,7 @@ class FloorHeating(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
 class TABS(EmissionBuilder):
     # Thermally activated Building systems. HC energy input into bulk node. Supply Temperature low.
     # Heat is emitted to the thermal mass node
@@ -178,13 +185,17 @@ class TABS(EmissionBuilder):
 
         return flows
 
-
+# use docstrings instead of comments for stuff that could become API documentation!
+# what is a "System" class?? oh. i get it. hm. naming is hard!
 class EmissionOut:
     # The System class which is used to output the final results
 
+    # since you're using numpy, why not make these NaN? and then when you assign them in the subclasses of EmissionBuilder,
+    # assign doubles - that way you won't be mixing types.
     phi_ia_plus = None
     phi_m_plus = None
     phi_st_plus = None
 
     heatingSupplyTemperature = None
     coolingSupplyTemperature = None
+    # return temperatures?

@@ -1,3 +1,5 @@
+# naming of module isn't pep8
+# also, what's with the `======` in the docstrings? those are just going to cause problems with sphinx
 """
 =========================================
 Physics Required to calculate sensible space heating and space cooling loads, and space lighting loads
@@ -20,18 +22,24 @@ __email__ = "jayathissa@arch.ethz.ch"
 __status__ = "BETA"
 
 
+# move this to docstring at the top!
+# BTW: gotta love me some good documentation!! :-D
 """
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
 Daylighting is based on methods in The Environmental Science Handbook, S V Szokolay
 
 HOW TO USE
-from buildingPhysics import Building #Importing Building Class
-Office=Building() #Set an instance of the class
-Office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev) #Solve for Heating
-Office.solve_building_lighting(ill, occupancy) #Solve for Lighting
+
+::
+
+    from buildingPhysics import Building  #Importing Building Class
+    office = Building()  #Set an instance of the class
+    office.solve_building_energy(internal_gains, solar_gains, T_out, T_m_prev) #Solve for Heating
+    office.solve_building_lighting(illumination, occupancy) #Solve for Lighting
 
 
+# this can be done in reStructuredText to be nicer...
 VARIABLE DEFINITION
 
     internal_gains: Internal Heat Gains [W]
@@ -118,7 +126,7 @@ class Building(object):
                  T_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-np.inf,
                  max_heating_energy_per_floor_area=np.inf,
-                 heatingSupplySystem=supplySystem.OilBoilerMed,
+                 heatingSupplySystem=supplySystem.OilBoilerMed,  # NOTE: these variables aren't pep8!
                  coolingSupplySystem=supplySystem.HeatPumpAir,
                  heatingEmissionSystem=emissionSystem.NewRadiators,
                  coolingEmissionSystem=emissionSystem.AirConditioning,
@@ -204,12 +212,16 @@ class Building(object):
 
         """
         # Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
+        # Lux -> lux, be pep8 man
+        # also, this might be sped up by pre-calculating the constants, but idk. first check with profiler...
         Lux = (illuminance * self.lighting_utilisation_factor *
                self.lighting_maintenance_factor) / self.floor_area  # [Lux]
 
         if Lux < self.lighting_control and occupancy > 0:
-            self.lighting_demand = self.lighting_load * \
-                self.floor_area  # Lighting demand for the hour
+            # you can use parenthesis in the expression to avoid the ugly backslash at the end of the line...
+            # even better: just use a whole-line-comment instead ;-)
+            # Lighting demand for the hour
+            self.lighting_demand = self.lighting_load * self.floor_area
         else:
             self.lighting_demand = 0
 
@@ -247,6 +259,7 @@ class Building(object):
         self.calc_h_tr_2()
         self.calc_h_tr_3()
 
+        # this is unexpected! has_demand? sounds like it returns bool, but actually you're changing state? maybe??
         # check demand
         self.has_demand(internal_gains, solar_gains, T_out, T_m_prev)
 
@@ -256,8 +269,11 @@ class Building(object):
             # calculate temperatures of building R-C-model and exit
             # --> rc_model_function_1(...)
             self.energy_demand = 0
+            # wait... didn't we just do this??
             self.calc_temperatures_crank_nicolson(
                 self.energy_demand, internal_gains, solar_gains, T_out, T_m_prev)
+
+            # y u no pep8 bra?
             self.heatingDemand = 0  # Energy required by the zone
             self.coolingDemand = 0  # Energy surplus of the zone
             # Energy (in electricity) required by the supply system to provide
@@ -290,6 +306,7 @@ class Building(object):
 
             # Calculate the Heating/Cooling Input Energy Required
 
+            # should be called `supply_director` - why bother shortening to `sup`?
             supDirector = supplySystem.SupplyDirector()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
@@ -332,6 +349,9 @@ class Building(object):
         self.heatingEnergy = self.heatingSysElectricity + self.heatingSysFossils
         self.coolingEnergy = self.coolingSysElectricity + self.coolingSysFossils
 
+    # rename. this is expected to return a boolean. instead, it changes state??? you don't want to change state...
+    # why not just return has_heating_demand and has_cooling_demand?? then call the function "check_demand"
+    # has_heating_demand, has_cooling_demand = self.check_demand(...)
     def has_demand(self, internal_gains, solar_gains, T_out, T_m_prev):
         """
         Determines whether the building requires heating or cooling
@@ -409,6 +429,7 @@ class Building(object):
         elif self.has_cooling_demand:
             T_air_set = self.T_set_cooling
         else:
+            # not the best error type to raise in this case... check the list or create a new one
             raise ValueError(
                 'heating function has been called even though no heating is required')
 
@@ -560,6 +581,7 @@ class Building(object):
 
         self.h_tr_3 = 1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
 
+    # no. don't do this!
     '''Functions to Calculate the temperatures at the nodes'''
 
     def calc_T_m(self, T_m_prev):
