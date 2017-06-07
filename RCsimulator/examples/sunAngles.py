@@ -23,7 +23,7 @@ def calculate_sun_angles():
     Zurich = Location(epwfile_path=os.path.join(
         mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
-    print Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
+    Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
 
     Azimuth = []
     Altitude = []

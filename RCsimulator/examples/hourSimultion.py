@@ -46,9 +46,9 @@ Office.solve_building_energy(internal_gains, solar_gains, T_air, T_m_prev)
 Office.solve_building_lighting(ill, occupancy)
 
 
-print Office.T_m  # Printing Room Temperature of the medium
-print Office.lighting_demand  # Print Lighting Demand
-print Office.energy_demand  # Print heating/cooling loads
+print(Office.T_m)  # Printing Room Temperature of the medium
+print(Office.lighting_demand)  # Print Lighting Demand
+print(Office.energy_demand)  # Print heating/cooling loads
 
 # Example of how to change the set point temperature after running a simulation
 Office.theta_int_h_set = 20.0
@@ -56,7 +56,7 @@ Office.theta_int_h_set = 20.0
 # Solve again for the new set point temperature
 Office.solve_building_energy(internal_gains, solar_gains, T_air, T_m_prev)
 
-print Office.T_m  # Print the new internal temperature
+print(Office.T_m)  # Print the new internal temperature
 
 # Print a boolean of whether there is a heating demand
-print Office.has_heating_demand
+print(Office.has_heating_demand)
