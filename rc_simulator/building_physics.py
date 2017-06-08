@@ -490,7 +490,7 @@ class Building(object):
         self.phi_ia = 0.5 * internal_gains
         # Heat flow to the surface node
         self.phi_st = (1 - (self.mass_area / self.A_t) - (self.h_tr_w /
-                                                          (9.1 * self.A_t))) * (0.5 * internal_gains + solar_gains)
+                            (9.1 * self.A_t))) * (0.5 * internal_gains + solar_gains)
         # Heatflow to the thermal mass node
         self.phi_m = (self.mass_area / self.A_t) * \
             (0.5 * internal_gains + solar_gains)
