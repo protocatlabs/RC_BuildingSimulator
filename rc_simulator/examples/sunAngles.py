@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from buildingPhysics import Building  # Importing Building Class
+from building_physics import Building  # Importing Building Class
 from auxiliary import epwReader
 from auxiliary import sunPositionReader
 
@@ -23,33 +23,33 @@ def calculate_sun_angles():
     Zurich = Location(epwfile_path=os.path.join(
         mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
-    print Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=3708)
+    print Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=3708)
 
     Azimuth = []
     Altitude = []
-    SunnyHOY = []
+    Sunnyhoy = []
 
-    for HOY in range(8760):
+    for hoy in range(8760):
         sun = Zurich.calc_sun_position(
-            latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
+            latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=hoy)
         Altitude.append(sun[0])
         Azimuth.append(sun[1])
-        SunnyHOY.append(HOY + 1)
+        Sunnyhoy.append(hoy + 1)
 
     sunPosition = pd.read_csv(os.path.join(
         mainPath, 'auxiliary', 'SunPosition.csv'), skiprows=1)
 
     transSunPos = sunPosition.transpose()
-    HOY_check = transSunPos.index.tolist()
-    HOY_check = [float(ii) for ii in HOY_check]
+    hoy_check = transSunPos.index.tolist()
+    hoy_check = [float(ii) for ii in hoy_check]
     Azimuth_check = (180 - transSunPos[1]).tolist()
 
     Altitude_check = transSunPos[0].tolist()
 
     plt.style.use('ggplot')
 
-    plt.plot(SunnyHOY, Azimuth, HOY_check, Azimuth_check,
-             SunnyHOY, Altitude, HOY_check, Altitude_check)
+    plt.plot(Sunnyhoy, Azimuth, hoy_check, Azimuth_check,
+             Sunnyhoy, Altitude, hoy_check, Altitude_check)
     plt.legend(['Azimuth', 'Azimuth Check', 'Altitude', 'Altitude_check'])
 
     plt.show()

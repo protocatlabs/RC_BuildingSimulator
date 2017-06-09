@@ -1,7 +1,7 @@
+
 """
-=========================================
 Tool to Evaluate Radiation incident on a surface of a set angle
-=========================================
+
 """
 
 import numpy as np
@@ -22,17 +22,13 @@ __email__ = "jayathissa@arch.ethz.ch"
 __status__ = "BETA"
 
 
-"""
-TODO: Create a PV model
 
-"""
 
 
 class Location(object):
     """Set the Location of the Simulation with an Energy Plus Weather File"""
 
     def __init__(self, epwfile_path):
-        super(Location, self).__init__()
 
         # Set EPW Labels and import epw file
         epw_labels = ['year', 'month', 'day', 'hour', 'minute', 'datasource', 'drybulb_C', 'dewpoint_C', 'relhum_percent',
@@ -46,7 +42,7 @@ class Location(object):
         self.weather_data = pd.read_csv(
             epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
 
-    def calc_sun_position(self, latitude_deg, longitude_deg, year, HOY):
+    def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """
         Calculates the Sun Position for a specific hour and location
 
@@ -56,8 +52,8 @@ class Location(object):
         :type longitude_deg: float
         :param year: year
         :type year: int
-        :param HOY: Hour of the year from the start. The first hour of January is 1
-        :type HOY: int
+        :param hoy: Hour of the year from the start. The first hour of January is 1
+        :type hoy: int
         :return: altitude, azimuth: Sun position in altitude and azimuth degrees [degrees]
         :rtype: tuple
         """
@@ -68,7 +64,7 @@ class Location(object):
 
         # Set the date in UTC based off the hour of year and the year itself
         start_of_year = datetime.datetime(year, 1, 1, 0, 0, 0, 0)
-        utc_datetime = start_of_year + datetime.timedelta(hours=HOY)
+        utc_datetime = start_of_year + datetime.timedelta(hours=hoy)
 
         # Angular distance of the sun north or south of the earths equator
         # Determine the day of the year.
@@ -116,7 +112,7 @@ class Window(object):
 
     def __init__(self, azimuth_tilt, alititude_tilt=90, glass_solar_transmittance=0.7,
                  glass_light_transmittance=0.8, area=1):
-        super(Window, self).__init__()
+
         self.alititude_tilt_rad = math.radians(alititude_tilt)
         self.azimuth_tilt_rad = math.radians(azimuth_tilt)
         self.glass_solar_transmittance = glass_solar_transmittance
@@ -140,8 +136,8 @@ class Window(object):
         :rtype: float
         """
 
-        direct_factor = self.calcDirectSolarFactor(sun_altitude, sun_azimuth,)
-        diffuse_factor = self.calcDiffuseSolarFactor()
+        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
+        diffuse_factor = self.calc_diffuse_solar_factor()
 
         direct_solar = direct_factor * normal_direct_radiation
         diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
@@ -166,8 +162,8 @@ class Window(object):
         :rtype: float
         """
 
-        direct_factor = self.calcDirectSolarFactor(sun_altitude, sun_azimuth,)
-        diffuse_factor = self.calcDiffuseSolarFactor()
+        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
+        diffuse_factor = self.calc_diffuse_solar_factor()
 
         direct_illuminance = direct_factor * normal_direct_illuminance
         diffuse_illuminance = diffuse_factor * horizontal_diffuse_illuminance
@@ -177,7 +173,7 @@ class Window(object):
         self.transmitted_illuminance = self.incident_illuminance * \
             self.glass_light_transmittance
 
-    def calcDirectSolarFactor(self, sun_altitude, sun_azimuth):
+    def calc_direct_solar_factor(self, sun_altitude, sun_azimuth):
         """
         Calculates the cosine of the angle of incidence on the window 
         """
@@ -197,7 +193,7 @@ class Window(object):
 
         return direct_factor
 
-    def calcDiffuseSolarFactor(self):
+    def calc_diffuse_solar_factor(self):
         """Calculates the proportion of diffuse radiation"""
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2

@@ -1,8 +1,6 @@
 """
-=========================================
 Main file to calculate the building loads
 EN-13970
-=========================================
 """
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -25,7 +23,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from buildingPhysics import Building  # Importing Building Class
+from building_physics import Building  # Importing Building Class
 from auxiliary import epwReader
 from auxiliary import sunPositionReader
 
@@ -70,7 +68,7 @@ azimuth = 180 - sunPosition.loc[1]
 occupancyProfile = pd.read_csv(os.path.join(
     mainPath, 'auxiliary', 'schedules_el_OFFICE.csv'))
 
-T_m_prev = 20
+t_m_prev = 20
 
 for hour in range(8760):
     # Occupancy for the time step
@@ -80,7 +78,7 @@ for hour in range(8760):
         appliance_gains * Office.floor_area
 
     # Outdoor Temperature
-    T_out = weatherData['drybulb_C'][hour]
+    t_out = weatherData['drybulb_C'][hour]
 
     if str(float(hour)) in altitude.index:
         # if solar gains land in front of the south window. Assume that window
@@ -104,19 +102,19 @@ for hour in range(8760):
         solar_gains = 0
 
     Office.solve_building_energy(
-        internal_gains=internal_gains, solar_gains=solar_gains, T_out=T_out, T_m_prev=T_m_prev)
+        internal_gains=internal_gains, solar_gains=solar_gains, t_out=t_out, t_m_prev=t_m_prev)
 
-    T_m_prev = Office.T_m_next
+    t_m_prev = Office.t_m_next
 
-    HeatingDemand.append(Office.heatingDemand)
-    HeatingEnergy.append(Office.heatingEnergy)
-    CoolingDemand.append(Office.coolingDemand)
-    CoolingEnergy.append(Office.coolingEnergy)
-    ElectricityOut.append(Office.electricityOut)
-    IndoorAir.append(Office.T_air)
-    OutsideTemp.append(T_out)
+    HeatingDemand.append(Office.heating_demand)
+    HeatingEnergy.append(Office.heating_energy)
+    CoolingDemand.append(Office.cooling_demand)
+    CoolingEnergy.append(Office.cooling_energy)
+    ElectricityOut.append(Office.electricity_out)
+    IndoorAir.append(Office.t_air)
+    OutsideTemp.append(t_out)
     SolarGains.append(solar_gains)
-    COP.append(Office.COP)
+    COP.append(Office.cop)
 
 annualResults = pd.DataFrame({
     'HeatingDemand': HeatingDemand,
