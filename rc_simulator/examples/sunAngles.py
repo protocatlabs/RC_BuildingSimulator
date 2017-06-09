@@ -26,6 +26,7 @@ def calculate_sun_angles():
 
     Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=3708)
 
+
     Azimuth = []
     Altitude = []
     Sunnyhoy = []

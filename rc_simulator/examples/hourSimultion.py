@@ -46,7 +46,9 @@ Office.solve_building_lighting(ill, occupancy)
 
 
 
+
 print(Office.t_m)  # Printing Room Temperature of the medium
+
 print(Office.lighting_demand)  # Print Lighting Demand
 print(Office.energy_demand)  # Print heating/cooling loads
 
@@ -57,7 +59,9 @@ Office.theta_int_h_set = 20.0
 Office.solve_building_energy(internal_gains, solar_gains, t_air, t_m_prev)
 
 
+
 print(Office.t_m)  # Print the new internal temperature
+
 
 # Print a boolean of whether there is a heating demand
 print(Office.has_heating_demand)
