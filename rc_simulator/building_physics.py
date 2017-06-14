@@ -109,6 +109,8 @@ class Building(object):
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
+                 ach_vent=1.5,
+                 ach_infl=0.5,
                  ventilation_efficiency=0.6,
                  thermal_capacitance_per_floor_area=165000,
                  t_set_heating=20.0,
@@ -124,7 +126,7 @@ class Building(object):
         # Initialise Zone
         self.zone = zone
         if zone == None:
-            zone = zoneBuilder.zone
+            zone = zone_builder.zone
 
         # Fenestration and Lighting Properties
         self.lighting_load = lighting_load  # [kW/m2] lighting load
