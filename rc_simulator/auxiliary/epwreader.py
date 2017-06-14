@@ -1,15 +1,12 @@
 """
-===========================
 Energyplus file reader
-===========================
+
 File history and credits:
 C. Miller script development               10.08.14
 J. A. Fonseca  adaptation for CEA tool     18.05.16
 
 """
 import pandas as pd
-
-#import cea.inputlocator
 
 __author__ = "Clayton Miller"
 __copyright__ = "Copyright 2014, Architecture and Building Systems - ETH Zurich"
@@ -39,15 +36,3 @@ def epwReader(weather_path):
 
     return result
 
-
-def testReader():
-
-    locator = cea.inputlocator.InputLocator(r'C:\reference-case\baseline')
-    # for the interface, the user should pick a file out of of those in
-    # ...DB/Weather/...
-    weather_path = locator.get_default_weather()
-    epw_reader(weather_path=weather_path)
-
-if __name__ == '__main__':
-    # test_reader()
-    epw_reader(weather_path=weather_path)

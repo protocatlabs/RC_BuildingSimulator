@@ -1,7 +1,5 @@
 """
-=========================================
 Example of a radiation calculation
-=========================================
 """
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -24,9 +22,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from buildingPhysics import Building  # Importing Building Class
-import supplySystem
-import emissionSystem
+from building_physics import Building  # Importing Building Class
+import supply_system
+import emission_system
 from radiation import Location
 from radiation import Window
 
@@ -37,11 +35,11 @@ Zurich = Location(epwfile_path=os.path.join(
 
 # Set the hour of the year for determination of the solar angles
 # 9:00 am 16 June
-HOY = 3993
+hoy = 3993
 
 # Determine the solar azimuth and altitude angle
 Altitude, Azimuth = Zurich.calc_sun_position(
-    latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=HOY)
+    latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=hoy)
 
 # Define Windows
 SouthWindow = Window(azimuth_tilt=0, alititude_tilt=90, glass_solar_transmittance=0.7,
@@ -59,12 +57,12 @@ RoofAtrium = Window(azimuth_tilt=0, alititude_tilt=0, glass_solar_transmittance=
 for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAtrium]:
     selected_window.calc_solar_gains(sun_altitude=Altitude, sun_azimuth=Azimuth,
                                      normal_direct_radiation=Zurich.weather_data[
-                                         'dirnorrad_Whm2'][HOY],
-                                     horizontal_diffuse_radiation=Zurich.weather_data['difhorrad_Whm2'][HOY])
+                                         'dirnorrad_Whm2'][hoy],
+                                     horizontal_diffuse_radiation=Zurich.weather_data['difhorrad_Whm2'][hoy])
     selected_window.calc_illuminance(sun_altitude=Altitude, sun_azimuth=Azimuth,
                                      normal_direct_illuminance=Zurich.weather_data[
-                                         'dirnorillum_lux'][HOY],
-                                     horizontal_diffuse_illuminance=Zurich.weather_data['difhorillum_lux'][HOY])
+                                         'dirnorillum_lux'][hoy],
+                                     horizontal_diffuse_illuminance=Zurich.weather_data['difhorillum_lux'][hoy])
 
 print SouthWindow.incident_solar
 print EastWindow.incident_solar

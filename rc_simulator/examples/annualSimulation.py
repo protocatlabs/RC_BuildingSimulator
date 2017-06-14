@@ -1,7 +1,5 @@
 """
-=========================================
 Example of an Annual Simulation
-=========================================
 """
 __author__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -24,9 +22,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-from buildingPhysics import Building  # Importing Building Class
-import supplySystem
-import emissionSystem
+from building_physics import Building  # Importing Building Class
+import supply_system
+import emission_system
 from radiation import Location
 from radiation import Window
 
@@ -59,20 +57,20 @@ Office = Building(window_area=4.0,
                   lighting_control=300.0,
                   lighting_utilisation_factor=0.45,
                   lighting_maintenance_factor=0.9,
-                  U_walls=0.2,
-                  U_windows=1.1,
-                  ACH_vent=1.5,
-                  ACH_infl=0.5,
+                  u_walls=0.2,
+                  u_windows=1.1,
+                  ach_vent=1.5,
+                  ach_infl=0.5,
                   ventilation_efficiency=0.6,
                   thermal_capacitance_per_floor_area=165000,
-                  T_set_heating=20.0,
-                  T_set_cooling=26.0,
+                  t_set_heating=20.0,
+                  t_set_cooling=26.0,
                   max_cooling_energy_per_floor_area=-np.inf,
                   max_heating_energy_per_floor_area=np.inf,
-                  heatingSupplySystem=supplySystem.OilBoilerMed,
-                  coolingSupplySystem=supplySystem.HeatPumpAir,
-                  heatingEmissionSystem=emissionSystem.NewRadiators,
-                  coolingEmissionSystem=emissionSystem.AirConditioning,)
+                  heating_supply_system=supply_system.OilBoilerMed,
+                  cooling_supply_system=supply_system.HeatPumpAir,
+                  heating_emission_system=emission_system.NewRadiators,
+                  cooling_emission_system=emission_system.AirConditioning,)
 
 # Define Windows
 SouthWindow = Window(azimuth_tilt=0, alititude_tilt=90, glass_solar_transmittance=0.7,
@@ -90,7 +88,7 @@ occupancyProfile = pd.read_csv(os.path.join(
     mainPath, 'auxiliary', 'schedules_el_OFFICE.csv'))
 
 # Starting temperature of the builidng
-T_m_prev = 20
+t_m_prev = 20
 
 # Loop through all 8760 hours of the year
 for hour in range(8760):
@@ -102,7 +100,7 @@ for hour in range(8760):
         appliance_gains * Office.floor_area
 
     # Extract the outdoor temperature in Zurich for that hour
-    T_out = Zurich.weather_data['drybulb_C'][hour]
+    t_out = Zurich.weather_data['drybulb_C'][hour]
 
     Altitude, Azimuth = Zurich.calc_sun_position(
         latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=hour)
@@ -118,23 +116,23 @@ for hour in range(8760):
                                  horizontal_diffuse_illuminance=Zurich.weather_data['difhorillum_lux'][hour])
 
     Office.solve_building_energy(internal_gains=internal_gains,
-                                 solar_gains=SouthWindow.solar_gains, T_out=T_out, T_m_prev=T_m_prev)
+                                 solar_gains=SouthWindow.solar_gains, t_out=t_out, t_m_prev=t_m_prev)
 
     Office.solve_building_lighting(
         illuminance=SouthWindow.transmitted_illuminance, occupancy=occupancy)
 
     # Set the previous temperature for the next time step
-    T_m_prev = Office.T_m_next
+    t_m_prev = Office.t_m_next
 
-    HeatingDemand.append(Office.heatingDemand)
-    HeatingEnergy.append(Office.heatingEnergy)
-    CoolingDemand.append(Office.coolingDemand)
-    CoolingEnergy.append(Office.coolingEnergy)
-    ElectricityOut.append(Office.electricityOut)
-    IndoorAir.append(Office.T_air)
-    OutsideTemp.append(T_out)
+    HeatingDemand.append(Office.heating_demand)
+    HeatingEnergy.append(Office.heating_energy)
+    CoolingDemand.append(Office.cooling_demand)
+    CoolingEnergy.append(Office.cooling_energy)
+    ElectricityOut.append(Office.electricity_out)
+    IndoorAir.append(Office.t_air)
+    OutsideTemp.append(t_out)
     SolarGains.append(SouthWindow.solar_gains)
-    COP.append(Office.COP)
+    COP.append(Office.cop)
 
 annualResults = pd.DataFrame({
     'HeatingDemand': HeatingDemand,
