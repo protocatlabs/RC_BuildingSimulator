@@ -9,6 +9,10 @@ import numpy as np
 import supplySystem
 import emissionSystem
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__),'auxiliary'))
+import zoneBuilder as zoneBuilder
 
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -99,17 +103,18 @@ class Building(object):
     '''Sets the parameters of the building. '''
 
     def __init__(self,
-                 window_area=4.0,
-                 external_envelope_area=15.0,
-                 room_depth=7.0,
-                 room_width=5.0,
-                 room_height=3.0,
+                 zone = None,
+                 # window_area=4.0,
+                 # external_envelope_area=15.0,
+                 # room_depth=7.0,
+                 # room_width=5.0,
+                 # room_height=3.0,
                  lighting_load=11.7,
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
-                 U_walls=0.2,
-                 U_windows=1.1,
+                 # U_walls=0.2,
+                 # U_windows=1.1,
                  ACH_vent=1.5,
                  ACH_infl=0.5,
                  ventilation_efficiency=0.6,
@@ -124,11 +129,10 @@ class Building(object):
                  coolingEmissionSystem=emissionSystem.AirConditioning,
                  ):
 
-        # Building Dimensions
-        self.window_area = window_area  # [m2] Window Area
-        self.room_depth = room_depth  # [m] Room Depth
-        self.room_width = room_width  # [m] Room Width
-        self.room_height = room_height  # [m] Room Height
+        # Initialise Zone
+        self.zone = zone
+        if zone == None:
+            zone = zoneBuilder.zone
 
         # Fenestration and Lighting Properties
         self.lighting_load = lighting_load  # [kW/m2] lighting load
@@ -140,13 +144,11 @@ class Building(object):
         self.lighting_maintenance_factor = lighting_maintenance_factor
 
         # Calculated Properties
-        self.floor_area = room_depth * room_width  # [m2] Floor Area
+        self.floor_area = zone.floor_area # [m2] Floor Area
         # [m2] Effective Mass Area assuming a medium weight building #12.3.1.2
         self.mass_area = self.floor_area * 2.5
-        self.Room_Vol = room_width * room_depth * \
-            room_height  # [m3] Room Volume
-        self.total_internal_area = self.floor_area * 2 + \
-            room_width * room_height * 2 + room_depth * room_height * 2
+        self.Room_Vol = zone.Room_Vol  # [m3] Room Volume
+        self.total_internal_area = zone.total_internal_area
         # TODO: Standard doesn't explain what A_t is. Needs to be checked
         self.A_t = self.total_internal_area
 
@@ -154,10 +156,10 @@ class Building(object):
         # [kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
         self.c_m = thermal_capacitance_per_floor_area * self.floor_area
         # Conductance of opaque surfaces to exterior [W/K]
-        self.h_tr_em = U_walls * (external_envelope_area - window_area)
+        self.h_tr_em = zone.h_tr_em
         # Conductance to exterior through glazed surfaces [W/K], based on
         # U-wert of 1W/m2K
-        self.h_tr_w = U_windows * window_area
+        self.h_tr_w = zone.h_tr_w
 
         # Determine the ventilation conductance
         ACH_tot = ACH_infl + ACH_vent  # Total Air Changes Per Hour

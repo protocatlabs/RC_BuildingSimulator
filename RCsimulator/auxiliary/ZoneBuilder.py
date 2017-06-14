@@ -61,8 +61,6 @@ class zone(object):
         self.Room_Vol = Room_Vol
         self.total_internal_area =total_internal_area
 
-
-
     def addElements(self,e):
         # self.elements.append(e)
         if e.name == 'window':

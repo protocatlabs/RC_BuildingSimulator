@@ -830,17 +830,11 @@ class TestBuildingSim(unittest.TestCase):
         occupancy = 0.1
 
         # Set Building Parameters
-        Office = Building(window_area=13.5,
-                          external_envelope_area=15.19,
-                          room_depth=7,
-                          room_width=4.9,
-                          room_height=3.1,
+        Office = Building(zone=None, #default zone defined using the same parameters
                           lighting_load=11.7,
                           lighting_control=300,
                           lighting_utilisation_factor=0.45,
                           lighting_maintenance_factor=0.9,
-                          U_walls=0.2,
-                          U_windows=1.1,
                           ACH_vent=1.5,
                           ACH_infl=0.5,
                           ventilation_efficiency=0.6,
