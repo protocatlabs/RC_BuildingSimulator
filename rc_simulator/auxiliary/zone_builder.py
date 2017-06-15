@@ -68,8 +68,6 @@ class Zone(object):
         #report the number of elements added to facilitate bug detection
         if self.elements != []:
             print 'Zone with %i/%i elements specified'%(self.elements_added,len(self.elements))
-        else:
-            print 'Zone with default (ASF) elements: %s'%str(self.element_names)
 
 
     def add_elements(self,e):
