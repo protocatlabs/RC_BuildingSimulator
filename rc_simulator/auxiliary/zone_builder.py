@@ -67,7 +67,7 @@ class Zone(object):
 
         #report the number of elements added to facilitate bug detection
         if self.elements != []:
-            print 'Zone with %i/%i elements specified'%(self.elements_added,len(self.elements))
+            print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
 
 
     def add_elements(self,e):

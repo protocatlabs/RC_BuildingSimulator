@@ -99,7 +99,7 @@ __status__ = "BETA"
 
 
 
-class Building(object):
+class RC_zone(object):
     '''Sets the parameters of the building. '''
 
     def __init__(self,
@@ -495,6 +495,7 @@ class Building(object):
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
         # Set the emission system to the type specified by the user
+
         emDirector.set_builder(self.heating_emission_system(
             energy_demand=energy_demand))
         # Calculate the new flows to each node based on the heating system
