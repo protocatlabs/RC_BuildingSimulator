@@ -2,7 +2,7 @@
 Physics Required to calculate sensible space heating and space cooling loads, and space lighting loads
 EN-13970
 
-The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
+The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex
 
 Daylighting is based on methods in The Environmental Science Handbook, S V Szokolay
 
@@ -21,12 +21,12 @@ VARIABLE DEFINITION
     internal_gains: Internal Heat Gains [W]
     solar_gains: Solar Heat Gains after transmitting through the window [W]
     t_out: Outdoor air temperature [C]
-    t_m_prev: Thermal mass temperature from the previous time step 
+    t_m_prev: Thermal mass temperature from the previous time step
     ill: Illuminance transmitting through the window [lumen]
     occupancy: Occupancy [people]
 
     t_m_next: Medium temperature of the next time step [C]
-    t_m: Some weird average between the previous and current time-step of the medium  [C] #TODO: Check this 
+    t_m: Some weird average between the previous and current time-step of the medium  [C] #TODO: Check this
 
     Inputs to the 5R1C model:
     c_m: Thermal Capacitance of the medium [J/K]
@@ -47,33 +47,33 @@ VARIABLE DEFINITION
     h_tr_3: combined heat conductance, see function for definition [W/K]
 
 
-    
-INPUT PARAMETER DEFINITION 
+
+INPUT PARAMETER DEFINITION
 
     window_area: Area of the Glazed Surface in contact with the outside [m2]
     external_envelope_area: Area of all envelope surfaces, including windows in contact with the outside
     room_depth=7.0 Depth of the modelled room [m]
     room_width=4.9 Width of the modelled room [m]
     room_height=3.1 Height of the modelled room [m]
-    lighting_load: Lighting Load [W/m2] 
+    lighting_load: Lighting Load [W/m2]
     lighting_control: Lux threshold at which the lights turn on [Lx]
     u_walls: U value of opaque surfaces  [W/m2K]
     u_windows: U value of glazed surfaces [W/m2K]
     ach_vent: Air changes per hour through ventilation [Air Changes Per Hour]
     ach_infl: Air changes per hour through infiltration [Air Changes Per Hour]
-    ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat 
+    ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat
         recovery []
     thermal_capacitance_per_floor_area: Thermal capacitance of the room per floor area [J/m2K]
     t_set_heating : Thermal heating set point [C]
     t_set_cooling: Thermal cooling set point [C]
     max_cooling_energy_per_floor_area: Maximum cooling load. Set to -np.inf for unrestricted cooling [C]
     max_heating_energy_per_floor_area: Maximum heating load per floor area. Set to no.inf for unrestricted heating [C]
-    heating_supply_system: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater. 
-        Direct heater has no changes to the heating demand load, a resistive heater takes an efficiency into account, 
-        HeatPumpHeatercalculates a COP based on the outdoor and system supply temperature 
-    cooling_supply_system: The type of cooling system. Choices are DirectCooler HeatPumpCooler. 
-        DirectCooler has no changes to the cooling demand load, 
-        HeatPumpCooler calculates a COP based on the outdoor and system supply temperature 
+    heating_supply_system: The type of heating system. Choices are DirectHeater, ResistiveHeater, HeatPumpHeater.
+        Direct heater has no changes to the heating demand load, a resistive heater takes an efficiency into account,
+        HeatPumpHeatercalculates a COP based on the outdoor and system supply temperature
+    cooling_supply_system: The type of cooling system. Choices are DirectCooler HeatPumpCooler.
+        DirectCooler has no changes to the cooling demand load,
+        HeatPumpCooler calculates a COP based on the outdoor and system supply temperature
     heating_emission_system: How the heat is distributed to the building
     cooling_emission_system: How the cooling energy is distributed to the building
 
@@ -83,6 +83,10 @@ import numpy as np
 import supply_system
 import emission_system
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__),'auxiliary'))
+from zone_builder import Zone
 
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -99,12 +103,7 @@ class Building(object):
     '''Sets the parameters of the building. '''
 
     def __init__(self,
-                 zone = None,
-                 # window_area=4.0,
-                 # external_envelope_area=15.0,
-                 # room_depth=7.0,
-                 # room_width=5.0,
-                 # room_height=3.0,
+                 zone=None,
                  lighting_load=11.7,
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
@@ -117,7 +116,7 @@ class Building(object):
                  t_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-np.inf,
                  max_heating_energy_per_floor_area=np.inf,
-                 heating_supply_system=supply_system.OilBoilerMed,  
+                 heating_supply_system=supply_system.OilBoilerMed,
                  cooling_supply_system=supply_system.HeatPumpAir,
                  heating_emission_system=emission_system.NewRadiators,
                  cooling_emission_system=emission_system.AirConditioning,
@@ -126,7 +125,7 @@ class Building(object):
         # Initialise Zone
         self.zone = zone
         if zone == None:
-            zone = zone_builder.zone
+            zone = Zone()
 
         # Fenestration and Lighting Properties
         self.lighting_load = lighting_load  # [kW/m2] lighting load
@@ -141,10 +140,8 @@ class Building(object):
         self.floor_area = zone.floor_area # [m2] Floor Area
         # [m2] Effective Mass Area assuming a medium weight building #12.3.1.2
         self.mass_area = self.floor_area * 2.5
-        self.room_vol = room_width * room_depth * \
-            room_height  # [m3] Room Volume
-        self.total_internal_area = self.floor_area * 2 + \
-            room_width * room_height * 2 + room_depth * room_height * 2
+        self.room_vol = zone.room_vol# [m3] Room Volume
+        self.total_internal_area = zone.total_internal_area
         # TODO: Standard doesn't explain what A_t is. Needs to be checked
         self.A_t = self.total_internal_area
 
@@ -228,13 +225,13 @@ class Building(object):
 
         :return: self.heating_demand, space heating demand of the building
         :return: self.heating_sys_electricity, heating electricity consumption
-        :return: self.heating_sys_fossils, heating fossil fuel consumption 
+        :return: self.heating_sys_fossils, heating fossil fuel consumption
         :return: self.cooling_demand, space cooling demand of the building
         :return: self.cooling_sys_electricity, electricity consumption from cooling
         :return: self.cooling_sys_fossils, fossil fuel consumption from cooling
         :return: self.electricity_out, electricity produced from combined heat pump systems
         :return: self.sys_total_energy, total exergy consumed (electricity + fossils) for heating and cooling
-        :return: self.heating_energy, total exergy consumed (electricity + fossils) for heating 
+        :return: self.heating_energy, total exergy consumed (electricity + fossils) for heating
         :return: self.cooling_energy, total exergy consumed (electricity + fossils) for cooling
         :return: self.cop, Coefficient of Performance of the heating or cooling system
         :rtype: float
@@ -258,8 +255,8 @@ class Building(object):
             self.energy_demand = 0
 
             # y u no pep8 bra?
-            self.heating_demand = 0  # Energy required by the zone
-            self.cooling_demand = 0  # Energy surplus of the zone
+            self.heating_demand = 0  # Energy required by the Zone
+            self.cooling_demand = 0  # Energy surplus of the Zone
             # Energy (in electricity) required by the supply system to provide
             # HeatingDemand
             self.heating_sys_electricity = 0
@@ -293,11 +290,11 @@ class Building(object):
             supply_director = supply_system.SupplyDirector()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supply_director.set_builder(self.heating_supply_system(load=self.energy_demand, 
-                                                                t_out=t_out, 
+                supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
+                                                                t_out=t_out,
                                                                 heating_supply_temperature=self.heating_supply_temperature,
-                                                                cooling_supply_temperature=self.cooling_supply_temperature, 
-                                                                has_heating_demand=self.has_heating_demand, 
+                                                                cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                has_heating_demand=self.has_heating_demand,
                                                                 has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 # All Variables explained underneath line 467
@@ -310,11 +307,11 @@ class Building(object):
                 self.electricity_out = supplyOut.electricity_out
 
             elif self.has_cooling_demand:
-                supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1), 
-                                                                t_out=t_out, 
+                supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1),
+                                                                t_out=t_out,
                                                                 heating_supply_temperature=self.heating_supply_temperature,
-                                                                cooling_supply_temperature=self.cooling_supply_temperature, 
-                                                                has_heating_demand=self.has_heating_demand, 
+                                                                cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                has_heating_demand=self.has_heating_demand,
                                                                 has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 self.heating_demand = 0
@@ -395,7 +392,7 @@ class Building(object):
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
 
-        # Step 1: Check if heating or cooling is needed 
+        # Step 1: Check if heating or cooling is needed
         #(Not needed, but doing so for readability when comparing with the standard)
         # Set heating/cooling to 0
         energy_demand_0 = 0
@@ -460,9 +457,9 @@ class Building(object):
         # (C.13) in [C.3 ISO 13790]
 
 
-        Based on the Thales Intercept Theorem. 
-        Where we set a heating case that is 10x the floor area and determine the temperature as a result 
-        Assuming that the relation is linear, one can draw a right angle triangle. 
+        Based on the Thales Intercept Theorem.
+        Where we set a heating case that is 10x the floor area and determine the temperature as a result
+        Assuming that the relation is linear, one can draw a right angle triangle.
         From this we can determine the heating level required to achieve the set point temperature
         This assumes a perfect HVAC control system
         """
@@ -478,7 +475,7 @@ class Building(object):
 
         #C.1 - C.3 in [C.3 ISO 13790]
 
-        Note that this equation has diverged slightly from the standard 
+        Note that this equation has diverged slightly from the standard
         as the heating/cooling node can enter any node depending on the
         emission system selected
 
@@ -599,7 +596,7 @@ class Building(object):
 
     def calc_t_opperative(self):
         """
-        The opperative temperature is a weighted average of the air and mean radiant temperatures. 
+        The opperative temperature is a weighted average of the air and mean radiant temperatures.
         It is not used in any further calculation at this stage
         # (C.12) in [C.3 ISO 13790]
         """

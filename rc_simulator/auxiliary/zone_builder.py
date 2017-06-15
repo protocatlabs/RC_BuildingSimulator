@@ -41,9 +41,9 @@ class Element(object):
 class Zone(object):
     def __init__(self,
                  elements = [],
-                 floor_area = 35,
+                 floor_area = 34.3,
                  room_vol = 106.33,
-                 total_internal_area = 137.358
+                 total_internal_area = 142.380
                 ):
 
         self.h_tr_em = 0
@@ -55,26 +55,33 @@ class Zone(object):
         self.elements_added = 0 #counter to check that the zone contains exactly the specified elements.
         self.element_names = []
 
+        #if left blank, zone elements will be set to ASF default values
         if self.elements == []:
-            Window = Element(name='ASF_window',area=13.5,u_value=1.1)
-            Wall = Element(name='ASF_wall',area=1.69,u_value=0.2)
+            Window = Element(name='ASF_window', area=13.5, u_value=1.1)
+            Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
             self.add_elements(Window)
             self.add_elements(Wall)
 
         for each_element in elements:
             self.add_elements(each_element)
 
+        #report the number of elements added to facilitate bug detection
         if self.elements != []:
-            print 'zone contains %i/%i elements specified'%(self.elements_added,len(self.elements))
+            print 'Zone with %i/%i elements specified'%(self.elements_added,len(self.elements))
         else:
-            print 'default elements added: %s'%str(self.element_names)
+            print 'Zone with default (ASF) elements: %s'%str(self.element_names)
 
 
     def add_elements(self,e):
         self.element_names.append(e.name)
+        #raise error for invalid names
+        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground slab','roof']):
+            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"groundslab"'","'"roof"'"')
+        # add window conductance to window conductances
         if any(x in str.lower(e.name) for x in ['window']):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
+        # add surface conductances to conductance of mass
         if any(x in str.lower(e.name) for x in ['wall','roof','groundslab','ground slab']):
             self.h_tr_em += e.h_tr
             self.elements_added += 1
