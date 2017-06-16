@@ -244,7 +244,6 @@ class Building(object):
         self.has_demand(internal_gains, solar_gains, t_out, t_m_prev)
 
         if not self.has_heating_demand and not self.has_cooling_demand:
-            print 'freerunning'
             # no heating or cooling demand
             # calculate temperatures of building R-C-model and exit
             # --> rc_model_function_1(...)
@@ -269,7 +268,6 @@ class Building(object):
             self.electricity_out = 0
 
         else:
-            print 'heated/cooled'
             # has heating/cooling demand
 
             # Calculates energy_demand used below
@@ -278,7 +276,6 @@ class Building(object):
 
             self.calc_temperatures_crank_nicolson(
                 self.energy_demand, internal_gains, solar_gains, t_out, t_m_prev)
-            print 'crank-nicholson inputs:', self.energy_demand, internal_gains, solar_gains, t_out, t_m_prev
             # calculates the actual t_m resulting from the actual heating
             # demand (energy_demand)
 
@@ -342,7 +339,6 @@ class Building(object):
         # Solve for the internal temperature t_Air
         self.calc_temperatures_crank_nicolson(
             energy_demand, internal_gains, solar_gains, t_out, t_m_prev)
-        print internal_gains, solar_gains, t_out, t_m_prev
         # If the air temperature is less or greater than the set temperature,
         # there is a heating/cooling load
         if self.t_air < self.t_set_heating:
@@ -377,7 +373,6 @@ class Building(object):
         self.calc_t_air(t_out)
 
         self.calc_t_opperative()
-        print 'CN results:', self.t_m, self.t_air, self.t_opperative
         return self.t_m, self.t_air, self.t_opperative
 
     def calc_energy_demand(self, internal_gains, solar_gains, t_out, t_m_prev):
@@ -386,8 +381,7 @@ class Building(object):
         Used in: solve_building_energy()
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
-        print 'calc_energy_demand works'
-        print self.floor_area
+
         # Step 1: Check if heating or cooling is needed
         #(Not needed, but doing so for readability when comparing with the standard)
         # Set heating/cooling to 0
@@ -395,7 +389,7 @@ class Building(object):
         # Calculate the air temperature with no heating/cooling
         t_air_0 = self.calc_temperatures_crank_nicolson(
             energy_demand_0, internal_gains, solar_gains, t_out, t_m_prev)[1]
-        print t_air_0
+
         # Step 2: Calculate the unrestricted heating/cooling required
 
         # determine if we need heating or cooling based based on the condition
@@ -411,7 +405,6 @@ class Building(object):
         # Set a heating case where the heating load is 10x the floor area (10
         # W/m2)
         energy_floorAx10 = 10 * self.floor_area
-        print self.floor_area
 
         # Calculate the air temperature obtained by having this 10 W/m2
         # setpoint
@@ -461,7 +454,6 @@ class Building(object):
         """
         self.energy_demand_unrestricted = energy_floorAx10 * \
             (t_air_set - t_air_0) / (t_air_10 - t_air_0)
-        print self.energy_demand_unrestricted
 
     def calc_heat_flow(self, t_out, internal_gains, solar_gains, energy_demand):
         """
@@ -488,7 +480,6 @@ class Building(object):
         self.phi_m = (self.mass_area / self.A_t) * \
             (0.5 * internal_gains + solar_gains)
 
-        print 'phi_st, Phi_m:',  self.phi_st, self.phi_m
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
@@ -518,7 +509,6 @@ class Building(object):
 
         self.t_m_next = ((t_m_prev * ((self.c_m / 3600.0) - 0.5 * (self.h_tr_3 + self.h_tr_em))) +
                          self.phi_m_tot) / ((self.c_m / 3600.0) + 0.5 * (self.h_tr_3 + self.h_tr_em))
-        print self.phi_m_tot
 
     def calc_phi_m_tot(self, t_out):
         """
@@ -533,7 +523,6 @@ class Building(object):
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
             self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
                            ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
-        print self.phi_m,  self.phi_st
 
     def calc_h_tr_1(self):
         """

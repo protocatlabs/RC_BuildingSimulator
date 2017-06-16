@@ -40,12 +40,14 @@ class Element(object):
 
 class Zone(object):
     def __init__(self,
+                 name = 'Default Zone',
                  elements = [],
                  floor_area = 34.3,
                  room_vol = 106.33,
                  total_internal_area = 142.380
                 ):
 
+        self.name = name
         self.h_tr_em = 0
         self.h_tr_w = 0
         self.floor_area = floor_area
