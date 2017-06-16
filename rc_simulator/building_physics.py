@@ -97,9 +97,7 @@ __maintainer__ = "Prageeth Jayathissa"
 __email__ = "jayathissa@arch.ethz.ch"
 __status__ = "BETA"
 
-
-
-class RC_zone(object):
+class Building(object):
     '''Sets the parameters of the building. '''
 
     def __init__(self,
@@ -124,8 +122,8 @@ class RC_zone(object):
 
         # Initialise Zone
         self.zone = zone
-        if zone == None:
-            zone = Zone()
+        if self.zone == None:
+            self.zone = Zone()
 
         # Fenestration and Lighting Properties
         self.lighting_load = lighting_load  # [kW/m2] lighting load
@@ -137,11 +135,11 @@ class RC_zone(object):
         self.lighting_maintenance_factor = lighting_maintenance_factor
 
         # Calculated Properties
-        self.floor_area = zone.floor_area # [m2] Floor Area
+        self.floor_area = self.zone.floor_area # [m2] Floor Area
         # [m2] Effective Mass Area assuming a medium weight building #12.3.1.2
         self.mass_area = self.floor_area * 2.5
-        self.room_vol = zone.room_vol# [m3] Room Volume
-        self.total_internal_area = zone.total_internal_area
+        self.room_vol = self.zone.room_vol# [m3] Room Volume
+        self.total_internal_area = self.zone.total_internal_area
         # TODO: Standard doesn't explain what A_t is. Needs to be checked
         self.A_t = self.total_internal_area
 
@@ -149,10 +147,10 @@ class RC_zone(object):
         # [kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
         self.c_m = thermal_capacitance_per_floor_area * self.floor_area
         # Conductance of opaque surfaces to exterior [W/K]
-        self.h_tr_em = zone.h_tr_em
+        self.h_tr_em = self.zone.h_tr_em
         # Conductance to exterior through glazed surfaces [W/K], based on
         # U-wert of 1W/m2K
-        self.h_tr_w = zone.h_tr_w
+        self.h_tr_w = self.zone.h_tr_w
 
 
         # Determine the ventilation conductance
@@ -179,7 +177,6 @@ class RC_zone(object):
             self.floor_area  # max cooling load (W/m2)
         self.max_heating_energy = max_heating_energy_per_floor_area * \
             self.floor_area  # max heating load (W/m2)
-
         # Building System Properties
         self.heating_supply_system = heating_supply_system
         self.cooling_supply_system = cooling_supply_system
@@ -238,7 +235,6 @@ class RC_zone(object):
 
         """
         # Main File
-
         # Calculate the heat transfer definitions for formula simplification
         self.calc_h_tr_1()
         self.calc_h_tr_2()
@@ -248,7 +244,7 @@ class RC_zone(object):
         self.has_demand(internal_gains, solar_gains, t_out, t_m_prev)
 
         if not self.has_heating_demand and not self.has_cooling_demand:
-
+            print 'freerunning'
             # no heating or cooling demand
             # calculate temperatures of building R-C-model and exit
             # --> rc_model_function_1(...)
@@ -273,7 +269,7 @@ class RC_zone(object):
             self.electricity_out = 0
 
         else:
-
+            print 'heated/cooled'
             # has heating/cooling demand
 
             # Calculates energy_demand used below
@@ -339,14 +335,13 @@ class RC_zone(object):
 
         # step 1 in section C.4.2 in [C.3 ISO 13790]
         """
-
         # set energy demand to 0 and see if temperatures are within the comfort
         # range
         energy_demand = 0
         # Solve for the internal temperature t_Air
         self.calc_temperatures_crank_nicolson(
             energy_demand, internal_gains, solar_gains, t_out, t_m_prev)
-
+        print internal_gains, solar_gains, t_out, t_m_prev
         # If the air temperature is less or greater than the set temperature,
         # there is a heating/cooling load
         if self.t_air < self.t_set_heating:
@@ -365,7 +360,6 @@ class RC_zone(object):
         Used in: has_demand(), solve_building_energy(), calc_energy_demand()
         # section C.3 in [C.3 ISO 13790]
         """
-
         self.calc_heat_flow(t_out, internal_gains, solar_gains, energy_demand)
 
         self.calc_phi_m_tot(t_out)
@@ -391,7 +385,8 @@ class RC_zone(object):
         Used in: solve_building_energy()
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
-
+        print 'hello'
+        print self.floor_area
         # Step 1: Check if heating or cooling is needed
         #(Not needed, but doing so for readability when comparing with the standard)
         # Set heating/cooling to 0
@@ -399,7 +394,7 @@ class RC_zone(object):
         # Calculate the air temperature with no heating/cooling
         t_air_0 = self.calc_temperatures_crank_nicolson(
             energy_demand_0, internal_gains, solar_gains, t_out, t_m_prev)[1]
-
+        print t_air_0
         # Step 2: Calculate the unrestricted heating/cooling required
 
         # determine if we need heating or cooling based based on the condition
@@ -415,6 +410,7 @@ class RC_zone(object):
         # Set a heating case where the heating load is 10x the floor area (10
         # W/m2)
         energy_floorAx10 = 10 * self.floor_area
+        print self.floor_area
 
         # Calculate the air temperature obtained by having this 10 W/m2
         # setpoint
@@ -435,7 +431,6 @@ class RC_zone(object):
         # maximum
         # necessary heating power exceeds maximum available power
         elif self.energy_demand_unrestricted > self.max_heating_energy:
-
             self.energy_demand = self.max_heating_energy
 
         # necessary cooling power exceeds maximum available power
@@ -465,6 +460,7 @@ class RC_zone(object):
         """
         self.energy_demand_unrestricted = energy_floorAx10 * \
             (t_air_set - t_air_0) / (t_air_10 - t_air_0)
+        print self.energy_demand_unrestricted
 
     def calc_heat_flow(self, t_out, internal_gains, solar_gains, energy_demand):
         """
@@ -491,6 +487,7 @@ class RC_zone(object):
         self.phi_m = (self.mass_area / self.A_t) * \
             (0.5 * internal_gains + solar_gains)
 
+        print 'hello', self.phi_ia, self.phi_st, self.phi_m
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
@@ -520,6 +517,7 @@ class RC_zone(object):
 
         self.t_m_next = ((t_m_prev * ((self.c_m / 3600.0) - 0.5 * (self.h_tr_3 + self.h_tr_em))) +
                          self.phi_m_tot) / ((self.c_m / 3600.0) + 0.5 * (self.h_tr_3 + self.h_tr_em))
+        print self.phi_m_tot
 
     def calc_phi_m_tot(self, t_out):
         """
@@ -534,6 +532,7 @@ class RC_zone(object):
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
             self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
                            ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
+        print self.phi_m,  self.phi_st
 
     def calc_h_tr_1(self):
         """
@@ -561,14 +560,12 @@ class RC_zone(object):
 
         self.h_tr_3 = 1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
 
-
     def calc_t_m(self, t_m_prev):
         """
         Temperature used for the calculations, average between newly calculated and previous bulk temperature
         # (C.9) in [C.3 ISO 13790]
         """
         self.t_m = (self.t_m_next + t_m_prev) / 2.0
-
     def calc_t_s(self, t_out):
         """
         Calculate the temperature of the inside room surfaces
