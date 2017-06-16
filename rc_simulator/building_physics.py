@@ -361,6 +361,10 @@ class Building(object):
         Used in: has_demand(), solve_building_energy(), calc_energy_demand()
         # section C.3 in [C.3 ISO 13790]
         """
+        print('checking crank nik inputs')
+        print(energy_demand,internal_gains,solar_gains,t_out,t_m_prev)
+
+
         self.calc_heat_flow(t_out, internal_gains, solar_gains, energy_demand)
 
         self.calc_phi_m_tot(t_out)
@@ -387,7 +391,7 @@ class Building(object):
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
         print 'calc_energy_demand works'
-        print self.floor_area
+        print(self.floor_area)
         # Step 1: Check if heating or cooling is needed
         #(Not needed, but doing so for readability when comparing with the standard)
         # Set heating/cooling to 0
