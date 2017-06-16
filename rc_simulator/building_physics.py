@@ -278,6 +278,7 @@ class Building(object):
 
             self.calc_temperatures_crank_nicolson(
                 self.energy_demand, internal_gains, solar_gains, t_out, t_m_prev)
+            print 'crank-nicholson inputs:', self.energy_demand, internal_gains, solar_gains, t_out, t_m_prev
             # calculates the actual t_m resulting from the actual heating
             # demand (energy_demand)
 
@@ -376,7 +377,7 @@ class Building(object):
         self.calc_t_air(t_out)
 
         self.calc_t_opperative()
-
+        print 'CN results:', self.t_m, self.t_air, self.t_opperative
         return self.t_m, self.t_air, self.t_opperative
 
     def calc_energy_demand(self, internal_gains, solar_gains, t_out, t_m_prev):
@@ -385,7 +386,7 @@ class Building(object):
         Used in: solve_building_energy()
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
         """
-        print 'hello'
+        print 'calc_energy_demand works'
         print self.floor_area
         # Step 1: Check if heating or cooling is needed
         #(Not needed, but doing so for readability when comparing with the standard)
@@ -487,7 +488,7 @@ class Building(object):
         self.phi_m = (self.mass_area / self.A_t) * \
             (0.5 * internal_gains + solar_gains)
 
-        print 'hello', self.mass_area,self.A_t, self.phi_ia, self.phi_st, self.phi_m
+        print 'phi_st, Phi_m:',  self.phi_st, self.phi_m
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
