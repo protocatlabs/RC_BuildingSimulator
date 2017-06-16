@@ -487,7 +487,7 @@ class Building(object):
         self.phi_m = (self.mass_area / self.A_t) * \
             (0.5 * internal_gains + solar_gains)
 
-        print 'hello', self.phi_ia, self.phi_st, self.phi_m
+        print 'hello', self.mass_area,self.A_t, self.phi_ia, self.phi_st, self.phi_m
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
