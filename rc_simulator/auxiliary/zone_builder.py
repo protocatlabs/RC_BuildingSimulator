@@ -13,6 +13,11 @@ object suitable for:
 
 import numpy as np
 
+import os
+os.chdir(os.path.split (os.path.realpath (__file__))[0])
+import supply_system
+import emission_system
+
 
 __authors__ = "Justin Zarb"
 __copyright__ = "Copyright 2017, Architecture and Building Systems - ETH Zurich"
@@ -44,7 +49,10 @@ class Zone(object):
                  elements = [],
                  floor_area = 34.3,
                  room_vol = 106.33,
-                 total_internal_area = 142.380
+                 total_internal_area = 142.380,
+                 max_heating_energy_per_floor_area = np.inf,
+                 heating_supply_system = supply_system.OilBoilerMed,
+                 heating_emission_system = emission_system.OldRadiators
                 ):
 
         self.name = name
@@ -56,6 +64,9 @@ class Zone(object):
         self.elements = elements
         self.elements_added = 0 #counter to check that the zone contains exactly the specified elements.
         self.element_names = []
+        self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
+        self.heating_supply_system = heating_supply_system,
+        self.heating_emission_system = heating_emission_system
 
         #if left blank, zone elements will be set to ASF default values
         if self.elements == []:
@@ -75,8 +86,8 @@ class Zone(object):
     def add_elements(self,e):
         self.element_names.append(e.name)
         #raise error for invalid names
-        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground slab','roof']):
-            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"groundslab"'","'"roof"'"')
+        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground slab','door','roof']):
+            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"door"'",""'"groundslab"'","'"roof"'"')
         # add window conductance to window conductances
         if any(x in str.lower(e.name) for x in ['window']):
             self.h_tr_w += e.h_tr
