@@ -151,8 +151,8 @@ class Building(object):
         # Conductance to exterior through glazed surfaces [W/K], based on
         # U-wert of 1W/m2K
         self.h_tr_w = self.zone.h_tr_w
-
-
+        print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
+        print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
         # Determine the ventilation conductance
         ach_tot = ach_infl + ach_vent  # Total Air Changes Per Hour
         # temperature adjustment factor taking ventilation and infiltration
@@ -166,6 +166,8 @@ class Building(object):
         # Conductance from the conditioned air to interior building surface
         self.h_tr_is = self.total_internal_area * 3.45
 
+        print 'transmittance from internal air to thermal mass of the building, h_tr_ms:', self.h_tr_ms
+        print 'conductance from the conditioned air to the interior building surface, h_tr_is:', self.h_tr_is
         # Thermal set points
         self.t_set_heating = t_set_heating
         self.t_set_cooling = t_set_cooling
