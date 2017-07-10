@@ -74,13 +74,16 @@ class Zone(object):
             Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
             self.add_elements(Window)
             self.add_elements(Wall)
-
-        for each_element in elements:
-            self.add_elements(each_element)
+        else:
+            for each_element in self.elements:
+                self.add_elements(each_element)
 
         #report the number of elements added to facilitate bug detection
         if self.elements != []:
             print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
+
+        print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
+        print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
 
 
     def add_elements(self,e):
