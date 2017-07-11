@@ -13,10 +13,8 @@ object suitable for:
 
 import numpy as np
 
-import os
-os.chdir(os.path.split (os.path.realpath (__file__))[0])
-import supply_system
-import emission_system
+import rc_simulator.rc_simulator.supply_system as supply_system
+import rc_simulator.rc_simulator.emission_system as emission_system
 
 
 __authors__ = "Justin Zarb"
@@ -33,7 +31,11 @@ class Element(object):
                  name = 'wall', #should contain one of the following: [Wall, Window, Ground slab, Roof]
                  area = 15.0, #Element area, [m2]
                  u_value = 1.0, #Element u_value-value, [W/m2.K]
-                 subgrade = False #Element above or below ground level. todo: modify building_physics accordingly
+                 subgrade = False, #Element above or below ground level. todo: modify building_physics accordingly
+                 azimuth_tilt = 0,
+                 altitude_tilt = 90,
+                 solar_transmittance = 0.7,
+                 light_transmittance=0.8
                  ):
 
         self.name = name
@@ -41,12 +43,21 @@ class Element(object):
         self.u_value = u_value
         self.subgrade = subgrade
         self.h_tr = self.u_value * self.area #element conductance [W/K]
+        self.azimuth_tilt = azimuth_tilt
+        self.altitude_tilt = altitude_tilt
+
+        if any(x in str.lower(self.name) for x in ['window']):
+            self.solar_transmittance = solar_transmittance
+            self.light_transmittance = light_transmittance
+        else:
+            self.solar_transmittance = 0
+            self.light_transmittance = 0
 
 
 class Zone(object):
     def __init__(self,
                  name = 'Default Zone',
-                 elements = [],
+                 elements = None,
                  floor_area = 34.3,
                  room_vol = 106.33,
                  total_internal_area = 142.380,
@@ -58,6 +69,9 @@ class Zone(object):
         self.name = name
         self.h_tr_em = 0
         self.h_tr_w = 0
+        self.wall_area = 0
+        self.window_area = 0
+        self.window_wall_ratio = 0
         self.floor_area = floor_area
         self.room_vol = room_vol
         self.total_internal_area = total_internal_area
@@ -65,25 +79,26 @@ class Zone(object):
         self.elements_added = 0 #counter to check that the zone contains exactly the specified elements.
         self.element_names = []
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
-        self.heating_supply_system = heating_supply_system,
-        self.heating_emission_system = heating_emission_system
+        # self.heating_supply_system = heating_supply_system,
+        # self.heating_emission_system = heating_emission_system
 
         #if left blank, zone elements will be set to ASF default values
-        if self.elements == []:
+        if self.elements == None:
             Window = Element(name='ASF_window', area=13.5, u_value=1.1)
             Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
             self.add_elements(Window)
             self.add_elements(Wall)
         else:
-            for each_element in self.elements:
-                self.add_elements(each_element)
+            for element in self.elements:
+                self.add_elements(element)
 
         #report the number of elements added to facilitate bug detection
-        if self.elements != []:
+        if self.elements != None:
             print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
 
         print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
         print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
+        print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
 
 
     def add_elements(self,e):
@@ -95,13 +110,23 @@ class Zone(object):
         if any(x in str.lower(e.name) for x in ['window']):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
+            self.window_area += e.area
         # add surface conductances to conductance of mass
         if any(x in str.lower(e.name) for x in ['wall','roof','groundslab','ground slab']):
             self.h_tr_em += e.h_tr
             self.elements_added += 1
+            self.wall_area += e.area
 
 
 if __name__ == '__main__':
-    test = Zone()
-    print test.h_tr_w
-    print test.h_tr_em
+    test_window = Element(name='window_S')
+    print test_window.name, 'light transmittance: ', test_window.light_transmittance
+
+    test_wall = Element(name='wall_E',azimuth_tilt=-90)
+    print test_wall.name, 'light transmittance: ', test_wall.light_transmittance
+
+    print 'testing zone:'
+    test_zone = Zone()
+    print 'window area: %f wall area: %s'%(test_zone.window_area, test_zone.wall_area)
+    print 'h_tr_w: ',test_zone.h_tr_w
+    print 'h_tr_em: ',test_zone.h_tr_em
