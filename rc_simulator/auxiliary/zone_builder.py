@@ -76,10 +76,10 @@ class Zone(object):
         self.window_wall_ratio = 0
         self.floor_area = floor_area
         self.room_vol = room_vol
-        self.total_internal_area = total_internal_area
+        self.total_internal_area = 0
         self.elements = elements
-        self.elements_added = 0 #counter to check that the zone contains exactly the specified elements.
-        self.element_names = []
+        self.elements_added = 0 #for reporting purposes
+        self.element_names = [] #for reporting purposes
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.heating_supply_system = heating_supply_system,
         self.heating_emission_system = heating_emission_system
@@ -90,9 +90,12 @@ class Zone(object):
             Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
             self.add_elements(Window)
             self.add_elements(Wall)
+            self.total_internal_area = total_internal_area
         else:
             for element in self.elements:
                 self.add_elements(element)
+                self.total_internal_area += element.area
+                #todo: is this ok? or should this parameter include internal floors and partitions?
 
         #report the number of elements added to facilitate bug detection
         if self.elements != None:
@@ -106,7 +109,7 @@ class Zone(object):
     def add_elements(self,e):
         self.element_names.append(e.name)
         #raise error for invalid names
-        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground slab','door','roof']):
+        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground','teile','fenster','door','roof']):
             raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"door"'",""'"groundslab"'","'"roof"'"')
         # add window conductance to window conductances
         if any(x in str.lower(e.name) for x in ['window','glazed','glazing','fenster']):
