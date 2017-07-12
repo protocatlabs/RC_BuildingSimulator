@@ -32,10 +32,11 @@ class Element(object):
                  area = 15.0, #Element area, [m2]
                  u_value = 1.0, #Element u_value-value, [W/m2.K]
                  subgrade = False, #Element above or below ground level. todo: modify building_physics accordingly
-                 azimuth_tilt = 0,
-                 altitude_tilt = 90,
+                 azimuth_tilt = 0, #South facing by default
+                 altitude_tilt = 90, #vertical surfaces by default
                  solar_transmittance = 0.7,
-                 light_transmittance=0.8
+                 light_transmittance=0.8,
+                 shading_factor=1.0
                  ):
 
         self.name = name
@@ -45,6 +46,7 @@ class Element(object):
         self.h_tr = self.u_value * self.area #element conductance [W/K]
         self.azimuth_tilt = azimuth_tilt
         self.altitude_tilt = altitude_tilt
+        self.shading_factor = shading_factor
 
         if any(x in str.lower(self.name) for x in ['window']):
             self.solar_transmittance = solar_transmittance
@@ -79,8 +81,8 @@ class Zone(object):
         self.elements_added = 0 #counter to check that the zone contains exactly the specified elements.
         self.element_names = []
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
-        # self.heating_supply_system = heating_supply_system,
-        # self.heating_emission_system = heating_emission_system
+        self.heating_supply_system = heating_supply_system,
+        self.heating_emission_system = heating_emission_system
 
         #if left blank, zone elements will be set to ASF default values
         if self.elements == None:
@@ -107,7 +109,7 @@ class Zone(object):
         if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground slab','door','roof']):
             raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"door"'",""'"groundslab"'","'"roof"'"')
         # add window conductance to window conductances
-        if any(x in str.lower(e.name) for x in ['window']):
+        if any(x in str.lower(e.name) for x in ['window','glazed','glazing','fenster']):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
             self.window_area += e.area
