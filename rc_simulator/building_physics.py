@@ -86,7 +86,7 @@ import emission_system
 import os
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__),'auxiliary'))
-from zone_builder import Zone
+from auxiliary.zone_builder import Zone
 
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
