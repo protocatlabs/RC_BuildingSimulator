@@ -48,7 +48,7 @@ class Element(object):
         self.altitude_tilt = altitude_tilt
         self.shading_factor = shading_factor
 
-        if any(x in str.lower(self.name) for x in ['window']):
+        if any(x in str.lower(self.name) for x in ['window','glazing','glazed','fenster']):
             self.solar_transmittance = solar_transmittance
             self.light_transmittance = light_transmittance
         else:
@@ -63,6 +63,8 @@ class Zone(object):
                  floor_area = 34.3,
                  room_vol = 106.33,
                  total_internal_area = 142.380,
+                 ach_vent=1.5,
+                 ach_infl=0.5,
                  max_heating_energy_per_floor_area = np.inf,
                  heating_supply_system = supply_system.OilBoilerMed,
                  heating_emission_system = emission_system.OldRadiators
@@ -77,6 +79,8 @@ class Zone(object):
         self.floor_area = floor_area
         self.room_vol = room_vol
         self.total_internal_area = 0
+        self.ach_vent = ach_vent
+        self.ach_infl = ach_infl
         self.elements = elements
         self.elements_added = 0 #for reporting purposes
         self.element_names = [] #for reporting purposes
