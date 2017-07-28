@@ -71,19 +71,23 @@ class Zone(object):
                 ):
 
         self.name = name
+        # Element objects
+        self.elements = elements
+        self.elements_added = 0  # for reporting purposes
+        self.element_names = []  # for reporting purposes
+        # calculated from Elements
         self.h_tr_em = 0
         self.h_tr_w = 0
         self.wall_area = 0
         self.window_area = 0
         self.window_wall_ratio = 0
+        # direct inputs
         self.floor_area = floor_area
         self.room_vol = room_vol
         self.total_internal_area = 0
         self.ach_vent = ach_vent
         self.ach_infl = ach_infl
-        self.elements = elements
-        self.elements_added = 0 #for reporting purposes
-        self.element_names = [] #for reporting purposes
+
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.heating_supply_system = heating_supply_system,
         self.heating_emission_system = heating_emission_system
