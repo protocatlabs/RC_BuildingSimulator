@@ -106,10 +106,10 @@ class Building(object):
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
-                 ach_vent=1.5,
-                 ach_infl=0.5,
-                 ventilation_efficiency=0.6,
-                 thermal_capacitance_per_floor_area=165000,
+                 # ach_vent=1.5,
+                 # ach_infl=0.5,
+                 # ventilation_efficiency=0.6,
+                 # thermal_capacitance_per_floor_area=165000,
                  t_set_heating=20.0,
                  t_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-np.inf,
@@ -145,17 +145,17 @@ class Building(object):
 
         # Single Capacitance  5 conductance Model Parameters
         # [kWh/K] Room Capacitance. Default based on ISO standard 12.3.1.2 for medium heavy buildings
-        self.c_m = thermal_capacitance_per_floor_area * self.floor_area
+        self.c_m = self.zone.thermal_capacitance_per_floor_area * self.floor_area
         # Conductance of opaque surfaces to exterior [W/K]
         self.h_tr_em = self.zone.h_tr_em
         # Conductance to exterior through glazed surfaces [W/K], based on
         # U-wert of 1W/m2K
         self.h_tr_w = self.zone.h_tr_w
         # Determine the ventilation conductance
-        ach_tot = ach_infl + ach_vent  # Total Air Changes Per Hour
+        ach_tot = self.zone.ach_infl + self.zone.ach_vent  # Total Air Changes Per Hour
         # temperature adjustment factor taking ventilation and infiltration
         # [ISO: E -27]
-        b_ek = (1 - (ach_vent / (ach_tot)) * ventilation_efficiency)
+        b_ek = (1 - (self.zone.ach_vent / (ach_tot)) * self.zone.ventilation_efficiency)
         self.h_ve_adj = 1200 * b_ek * self.room_vol * \
             (ach_tot / 3600)  # Conductance through ventilation [W/M]
         # transmittance from the internal air to the thermal mass of the

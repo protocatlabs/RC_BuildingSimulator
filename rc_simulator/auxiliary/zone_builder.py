@@ -63,8 +63,10 @@ class Zone(object):
                  floor_area = 34.3,
                  room_vol = 106.33,
                  total_internal_area = 142.380,
+                 thermal_capacitance_per_floor_area=165000,
                  ach_vent=1.5,
                  ach_infl=0.5,
+                 ventilation_efficiency=0.6,
                  max_heating_energy_per_floor_area = np.inf,
                  heating_supply_system = supply_system.OilBoilerMed,
                  heating_emission_system = emission_system.OldRadiators
@@ -87,6 +89,8 @@ class Zone(object):
         self.total_internal_area = 0
         self.ach_vent = ach_vent
         self.ach_infl = ach_infl
+        self.ventilation_efficiency = ventilation_efficiency
+        self.thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area
 
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.heating_supply_system = heating_supply_system,
