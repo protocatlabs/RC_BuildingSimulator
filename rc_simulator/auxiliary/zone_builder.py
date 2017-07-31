@@ -134,6 +134,11 @@ class Zone(object):
             self.elements_added += 1
             self.wall_area += e.area
 
+    def set_ventilation_efficiency(self, value):
+        self.ventilation_efficiency = value
+
+    def set_thermal_capacitance_per_area(self, value):
+        self.thermal_capacitance_per_floor_area = value
 
 if __name__ == '__main__':
     test_window = Element(name='window_S')
