@@ -58,7 +58,7 @@ class Element(object):
 
 class Zone(object):
     def __init__(self,
-                 name = 'Default Zone',
+                 name = 'Default Zone', #for Calibrated Retrofit Analyisis, this should be of the form "Building#"
                  elements = None,
                  floor_area = 34.3,
                  room_vol = 106.33,
