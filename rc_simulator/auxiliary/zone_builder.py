@@ -140,6 +140,15 @@ class Zone(object):
     def set_thermal_capacitance_per_area(self, value):
         self.thermal_capacitance_per_floor_area = value
 
+    def set_ach_vent(self,value):
+        self.ach_vent = value
+
+    def set_ach_infl(self,value):
+        self.ach_infl = value
+
+    def set_total_internal_area(self,value):
+        self.total_internal_area = value
+
 if __name__ == '__main__':
     test_window = Element(name='window_S')
     print test_window.name, 'light transmittance: ', test_window.light_transmittance

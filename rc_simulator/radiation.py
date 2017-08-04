@@ -95,6 +95,9 @@ class Location(object):
         altitude_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * math.cos(hour_angle_rad) +
                                  math.sin(latitude_rad) * math.sin(declination_rad))
 
+        # Zenith angle (the angle between the sun and the ground normal)
+        zenith_rad = math.pi/2 - altitude_rad
+
         # Azimuth Position fo the sun in radians
         azimuth_rad = math.asin(
             math.cos(declination_rad) * math.sin(hour_angle_rad) / math.cos(altitude_rad))
@@ -106,6 +109,12 @@ class Location(object):
         else:
             return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
 
+    def convert_GHI(self,start,end,hoy):
+        #input: hourly value for GHI
+        doy =
+        print 'doy:',doy
+        #return a dataframe with
+        irradiance.erbs(GHI,zenith,doy)
 
 class Window(object):
     """docstring for Window"""
@@ -198,6 +207,11 @@ class Window(object):
         """Calculates the proportion of diffuse radiation"""
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
+
+    def convert_GHI(self):
+        doy = self.start.timetuple ().tm_yday
+        print 'doy:',doy
+        irradiance.erbs(GHI,zenith,doy)
 
 
 if __name__ == '__main__':
