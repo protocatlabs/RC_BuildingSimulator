@@ -6,8 +6,7 @@ Tool to Evaluate Radiation incident on a surface of a set angle
 
 import numpy as np
 import pandas as pd
-import os
-import sys
+import pvlib.irradiance as irradiance
 import math
 import datetime
 
@@ -28,7 +27,7 @@ __status__ = "BETA"
 class Location(object):
     """Set the Location of the Simulation with an Energy Plus Weather File"""
 
-    def __init__(self, epwfile_path):
+    def __init__(self, epwfile_path = None, ghi_data = None):
 
         # Set EPW Labels and import epw file
         epw_labels = ['year', 'month', 'day', 'hour', 'minute', 'datasource', 'drybulb_C', 'dewpoint_C', 'relhum_percent',
@@ -39,8 +38,9 @@ class Location(object):
                       'snowdepth_cm', 'days_last_snow', 'Albedo', 'liq_precip_depth_mm', 'liq_precip_rate_Hour']
 
         # Import EPW file
-        self.weather_data = pd.read_csv(
-            epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
+        if epwfile_path is not None:
+            self.weather_data = pd.read_csv(
+                epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
 
     def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """
@@ -68,16 +68,16 @@ class Location(object):
 
         # Angular distance of the sun north or south of the earths equator
         # Determine the day of the year.
-        day_of_year = utc_datetime.timetuple().tm_yday
+        self.day_of_year = utc_datetime.timetuple().tm_yday
 
         # Calculate the declination angle: The variation due to the earths tilt
         # http://www.pveducation.org/pvcdrom/properties-of-sunlight/declination-angle
         declination_rad = math.radians(
-            23.45 * math.sin((2 * math.pi / 365.0) * (day_of_year - 81)))
+            23.45 * math.sin((2 * math.pi / 365.0) * (self.day_of_year - 81)))
 
         # Normalise the day to 2*pi
         # There is some reason as to why it is 364 and not 365.26
-        angle_of_day = (day_of_year - 81) * (2 * math.pi / 364)
+        angle_of_day = (self.day_of_year - 81) * (2 * math.pi / 364)
 
         # The deviation between local standard time and true solar time
         equation_of_time = (9.87 * math.sin(2 * angle_of_day)) - \
@@ -96,7 +96,7 @@ class Location(object):
                                  math.sin(latitude_rad) * math.sin(declination_rad))
 
         # Zenith angle (the angle between the sun and the ground normal)
-        zenith_rad = math.pi/2 - altitude_rad
+        self.zenith = 90 - math.degrees(altitude_rad)
 
         # Azimuth Position fo the sun in radians
         azimuth_rad = math.asin(
@@ -105,16 +105,21 @@ class Location(object):
         # I don't really know what this code does, it has been imported from
         # PySolar
         if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
-            return math.degrees(altitude_rad), math.degrees(azimuth_rad)
+            self.Altitude = math.degrees(altitude_rad)
+            self.Azimuth = math.degrees(azimuth_rad)
         else:
-            return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
+            self.Altitude = math.degrees(altitude_rad)
+            self.Azimuth = (180 - math.degrees(azimuth_rad))
 
-    def convert_GHI(self,start,end,hoy):
-        #input: hourly value for GHI
-        doy =
-        print 'doy:',doy
-        #return a dataframe with
-        irradiance.erbs(GHI,zenith,doy)
+    def convert_GHI(self,GHI):
+        """
+        Calculates the Direct Normal Irradiation and Diffuse Horizontal Irradiation from the Global Horizontal Radiation
+        :param GHI: Global horizontal irradiation
+        :type GHI: float
+        """
+        erbs = irradiance.erbs(float(GHI),self.zenith,self.day_of_year)
+        self.DNI = erbs['dni']
+        self.DHI = erbs['dhi']
 
 class Window(object):
     """docstring for Window"""
@@ -208,11 +213,15 @@ class Window(object):
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
-    def convert_GHI(self):
-        doy = self.start.timetuple ().tm_yday
-        print 'doy:',doy
-        irradiance.erbs(GHI,zenith,doy)
+
 
 
 if __name__ == '__main__':
-    pass
+
+    Test = Location()
+
+    Test.calc_sun_position(latitude_deg=47.426,
+                                        longitude_deg=9.4006,
+                                        year=2017,
+                                        hoy=2026)
+    Test.convert_GHI (150)
