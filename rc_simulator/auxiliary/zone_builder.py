@@ -62,7 +62,6 @@ class Zone(object):
                  elements = None,
                  floor_area = 34.3,
                  room_vol = 106.33,
-                 total_internal_area = 142.380,
                  thermal_capacitance_per_floor_area=165000,
                  ach_vent=1.5,
                  ach_infl=0.5,
@@ -86,7 +85,7 @@ class Zone(object):
         # direct inputs
         self.floor_area = floor_area
         self.room_vol = room_vol
-        self.total_internal_area = 0
+        self.total_internal_area = floor_area * 4.5 #ISO13790 7.2.2.2
         self.ach_vent = ach_vent
         self.ach_infl = ach_infl
         self.ventilation_efficiency = ventilation_efficiency
