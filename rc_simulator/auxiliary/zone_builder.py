@@ -59,6 +59,7 @@ class Element(object):
 class Zone(object):
     def __init__(self,
                  name = 'Default Zone', #for Calibrated Retrofit Analyisis, this should be of the form "Building#"
+                 occupants = 2,
                  elements = None,
                  floor_area = 34.3,
                  room_vol = 106.33,
@@ -72,17 +73,14 @@ class Zone(object):
                 ):
 
         self.name = name
+
         # Element objects
         self.elements = elements
         self.elements_added = 0  # for reporting purposes
         self.element_names = []  # for reporting purposes
-        # calculated from Elements
-        self.h_tr_em = 0
-        self.h_tr_w = 0
-        self.wall_area = 0
-        self.window_area = 0
-        self.window_wall_ratio = 0
+
         # direct inputs
+        self.occupants = occupants
         self.floor_area = floor_area
         self.room_vol = room_vol
         self.total_internal_area = floor_area * 4.5 #ISO13790 7.2.2.2
@@ -90,10 +88,16 @@ class Zone(object):
         self.ach_infl = ach_infl
         self.ventilation_efficiency = ventilation_efficiency
         self.thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area
-
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.heating_supply_system = heating_supply_system,
         self.heating_emission_system = heating_emission_system
+
+        # initialize envelope properties
+        self.h_tr_em = 0
+        self.h_tr_w = 0
+        self.wall_area = 0
+        self.window_area = 0
+        self.window_wall_ratio = 0
 
         #if left blank, zone elements will be set to ASF default values
         if self.elements == None:

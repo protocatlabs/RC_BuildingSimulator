@@ -106,10 +106,6 @@ class Building(object):
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
-                 # ach_vent=1.5,
-                 # ach_infl=0.5,
-                 # ventilation_efficiency=0.6,
-                 # thermal_capacitance_per_floor_area=165000,
                  t_set_heating=20.0,
                  t_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-np.inf,
@@ -137,6 +133,9 @@ class Building(object):
         # Calculated Properties
         self.floor_area = self.zone.floor_area # [m2] Floor Area
         # [m2] Effective Mass Area assuming a medium weight building #12.3.1.2
+        # very light: 2.5 x Af
+        # heavy: 3.0 x Af
+        # very heavy: 3.5 x Af
         self.mass_area = self.floor_area * 2.5
         self.room_vol = self.zone.room_vol# [m3] Room Volume
         self.total_internal_area = self.zone.total_internal_area
