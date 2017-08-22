@@ -105,12 +105,9 @@ class Zone(object):
             Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
             self.add_elements(Window)
             self.add_elements(Wall)
-            self.total_internal_area = total_internal_area
         else:
             for element in self.elements:
                 self.add_elements(element)
-                self.total_internal_area += element.area
-                #todo: is this ok? or should this parameter include internal floors and partitions?
 
         #report the number of elements added to facilitate bug detection
         if self.elements != None:
