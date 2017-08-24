@@ -154,7 +154,9 @@ class Building(object):
         ach_tot = self.zone.ach_infl + self.zone.ach_vent  # Total Air Changes Per Hour
         # temperature adjustment factor taking ventilation and infiltration
         # [ISO: E -27]
+        # TODO: check this equation. I don't agree with the 1 - ...
         b_ek = (1 - (self.zone.ach_vent / (ach_tot)) * self.zone.ventilation_efficiency)
+        # b_ek = (self.zone.ach_vent/ ach_tot) * self.zone.ventilation_efficiency
         self.h_ve_adj = 1200 * b_ek * self.room_vol * \
             (ach_tot / 3600)  # Conductance through ventilation [W/M]
         # transmittance from the internal air to the thermal mass of the
