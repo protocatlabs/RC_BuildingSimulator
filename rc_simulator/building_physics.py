@@ -188,7 +188,7 @@ class Building(object):
 
         :param illuminance: Illuminance transmitted through the window [Lumens]
         :type illuminance: float
-        :param occupancy: Probability of full occupancy
+        :param : Probability of full occupancy
         :type occupancy: float
 
         :return: self.lighting_demand, Lighting Energy Required for the timestep
