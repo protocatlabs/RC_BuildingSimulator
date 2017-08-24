@@ -62,11 +62,11 @@ class Zone(object):
                  occupants = 2,
                  elements = None,
                  floor_area = 34.3,
-                 room_vol = 106.33,
+                 volume = 106.33,
                  thermal_capacitance_per_floor_area=165000,
                  ach_vent=1.5,
                  ach_infl=0.5,
-                 ventilation_efficiency=0.6,
+                 ventilation_efficiency=0,
                  max_heating_energy_per_floor_area = np.inf,
                  heating_supply_system = supply_system.OilBoilerMed,
                  heating_emission_system = emission_system.OldRadiators
@@ -82,7 +82,7 @@ class Zone(object):
         # direct inputs
         self.occupants = occupants
         self.floor_area = floor_area
-        self.room_vol = room_vol
+        self.volume = volume
         self.total_internal_area = floor_area * 4.5 #ISO13790 7.2.2.2
         self.ach_vent = ach_vent
         self.ach_infl = ach_infl

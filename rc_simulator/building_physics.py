@@ -137,7 +137,7 @@ class Building(object):
         # heavy: 3.0 x Af
         # very heavy: 3.5 x Af
         self.mass_area = self.floor_area * 2.5
-        self.room_vol = self.zone.room_vol# [m3] Room Volume
+        self.room_vol = self.zone.volume# [m3] Room Volume
         self.total_internal_area = self.zone.total_internal_area
         # TODO: Standard doesn't explain what A_t is. Needs to be checked
         self.A_t = self.total_internal_area
