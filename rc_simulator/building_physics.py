@@ -518,6 +518,13 @@ class Building(object):
         """
 
         t_supply = t_out  # ASSUMPTION: Supply air comes straight from the outside air
+        h_tr_3 = False
+        for key in self.__dict__:
+            if 'h_tr_3' in key:
+                h_tr_3 = True
+        if not h_tr_3: # This is the case when heating is supplied and crank-nicholson is called directly
+            self.calc_h_tr_3()
+
 
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
             self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
@@ -537,6 +544,12 @@ class Building(object):
         # (C.7) in [C.3 ISO 13790]
 
         """
+        h_tr_1 = False
+        for key in self.__dict__:
+            if 'h_tr_1' in key:
+                h_tr_1 = True
+        if not h_tr_1:
+            self.calc_h_tr_1 ()
 
         self.h_tr_2 = self.h_tr_1 + self.h_tr_w
 
@@ -546,6 +559,12 @@ class Building(object):
         # (C.8) in [C.3 ISO 13790]
 
         """
+        h_tr_2 = False
+        for key in self.__dict__:
+            if 'h_tr_2' in key:
+                h_tr_2 = True
+        if not h_tr_2:
+            self.calc_h_tr_2()
 
         self.h_tr_3 = 1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
 
