@@ -59,14 +59,16 @@ class Element(object):
 class Zone(object):
     def __init__(self,
                  name = 'Default Zone', #for Calibrated Retrofit Analyisis, this should be of the form "Building#"
-                 occupants = 2,
+                 occupants = 1,
                  elements = None,
                  floor_area = 34.3,
                  volume = 106.33,
                  thermal_capacitance_per_floor_area=165000,
                  ach_vent=1.5,
                  ach_infl=0.5,
-                 ventilation_efficiency=1,
+                 ventilation_efficiency=0,
+                 t_set_heating = 20,
+                 t_set_cooling = 26,
                  max_heating_energy_per_floor_area = np.inf,
                  heating_supply_system = supply_system.OilBoilerMed,
                  heating_emission_system = emission_system.OldRadiators
@@ -91,6 +93,9 @@ class Zone(object):
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.heating_supply_system = heating_supply_system,
         self.heating_emission_system = heating_emission_system
+        self.t_set_heating = t_set_heating
+        self.t_set_cooling = t_set_cooling
+
 
         # initialize envelope properties
         self.h_tr_em = 0
@@ -103,19 +108,10 @@ class Zone(object):
         if self.elements == None:
             Window = Element(name='ASF_window', area=13.5, u_value=1.1)
             Wall = Element(name='ASF_wall', area=1.69, u_value=0.2)
-            self.add_elements(Window)
-            self.add_elements(Wall)
-        else:
-            for element in self.elements:
-                self.add_elements(element)
+            self.elements = [Window,Wall]
 
-        #report the number of elements added to facilitate bug detection
-        if self.elements != None:
-            print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
-
-        print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
-        print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
-        print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
+        for element in self.elements:
+            self.add_elements(element)
 
 
     def add_elements(self,e):
@@ -134,6 +130,16 @@ class Zone(object):
             self.elements_added += 1
             self.wall_area += e.area
 
+
+    def summary(self):
+        #report the number of elements added to facilitate bug detection
+        if self.elements != None:
+            print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
+
+        print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
+        print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
+        print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
+
     def set_ventilation_efficiency(self, value):
         self.ventilation_efficiency = value
 
@@ -148,6 +154,11 @@ class Zone(object):
 
     def set_total_internal_area(self,value):
         self.total_internal_area = value
+
+    def set_heating_setpoint(self,value):
+        self.t_set_heating = value
+
+
 
 if __name__ == '__main__':
     test_window = Element(name='window_S')
