@@ -106,8 +106,6 @@ class Building(object):
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
-                 t_set_heating=20.0,
-                 t_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-np.inf,
                  max_heating_energy_per_floor_area=np.inf,
                  heating_supply_system=supply_system.OilBoilerMed,
@@ -166,8 +164,8 @@ class Building(object):
         self.h_tr_is = self.total_internal_area * 3.45
 
         # Thermal set points
-        self.t_set_heating = t_set_heating
-        self.t_set_cooling = t_set_cooling
+        self.t_set_heating = self.zone.t_set_heating
+        self.t_set_cooling = self.zone.t_set_cooling
 
         # Thermal Properties
         self.has_heating_demand = False  # Boolean for if heating is required
