@@ -66,7 +66,7 @@ class Zone(object):
                  thermal_capacitance_per_floor_area=165000,
                  ach_vent=1.5,
                  ach_infl=0.5,
-                 ventilation_efficiency=0,
+                 ventilation_efficiency=1,
                  t_set_heating = 20,
                  t_set_cooling = 26,
                  max_heating_energy_per_floor_area = np.inf,
