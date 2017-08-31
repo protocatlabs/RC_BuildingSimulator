@@ -16,6 +16,7 @@ import numpy as np
 import rc_simulator.rc_simulator.supply_system as supply_system
 import rc_simulator.rc_simulator.emission_system as emission_system
 
+#testing
 
 __authors__ = "Justin Zarb"
 __copyright__ = "Copyright 2017, Architecture and Building Systems - ETH Zurich"
