@@ -28,6 +28,19 @@ __email__ = "zarbj@arch.ethz.ch"
 __status__ = "under development"
 
 class Element(object):
+    """
+    Element object representing an opaque or transparent element.
+
+    ##OUTLOOK##
+    Subgrade: currently a dummy attribute but this would indicate that the element is in contact with the ground
+    rather than the outside air.
+
+    absorptivity, reflectivity: Not yet implemented, but adding these parameters would make it possible to include
+    solar gains calculations to opaque elements. The RC model would need to be adapted for this.
+
+    Note to future developers: when adding attributes, make sure to upadate the copy method below with the same
+    attributes!
+    """
     def __init__(self,
                  name = 'wall', #should contain one of the following: [Wall, Window, Ground slab, Roof]
                  area = 15.0, #Element area, [m2]
@@ -56,6 +69,16 @@ class Element(object):
             self.solar_transmittance = 0
             self.light_transmittance = 0
 
+    def copy(self):
+        return Element(name = self.name,
+                       area = self.area,
+                       u_value = self.u_value,
+                       subgrade = self.subgrade,
+                       azimuth_tilt = self.azimuth_tilt,
+                       altitude_tilt = self.altitude_tilt,
+                       solar_transmittance = self.solar_transmittance,
+                       light_transmittance= self.light_transmittance,
+                       shading_factor= self.shading_factor)
 
 class Zone(object):
     def __init__(self,
@@ -92,7 +115,7 @@ class Zone(object):
         self.ventilation_efficiency = ventilation_efficiency
         self.thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
-        self.heating_supply_system = heating_supply_system,
+        self.heating_supply_system = heating_supply_system
         self.heating_emission_system = heating_emission_system
         self.t_set_heating = t_set_heating
         self.t_set_cooling = t_set_cooling
@@ -141,23 +164,22 @@ class Zone(object):
         print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
         print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
 
-    def set_ventilation_efficiency(self, value):
-        self.ventilation_efficiency = value
 
-    def set_thermal_capacitance_per_area(self, value):
-        self.thermal_capacitance_per_floor_area = value
-
-    def set_ach_vent(self,value):
-        self.ach_vent = value
-
-    def set_ach_infl(self,value):
-        self.ach_infl = value
-
-    def set_total_internal_area(self,value):
-        self.total_internal_area = value
-
-    def set_heating_setpoint(self,value):
-        self.t_set_heating = value
+    def copy(self):
+        return Zone(name = self.name,
+                 occupants = self.occupants,
+                 elements = [e.copy() for e in self.elements],
+                 floor_area = self.floor_area,
+                 volume = self.volume,
+                 thermal_capacitance_per_floor_area=self.thermal_capacitance_per_floor_area,
+                 ach_vent=self.ach_vent,
+                 ach_infl=self.ach_infl,
+                 ventilation_efficiency=self.ventilation_efficiency,
+                 t_set_heating = self.t_set_heating,
+                 t_set_cooling = self.t_set_cooling,
+                 max_heating_energy_per_floor_area = self.max_heating_energy_per_floor_area,
+                 heating_supply_system = self.heating_supply_system,
+                 heating_emission_system = self.heating_emission_system)
 
 
 
