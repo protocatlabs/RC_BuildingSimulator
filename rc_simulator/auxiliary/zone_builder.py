@@ -62,7 +62,7 @@ class Element(object):
         self.altitude_tilt = altitude_tilt
         self.shading_factor = shading_factor
 
-        if any(x in str.lower(self.name) for x in ['window','glazing','glazed','fenster']):
+        if any(x in str.lower(self.name) for x in ['window','glazing','glazed','fenster','skylight','sky light']):
             self.solar_transmittance = solar_transmittance
             self.light_transmittance = light_transmittance
         else:
@@ -99,7 +99,7 @@ class Zone(object):
                 ):
 
         self.name = name
-
+        self.accepted_glazing_names = ['window','glazed','glazing','fenster','skylight', 'sky light']
         # Element objects
         self.elements = elements
         self.elements_added = 0  # for reporting purposes
@@ -141,10 +141,12 @@ class Zone(object):
     def add_elements(self,e):
         self.element_names.append(e.name)
         #raise error for invalid names
-        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground','teile','fenster','door','roof']):
-            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'","'"door"'",""'"groundslab"'","'"roof"'"')
+        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground','teile','fenster','skylight',
+                                                    'sky light','door','roof']):
+            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'",'
+                                                '"'"skylight"'","'"door"'",""'"groundslab"'","'"roof"'"')
         # add window conductance to window conductances
-        if any(x in str.lower(e.name) for x in ['window','glazed','glazing','fenster']):
+        if any(x in str.lower(e.name) for x in self.accepted_glazing_names):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
             self.window_area += e.area
