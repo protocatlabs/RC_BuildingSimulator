@@ -181,6 +181,22 @@ class Zone(object):
                  heating_supply_system = self.heating_supply_system,
                  heating_emission_system = self.heating_emission_system)
 
+    def change_elements(self,newelements):
+        return Zone(name = self.name,
+                 occupants = self.occupants,
+                 elements = newelements,
+                 floor_area = self.floor_area,
+                 volume = self.volume,
+                 thermal_capacitance_per_floor_area=self.thermal_capacitance_per_floor_area,
+                 ach_vent=self.ach_vent,
+                 ach_infl=self.ach_infl,
+                 ventilation_efficiency=self.ventilation_efficiency,
+                 t_set_heating = self.t_set_heating,
+                 t_set_cooling = self.t_set_cooling,
+                 max_heating_energy_per_floor_area = self.max_heating_energy_per_floor_area,
+                 heating_supply_system = self.heating_supply_system,
+                 heating_emission_system = self.heating_emission_system)
+
 
 
 if __name__ == '__main__':
