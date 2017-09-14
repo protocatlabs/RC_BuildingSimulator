@@ -99,6 +99,8 @@ class Zone(object):
                 ):
 
         self.name = name
+        self.accepted_opaque_element_names = ['wall','groundslab','slab','floor','door','roof',
+                                              'dach','wand','boden','ture','decke']
         self.accepted_glazing_names = ['window','glazed','glazing','fenster','skylight', 'sky light']
         # Element objects
         self.elements = elements
@@ -141,17 +143,15 @@ class Zone(object):
     def add_elements(self,e):
         self.element_names.append(e.name)
         #raise error for invalid names
-        if not any(x in str.lower(e.name) for x in ['window','wall','groundslab','ground','teile','fenster','skylight',
-                                                    'sky light','door','roof']):
-            raise NameError('element ', e.name, ' is not a valid input. Please choose one from "'"wall"'","'"window"'",'
-                                                '"'"skylight"'","'"door"'",""'"groundslab"'","'"roof"'"')
+        if not any(x in str.lower(e.name) for x in self.accepted_opaque_element_names + self.accepted_glazing_names):
+            raise NameError('element ', e.name, ' is not an accepted element name')
         # add window conductance to window conductances
         if any(x in str.lower(e.name) for x in self.accepted_glazing_names):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
             self.window_area += e.area
         # add surface conductances to conductance of mass
-        if any(x in str.lower(e.name) for x in ['wall','roof','groundslab','ground slab']):
+        if any(x in str.lower(e.name) for x in self.accepted_opaque_element_names):
             self.h_tr_em += e.h_tr
             self.elements_added += 1
             self.wall_area += e.area
@@ -159,9 +159,7 @@ class Zone(object):
 
     def summary(self):
         #report the number of elements added to facilitate bug detection
-        if self.elements != None:
-            print 'Zone with %s of %i elements specified'%(str(self.element_names),len(self.elements))
-
+        print 'Zone with %i elements'%len(self.elements)
         print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
         print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
         print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
