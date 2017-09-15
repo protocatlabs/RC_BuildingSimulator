@@ -160,9 +160,11 @@ class Zone(object):
     def summary(self):
         #report the number of elements added to facilitate bug detection
         print 'Zone with %i elements'%len(self.elements)
+
         print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
         print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
-        print 'window to wall ratio: %f %%\n' %(round(self.window_area/self.wall_area*100,1))
+        print 'windows: %f m2, walls: %f m2, total: %f m2'%(self.window_area,self.wall_area,self.window_area+self.wall_area)
+        print 'window to wall ratio: %f %%\n' %(int(round(self.window_area/self.wall_area*100,1)))
 
 
     def copy(self):
