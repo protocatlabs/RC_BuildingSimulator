@@ -122,7 +122,6 @@ class Zone(object):
         self.t_set_heating = t_set_heating
         self.t_set_cooling = t_set_cooling
 
-
         # initialize envelope properties
         self.h_tr_em = 0
         self.h_tr_w = 0
