@@ -80,11 +80,28 @@ class Element(object):
                        light_transmittance= self.light_transmittance,
                        shading_factor= self.shading_factor)
 
+class ThermalBridge(object):
+    def __init__(self,
+                 name,
+                 length,
+                 linear_conductance):
+        self.name = name
+        self.length = length
+        self.linear_conductance = linear_conductance
+        self.h_tr = length * linear_conductance
+
+    def copy(self):
+        return ThermalBridge(name = self.name,
+                             length = self.length,
+                             linear_conductance= self.linear_conductance)
+
+
 class Zone(object):
     def __init__(self,
                  name = 'Default Zone', #for Calibrated Retrofit Analyisis, this should be of the form "Building#"
                  occupants = 1,
                  elements = None,
+                 thermal_bridges = None,
                  floor_area = 34.3,
                  volume = 106.33,
                  thermal_capacitance_per_floor_area=165000,
@@ -106,6 +123,8 @@ class Zone(object):
         self.elements = elements
         self.elements_added = 0  # for reporting purposes
         self.element_names = []  # for reporting purposes
+        # Thermal bridges
+        self.thermal_bridges = thermal_bridges
 
         # direct inputs
         self.occupants = occupants
@@ -138,6 +157,10 @@ class Zone(object):
         for element in self.elements:
             self.add_elements(element)
 
+        if self.thermal_bridges is not None:
+            for tb in self.thermal_bridges:
+                self.add_thermal_bridge(tb)
+
 
     def add_elements(self,e):
         self.element_names.append(e.name)
@@ -155,6 +178,9 @@ class Zone(object):
             self.elements_added += 1
             self.wall_area += e.area
 
+    def add_thermal_bridge(self,tb):
+        self.h_tr_em += tb.h_tr
+        self.elements_added += 1
 
     def summary(self):
         #report the number of elements added to facilitate bug detection
@@ -170,6 +196,7 @@ class Zone(object):
         return Zone(name = self.name,
                  occupants = self.occupants,
                  elements = [e.copy() for e in self.elements],
+                 thermal_bridges = [tb.copy() for tb in self.thermal_bridges],
                  floor_area = self.floor_area,
                  volume = self.volume,
                  thermal_capacitance_per_floor_area=self.thermal_capacitance_per_floor_area,
