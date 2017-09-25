@@ -111,8 +111,11 @@ class Zone(object):
                  t_set_heating = 20,
                  t_set_cooling = 26,
                  max_heating_energy_per_floor_area = np.inf,
+                 max_cooling_energy_per_floor_area = -np.inf,
                  heating_supply_system = supply_system.OilBoilerMed,
-                 heating_emission_system = emission_system.OldRadiators
+                 heating_emission_system = emission_system.OldRadiators,
+                 cooling_supply_system = supply_system.HeatPumpAir,
+                 cooling_emission_system = emission_system.AirConditioning
                 ):
 
         self.name = name
@@ -136,8 +139,11 @@ class Zone(object):
         self.ventilation_efficiency = ventilation_efficiency
         self.thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
+        self.max_cooling_energy_per_floor_area = max_cooling_energy_per_floor_area
         self.heating_supply_system = heating_supply_system
         self.heating_emission_system = heating_emission_system
+        self.cooling_supply_system = cooling_supply_system
+        self.cooling_emission_system = cooling_emission_system
         self.t_set_heating = t_set_heating
         self.t_set_cooling = t_set_cooling
 

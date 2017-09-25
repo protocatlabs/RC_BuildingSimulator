@@ -106,12 +106,6 @@ class Building(object):
                  lighting_control=300.0,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
-                 max_cooling_energy_per_floor_area=-np.inf,
-                 max_heating_energy_per_floor_area=np.inf,
-                 heating_supply_system=supply_system.OilBoilerMed,
-                 cooling_supply_system=supply_system.HeatPumpAir,
-                 heating_emission_system=emission_system.NewRadiators,
-                 cooling_emission_system=emission_system.AirConditioning,
                  ):
 
         # Initialise Zone
@@ -172,15 +166,15 @@ class Building(object):
         # Thermal Properties
         self.has_heating_demand = False  # Boolean for if heating is required
         self.has_cooling_demand = False  # Boolean for if cooling is required
-        self.max_cooling_energy = max_cooling_energy_per_floor_area * \
+        self.max_cooling_energy = zone.max_cooling_energy_per_floor_area * \
             self.floor_area  # max cooling load (W/m2)
-        self.max_heating_energy = max_heating_energy_per_floor_area * \
+        self.max_heating_energy = zone.max_heating_energy_per_floor_area * \
             self.floor_area  # max heating load (W/m2)
         # Building System Properties
-        self.heating_supply_system = heating_supply_system
-        self.cooling_supply_system = cooling_supply_system
-        self.heating_emission_system = heating_emission_system
-        self.cooling_emission_system = cooling_emission_system
+        self.heating_supply_system = zone.heating_supply_system
+        self.cooling_supply_system = zone.cooling_supply_system
+        self.heating_emission_system = zone.heating_emission_system
+        self.cooling_emission_system = zone.cooling_emission_system
 
     def solve_building_lighting(self, illuminance, occupancy):
         """
