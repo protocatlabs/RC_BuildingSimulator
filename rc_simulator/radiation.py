@@ -125,7 +125,7 @@ class Window(object):
     """docstring for Window"""
 
     def __init__(self, azimuth_tilt, alititude_tilt=90, glass_solar_transmittance=0.7,
-                 glass_light_transmittance=0.8, area=1, shading_factor=1):
+                 glass_light_transmittance=0.8, area=1, shading_factor=1, frame_factor=1):
 
         self.alititude_tilt_rad = math.radians(alititude_tilt)
         self.azimuth_tilt_rad = math.radians(azimuth_tilt)
@@ -133,6 +133,7 @@ class Window(object):
         self.glass_light_transmittance = glass_light_transmittance
         self.area = area
         self.shading_factor = shading_factor
+        self.frame_factor = frame_factor
 
     def calc_solar_gains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
         """

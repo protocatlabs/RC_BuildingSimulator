@@ -27,6 +27,11 @@ __maintainer__ = "Justin Zarb"
 __email__ = "zarbj@arch.ethz.ch"
 __status__ = "under development"
 
+# Global Variables
+accepted_opaque_element_names = ['wall', 'groundslab', 'slab', 'floor', 'door', 'roof', 'dach', 'wand', 'boden', 'ture',
+                                 'decke']
+accepted_glazing_names = ['window', 'glazed', 'glazing', 'fenster', 'skylight', 'sky light']
+
 class Element(object):
     """
     Element object representing an opaque or transparent element.
@@ -50,7 +55,8 @@ class Element(object):
                  altitude_tilt = 90, #vertical surfaces by default
                  solar_transmittance = 0.7,
                  light_transmittance=0.8,
-                 shading_factor=1.0
+                 shading_factor=1.0,
+                 frame_factor=1.0
                  ):
 
         self.name = name
@@ -61,8 +67,9 @@ class Element(object):
         self.azimuth_tilt = azimuth_tilt
         self.altitude_tilt = altitude_tilt
         self.shading_factor = shading_factor
+        self.frame_factor = frame_factor
 
-        if any(x in str.lower(self.name) for x in ['window','glazing','glazed','fenster','skylight','sky light']):
+        if any(x in str.lower(self.name) for x in accepted_glazing_names):
             self.solar_transmittance = solar_transmittance
             self.light_transmittance = light_transmittance
         else:
@@ -119,9 +126,6 @@ class Zone(object):
                 ):
 
         self.name = name
-        self.accepted_opaque_element_names = ['wall','groundslab','slab','floor','door','roof',
-                                              'dach','wand','boden','ture','decke']
-        self.accepted_glazing_names = ['window','glazed','glazing','fenster','skylight', 'sky light']
         # Element objects
         self.elements = elements
         self.elements_added = 0  # for reporting purposes
@@ -171,15 +175,15 @@ class Zone(object):
     def add_elements(self,e):
         self.element_names.append(e.name)
         #raise error for invalid names
-        if not any(x in str.lower(e.name) for x in self.accepted_opaque_element_names + self.accepted_glazing_names):
+        if not any(x in str.lower(e.name) for x in accepted_opaque_element_names + accepted_glazing_names):
             raise NameError('element ', e.name, ' is not an accepted element name')
         # add window conductance to window conductances
-        if any(x in str.lower(e.name) for x in self.accepted_glazing_names):
+        if any(x in str.lower(e.name) for x in accepted_glazing_names):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
             self.window_area += e.area
         # add surface conductances to conductance of mass
-        if any(x in str.lower(e.name) for x in self.accepted_opaque_element_names):
+        if any(x in str.lower(e.name) for x in accepted_opaque_element_names):
             self.h_tr_em += e.h_tr
             self.elements_added += 1
             self.wall_area += e.area
