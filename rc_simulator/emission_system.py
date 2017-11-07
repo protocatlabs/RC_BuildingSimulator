@@ -13,8 +13,6 @@ TODO: Need to double check supply temperatures, waiting on reply from the CEA te
 
 """
 
-import numpy as np
-
 
 __author__ = "Prageeth Jayathissa, Michael Fehr"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -192,10 +190,10 @@ class Flows:
     A base object to store output variables
     """
 
-    phi_ia_plus = np.nan
-    phi_m_plus = np.nan
-    phi_st_plus = np.nan
+    phi_ia_plus = float("nan")
+    phi_m_plus = float("nan")
+    phi_st_plus = float("nan")
 
-    heating_supply_temperature = np.nan
-    cooling_supply_temperature = np.nan
+    heating_supply_temperature = float("nan")
+    cooling_supply_temperature = float("nan")
     # return temperatures

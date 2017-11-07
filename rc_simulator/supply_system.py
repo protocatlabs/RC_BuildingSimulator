@@ -7,7 +7,6 @@ TODO: Have a look at CEA calculation methodology
 https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
 """
 
-import numpy as np
 
 __author__ = "Prageeth Jayathissa, Michael Fehr"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
@@ -234,7 +233,7 @@ class SupplyOut:
     """
     The System class which is used to output the final results
     """
-    fossils_in = np.nan
-    electricity_in = np.nan
-    electricity_out = np.nan
-    cop = np.nan
+    fossils_in = float("nan")
+    electricity_in = float("nan")
+    electricity_out = float("nan")
+    cop = float("nan")
