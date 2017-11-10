@@ -14,8 +14,17 @@ import scriptcontext
 hours = 23
 
 #Initialise zone object
-#TODO: Connect object attribtues to the component inputs
-Zone = scriptcontext.sticky["RC_Zone"]()
+#TODO: Use detected inputs in the RC_Zone initialisation
+Zone = scriptcontext.sticky["RC_Zone"](
+    window_area=window_area,
+    external_envelope_area=external_envelope_area,
+#    room_depth=room_depth,
+#    room_width=room_width,
+#    room_height=room_height,
+#    lighting_load=lighting_load,
+#    lighting_control=lighting_control,
+    ach_vent=0.1,
+    ach_infl=0.1)
 
 # Initialise simulation parameters
 # TODO: Check that all inputs are of the same length
@@ -57,12 +66,15 @@ for hour in range(0,hours):
     ig = internal_gains[hour]
     ta = t_air[hour]
     occ = occupancy[hour]
-    
+
     #Solve
     Zone.solve_building_energy(ig, solar_gains, ta, t_m_prev)    
     Zone.solve_building_lighting(ill, occupancy)
+    
+    #Set T_m as t_m_prev for next timestep
+    t_m_prev = Zone.t_m
 
-    #Results
+    #Record Results
     indoor_air_temperature.append(Zone.t_air)
     mass_temperature.append(Zone.t_m)  # Printing Room Temperature of the medium
     lighting_demand.append(Zone.lighting_demand)  # Print Lighting Demand
