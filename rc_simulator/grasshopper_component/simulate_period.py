@@ -11,7 +11,7 @@ ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 import Grasshopper.Kernel as gh
 import scriptcontext
 
-hours = 23
+hours = len(outdoor_air_temperature)
 
 #Initialise zone object
 #TODO: Use detected inputs in the RC_Zone initialisation
@@ -47,6 +47,8 @@ if solar_irradiation == []:
 if occupancy == []:
     occupancy = [0.1]*hours  # Occupancy for the timestep [people/hour/square_meter]
 
+if g_windows is None:
+    g_windows = 0.6
 
 #Initialise result lists
 indoor_air_temperature = []
@@ -60,7 +62,7 @@ lighting_demand = []
 for hour in range(0,hours):
     #Set parameters for his hour
     #For now assume glass solar transmittance = 0.6
-    solar_gains = solar_irradiation[hour] * 0.6
+    solar_gains = solar_irradiation[hour] * g_windows
     #Spectral luminous efficacy (108)- can be calculated from the weather file https://en.wikipedia.org/wiki/Luminous_efficacy
     ill = solar_irradiation[hour] * 108
     ig = internal_gains[hour]
@@ -69,7 +71,7 @@ for hour in range(0,hours):
 
     #Solve
     Zone.solve_building_energy(ig, solar_gains, ta, t_m_prev)    
-    Zone.solve_building_lighting(ill, occupancy)
+    Zone.solve_building_lighting(ill, occ)
     
     #Set T_m as t_m_prev for next timestep
     t_m_prev = Zone.t_m
