@@ -43,6 +43,8 @@ if internal_gains == []:
 
 if solar_irradiation == []:
     solar_irradiation = [2000]*hours # Watts. Requires adjustment to account for window losses
+#For now assume glass solar transmittance = 0.6
+solar_gains = [x * g_windows for x in solar_irradiation]
 
 if occupancy == []:
     occupancy = [0.1]*hours  # Occupancy for the timestep [people/hour/square_meter]
@@ -60,17 +62,15 @@ lighting_demand = []
 
 #Start simulation
 for hour in range(0,hours):
-    #Set parameters for his hour
-    #For now assume glass solar transmittance = 0.6
-    solar_gains = solar_irradiation[hour] * g_windows
     #Spectral luminous efficacy (108)- can be calculated from the weather file https://en.wikipedia.org/wiki/Luminous_efficacy
     ill = solar_irradiation[hour] * 108
     ig = internal_gains[hour]
     ta = t_air[hour]
+    sg = solar_gains[hour]
     occ = occupancy[hour]
 
     #Solve
-    Zone.solve_building_energy(ig, solar_gains, ta, t_m_prev)    
+    Zone.solve_building_energy(ig, sg, ta, t_m_prev)    
     Zone.solve_building_lighting(ill, occ)
     
     #Set T_m as t_m_prev for next timestep
