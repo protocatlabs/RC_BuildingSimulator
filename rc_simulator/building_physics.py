@@ -79,7 +79,6 @@ INPUT PARAMETER DEFINITION
 
 """
 
-import numpy as np
 import supply_system
 import emission_system
 
@@ -116,8 +115,8 @@ class Building(object):
                  thermal_capacitance_per_floor_area=165000,
                  t_set_heating=20.0,
                  t_set_cooling=26.0,
-                 max_cooling_energy_per_floor_area=-np.inf,
-                 max_heating_energy_per_floor_area=np.inf,
+                 max_cooling_energy_per_floor_area=-float("inf"),
+                 max_heating_energy_per_floor_area=float("inf"),
                  heating_supply_system=supply_system.OilBoilerMed,  
                  cooling_supply_system=supply_system.HeatPumpAir,
                  heating_emission_system=emission_system.NewRadiators,
