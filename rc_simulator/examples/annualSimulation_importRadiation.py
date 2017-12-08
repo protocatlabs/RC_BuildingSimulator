@@ -24,7 +24,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from building_physics import Building  # Importing Building Class
-from auxiliary import epwReader
+from auxiliary import epwreader
 from auxiliary import sunPositionReader
 
 matplotlib.style.use('ggplot')
@@ -50,7 +50,7 @@ max_occupancy = 3.0
 Office = Building()
 
 # Read Weather Data
-weatherData = epwReader.epwReader(os.path.join(
+weatherData = epwreader.epwreader(os.path.join(
     mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
 
@@ -91,8 +91,8 @@ for hour in range(8760):
 
         if hour == 3994:
 
-        solar_gains = (dir_solar_gains + diffuse_solar_gains) * \
-            Office.window_area * 0.7
+            solar_gains = (dir_solar_gains + diffuse_solar_gains) * \
+                Office.window_area * 0.7
 
     else:
         # Sun is below the horizon (night time)
@@ -124,6 +124,6 @@ annualResults = pd.DataFrame({
     'COP': COP
 })
 
-
+# Commented for now due to virtual environment
 annualResults[['HeatingEnergy', 'CoolingEnergy']].plot()
 plt.show()

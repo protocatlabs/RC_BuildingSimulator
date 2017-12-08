@@ -35,14 +35,20 @@ pip3 install virtualenvwrapper
 echo $PWD
 pip3 install -r /vagrant/requirements.txt
 
+
+# Pandas Fails to install with Pip3!!! Installation being annoying
+echo Installing Pandas with sudo apt get
+sudo apt-get install python3-pandas -y
+
+
 # Echo virtualenvironment things into bashrc, also for python3 compatibility
 echo "
 VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3'
-export WORKON_HOME=/refugee-matchmaking/.virtualenvs
-export PROJECT_HOME=/refugee-matchmaking/
+export WORKON_HOME=/rc-simulator/.virtualenvs
+export PROJECT_HOME=/rc-simulator/
 source /usr/local/bin/virtualenvwrapper.sh
-cd /refugee-matchmaking/
-workon refugee_matchmaking
+cd /rc-simulator/
+workon rc_simulator
 " >> /home/vagrant/.bashrc
 
 # Unmount swap

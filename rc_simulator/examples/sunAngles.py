@@ -11,8 +11,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from building_physics import Building  # Importing Building Class
-from auxiliary import epwReader
-from auxiliary import sunPositionReader
 
 from radiation import Location
 

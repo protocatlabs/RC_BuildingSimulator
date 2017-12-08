@@ -103,7 +103,7 @@ for hour in range(8760):
     t_out = Zurich.weather_data['drybulb_C'][hour]
 
     Altitude, Azimuth = Zurich.calc_sun_position(
-        latitude_deg=47.480, longitude_deg=8.536, year=2015, HOY=hour)
+        latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=hour)
 
     SouthWindow.calc_solar_gains(sun_altitude=Altitude, sun_azimuth=Azimuth,
                                  normal_direct_radiation=Zurich.weather_data[
@@ -145,6 +145,6 @@ annualResults = pd.DataFrame({
     'COP': COP
 })
 
-
+# Plotting has been commented out as it can not be conducted in a virtual environment over ssh
 annualResults[['HeatingEnergy', 'CoolingEnergy']].plot()
 plt.show()
