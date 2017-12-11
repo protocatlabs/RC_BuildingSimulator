@@ -21,7 +21,8 @@ import pandas as pd
 
 # Load grasshopper results and combine them into a single data frame
 gh_result = pd.read_csv('grasshopper_result.csv')
-
+gh_attr = pd.read_csv('grasshopper_attributes.csv',delimiter=':',index_col=0,header=None).to_dict()
+print (gh_attr)
 # Todo: Figure out a better way to do this
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -33,7 +34,29 @@ class TestSimulation(unittest.TestCase):
 
     def test_gh_results(self):
         # This should be the default rc zone, or a replication of the zone in grasshopper.
-        TestZone = Building()
+        TestZone = Building(window_area=gh_attr.window_area,
+                          external_envelope_area=gh_attr.external_envelope_area,
+                          room_depth=gh_attr.room_depth,
+                          room_width=gh_attr.room_width,
+                          room_height=gh_attr.room_height,
+                          lighting_load=gh_attr.lighting_load,
+                          lighting_control=gh_attr.lighting_control,
+                          lighting_utilisation_factor=gh_attr.lighting_utilisation_factor,
+                          lighting_maintenance_factor=gh_attr.lighting_maintenance_factor,
+                          u_walls=gh_attr.u_walls,
+                          u_windows=gh_attr.u_windows,
+                          ach_vent=gh_attr.ach_vent,
+                          ach_infl=gh_attr.ach_infl,
+                          ventilation_efficiency=0,
+                          thermal_capacitance_per_floor_area=165000,
+                          t_set_heating=20,
+                          t_set_cooling=26,
+                          max_cooling_energy_per_floor_area=-12,
+                          max_heating_energy_per_floor_area=12,
+                          heating_supply_system=supply_system.DirectHeater,
+                          cooling_supply_system=supply_system.DirectCooler,
+                          heating_emission_system=emission_system.AirConditioning,
+                          cooling_emission_system=emission_system.AirConditioning,)
         t_m_prev = 20
 
         # Empty Lists for Storing Data to Plot
@@ -59,7 +82,12 @@ class TestSimulation(unittest.TestCase):
             CoolingDemand.append(TestZone.cooling_demand)
             IndoorAir.append(TestZone.t_air)
 
-        self.assertEqual(gh_result.indoor_air_temperature[0], round(IndoorAir[0],2))
+        indoor_air_round = [round(x,2) for x in list(gh_result.indoor_air_temperature)]
+        IndoorAir_round = [round(x,2) for x in IndoorAir]
+        for i, j in zip(indoor_air_round, IndoorAir_round):
+            print(i,j)
+
+        self.assertListEqual(indoor_air_round, IndoorAir_round)
 
 
 
