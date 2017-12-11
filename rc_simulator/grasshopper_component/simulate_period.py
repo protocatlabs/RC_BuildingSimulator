@@ -1,5 +1,4 @@
-﻿
-""" Not sure exactly but I think this should go here...
+﻿""" Not sure exactly but I think this should go here...
 ghenv.Component.Name = "AS_simulate_period"
 ghenv.Component.NickName = 'sim_period'
 ghenv.Component.Message = 'VER 0.0.1'
@@ -13,18 +12,49 @@ import scriptcontext
 
 hours = len(outdoor_air_temperature)
 
+#  Initialize default values if no input is detected
+
+zone_attributes = ['window_area','external_envelope_area','room_depth',
+                  'room_width', 'room_height','lighting_load','lighting_control',
+                  'lighting_utilisation_factor',  'lighting_maintenance_factor',
+                  'u_walls', 'u_windows', 'ach_vent', 'ach_infl',
+                  'ventilation_efficiency','thermal_capacitance_per_floor_area',
+                  't_set_heating', 't_set_cooling', 'max_cooling_energy_per_floor_area',
+                  'max_heating_energy_per_floor_area', 'heating_supply_system',  
+                  'cooling_supply_system', 'heating_emission_system',
+                  'cooling_emission_system']
+
+initial_values = ['4.0','15.0','7.0','5.0','3.0','11.7','300.0','0.455','0.9',
+                  '0.2','1.1','1.5','0.5','0.6','165000','20.0','26.0',
+                  '-float("inf")','float("inf")','scriptcontext.sticky["OilBoilerNew"]',
+                  'scriptcontext.sticky["HeatPumpAir"]', 'scriptcontext.sticky["OldRadiators"]',
+                  'scriptcontext.sticky["AirConditioning"]']
+
+local_and_global_variables = ['Key:Value']
+
+for a,v in zip(zone_attributes,initial_values):
+    exec('%s = %s if %s is None else %s'%(a,v,a,a))
+    if 'supply' not in a and 'emission' not in a:
+        local_and_global_variables.append(a+':'+v)
+    elif 'supply' in a:
+        local_and_global_variables.append(a+': supply_system.'+v[22:-2])
+    elif 'emission' in a:
+        local_and_global_variables.append(a+': emission_system.'+v[22:-2])
+
+
 #Initialise zone object
-#TODO: Use detected inputs in the RC_Zone initialisation
 Zone = scriptcontext.sticky["RC_Zone"](
     window_area=window_area,
     external_envelope_area=external_envelope_area,
-#    room_depth=room_depth,
-#    room_width=room_width,
-#    room_height=room_height,
-#    lighting_load=lighting_load,
-#    lighting_control=lighting_control,
-    ach_vent=0.1,
-    ach_infl=0.1)
+    room_depth=room_depth,
+    room_width=room_width,
+    room_height=room_height,
+    lighting_load=lighting_load,
+    lighting_control=lighting_control,
+    ach_vent=ach_vent,
+    ach_infl=ach_infl,
+    thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area)
+
 
 # Initialise simulation parameters
 # TODO: Check that all inputs are of the same length
@@ -43,14 +73,21 @@ if internal_gains == []:
 
 if solar_irradiation == []:
     solar_irradiation = [2000]*hours # Watts. Requires adjustment to account for window losses
-#For now assume glass solar transmittance = 0.6
+
 solar_gains = [x * g_windows for x in solar_irradiation]
+
+#Spectral luminous efficacy (108)- can be calculated from the weather file https://en.wikipedia.org/wiki/Luminous_efficacy
+ill = [s * 108 for s in solar_irradiation]
 
 if occupancy == []:
     occupancy = [0.1]*hours  # Occupancy for the timestep [people/hour/square_meter]
 
-if g_windows is None:
-    g_windows = 0.6
+"""
+#  Export obect attributes for testing and debugging
+attrs = vars(Zone)
+for item in attrs.items():
+    local_and_global_variables.append("%s: %s" % item)
+"""
 
 #Initialise result lists
 indoor_air_temperature = []
@@ -62,16 +99,15 @@ lighting_demand = []
 
 #Start simulation
 for hour in range(0,hours):
-    #Spectral luminous efficacy (108)- can be calculated from the weather file https://en.wikipedia.org/wiki/Luminous_efficacy
-    ill = solar_irradiation[hour] * 108
+    il = ill[hour]
     ig = internal_gains[hour]
     ta = t_air[hour]
     sg = solar_gains[hour]
-    occ = occupancy[hour]
+    oc = occupancy[hour]
 
     #Solve
     Zone.solve_building_energy(ig, sg, ta, t_m_prev)    
-    Zone.solve_building_lighting(ill, occ)
+    Zone.solve_building_lighting(il, oc)
     
     #Set T_m as t_m_prev for next timestep
     t_m_prev = Zone.t_m

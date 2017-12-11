@@ -1,34 +1,24 @@
-window_area: 12.3039
-room_depth: 7.0
-room_width: 4.9
-room_height: 3.1
-lighting_load: 11.7
-lighting_control: 300.0
-lighting_utilisation_factor: 0.45
-lighting_maintenance_factor: 0.9
-floor_area: 34.3
-mass_area: 85.75
-room_vol: 106.33
-total_internal_area: 142.38
-A_t: 142.38
-c_m: 5659500.0
-h_tr_em: 0.57722
-h_tr_w: 13.53429
-h_ve_adj: 28.3546666667
-h_tr_ms: 780.325
-h_tr_is: 491.211
-t_set_heating: 20.0
-t_set_cooling: 26.0
-has_heating_demand: False
-has_cooling_demand: False
-max_cooling_energy: -inf
-max_heating_energy: inf
-heating_supply_system: __main__.OilBoilerNew
-cooling_supply_system: __main__.HeatPumpAir
-heating_emission_system: __main__.OldRadiators
-cooling_emission_system: __main__.AirConditioning
-external_envelope_area:15.190000
-u_walls:0.200000
-u_windows:1.100000
-ach_infl:0.200000
-ach_vent:1.500000
+Key:Value
+window_area:4.0
+external_envelope_area:15.0
+room_depth:7.0
+room_width:5.0
+room_height:3.0
+lighting_load:11.7
+lighting_control:300.0
+lighting_utilisation_factor:0.455
+lighting_maintenance_factor:0.9
+u_walls:0.2
+u_windows:1.1
+ach_vent:1.5
+ach_infl:0.5
+ventilation_efficiency:0.6
+thermal_capacitance_per_floor_area:165000
+t_set_heating:20.0
+t_set_cooling:26.0
+max_cooling_energy_per_floor_area:-float("inf")
+max_heating_energy_per_floor_area:float("inf")
+heating_supply_system: supply_system.OilBoilerNew
+cooling_supply_system: supply_system.HeatPumpAir
+heating_emission_system: emission_system.OldRadiators
+cooling_emission_system: emission_system.AirConditioning

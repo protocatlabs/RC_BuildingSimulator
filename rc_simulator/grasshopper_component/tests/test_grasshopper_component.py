@@ -21,8 +21,17 @@ import pandas as pd
 
 # Load grasshopper results and combine them into a single data frame
 gh_result = pd.read_csv('grasshopper_result.csv')
-gh_attr = pd.read_csv('grasshopper_attributes.csv',delimiter=':',index_col=0,header=None).to_dict()
+gh_attr = pd.read_csv('grasshopper_attributes.csv', delimiter=':', index_col=0).to_dict()['Value']
 print (gh_attr)
+
+for k,v in gh_attr.items():
+    try:
+        v=float(v)
+    except ValueError:
+        pass
+
+print (type(gh_attr['room_depth']))
+
 # Todo: Figure out a better way to do this
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -34,29 +43,29 @@ class TestSimulation(unittest.TestCase):
 
     def test_gh_results(self):
         # This should be the default rc zone, or a replication of the zone in grasshopper.
-        TestZone = Building(window_area=gh_attr.window_area,
-                          external_envelope_area=gh_attr.external_envelope_area,
-                          room_depth=gh_attr.room_depth,
-                          room_width=gh_attr.room_width,
-                          room_height=gh_attr.room_height,
-                          lighting_load=gh_attr.lighting_load,
-                          lighting_control=gh_attr.lighting_control,
-                          lighting_utilisation_factor=gh_attr.lighting_utilisation_factor,
-                          lighting_maintenance_factor=gh_attr.lighting_maintenance_factor,
-                          u_walls=gh_attr.u_walls,
-                          u_windows=gh_attr.u_windows,
-                          ach_vent=gh_attr.ach_vent,
-                          ach_infl=gh_attr.ach_infl,
-                          ventilation_efficiency=0,
-                          thermal_capacitance_per_floor_area=165000,
-                          t_set_heating=20,
-                          t_set_cooling=26,
-                          max_cooling_energy_per_floor_area=-12,
-                          max_heating_energy_per_floor_area=12,
-                          heating_supply_system=supply_system.DirectHeater,
-                          cooling_supply_system=supply_system.DirectCooler,
-                          heating_emission_system=emission_system.AirConditioning,
-                          cooling_emission_system=emission_system.AirConditioning,)
+        TestZone = Building(window_area=gh_attr['window_area'],
+                          external_envelope_area= gh_attr['external_envelope_area'],
+                          room_depth=gh_attr['room_depth'],
+                          room_width=gh_attr['room_width'],
+                          room_height=gh_attr['room_height'],
+                          lighting_load=gh_attr['lighting_load'],
+                          lighting_control=gh_attr['lighting_control'],
+                          lighting_utilisation_factor=gh_attr['lighting_utilisation_factor'],
+                          lighting_maintenance_factor=gh_attr['lighting_maintenance_factor'],
+                          u_walls=gh_attr['u_walls'],
+                          u_windows=gh_attr['u_windows'],
+                          ach_vent=gh_attr['ach_vent'],
+                          ach_infl=gh_attr['ach_infl'],
+                          ventilation_efficiency=gh_attr['ventilation_efficiency'],
+                          thermal_capacitance_per_floor_area=gh_attr['thermal_capacitance_per_floor_area'],
+                          t_set_heating=gh_attr['t_set_heating'],
+                          t_set_cooling=gh_attr['t_set_cooling'],
+                          max_cooling_energy_per_floor_area=gh_attr['max_cooling_energy_per_floor_area'],
+                          max_heating_energy_per_floor_area=gh_attr['max_heating_energy_per_floor_area'],
+                          heating_supply_system=gh_attr['heating_supply_system'],
+                          cooling_supply_system=gh_attr['cooling_supply_system'],
+                          heating_emission_system=gh_attr['heating_emission_system'],
+                          cooling_emission_system=gh_attr['cooling_emission_system'])
         t_m_prev = 20
 
         # Empty Lists for Storing Data to Plot
