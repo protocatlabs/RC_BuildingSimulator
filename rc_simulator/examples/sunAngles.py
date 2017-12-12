@@ -11,8 +11,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 from building_physics import Building  # Importing Building Class
-from auxiliary import epwReader
-from auxiliary import sunPositionReader
 
 from radiation import Location
 
@@ -23,7 +21,9 @@ def calculate_sun_angles():
     Zurich = Location(epwfile_path=os.path.join(
         mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
-    print Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=3708)
+
+    Zurich.calc_sun_position(latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=3708)
+
 
     Azimuth = []
     Altitude = []

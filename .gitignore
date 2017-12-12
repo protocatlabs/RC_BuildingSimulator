@@ -61,6 +61,8 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
+latex/
+
 .DS_Store
 .idea/*
 .vagrant/*

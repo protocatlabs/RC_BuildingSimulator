@@ -64,20 +64,20 @@ for selected_window in [SouthWindow, EastWindow, WestWindow, NorthWindow, RoofAt
                                          'dirnorillum_lux'][hoy],
                                      horizontal_diffuse_illuminance=Zurich.weather_data['difhorillum_lux'][hoy])
 
-print SouthWindow.incident_solar
-print EastWindow.incident_solar
-print WestWindow.incident_solar
-print NorthWindow.incident_solar
-print RoofAtrium.incident_solar
+print(SouthWindow.incident_solar)
+print(EastWindow.incident_solar)
+print(WestWindow.incident_solar)
+print(NorthWindow.incident_solar)
+print(RoofAtrium.incident_solar)
 
-print SouthWindow.solar_gains
-print EastWindow.solar_gains
-print WestWindow.solar_gains
-print NorthWindow.solar_gains
-print RoofAtrium.solar_gains
+print(SouthWindow.solar_gains)
+print(EastWindow.solar_gains)
+print(WestWindow.solar_gains)
+print(NorthWindow.solar_gains)
+print(RoofAtrium.solar_gains)
 
-print SouthWindow.transmitted_illuminance
-print EastWindow.transmitted_illuminance
-print WestWindow.transmitted_illuminance
-print NorthWindow.transmitted_illuminance
-print RoofAtrium.transmitted_illuminance
+print(SouthWindow.transmitted_illuminance)
+print(EastWindow.transmitted_illuminance)
+print(WestWindow.transmitted_illuminance)
+print(NorthWindow.transmitted_illuminance)
+print(RoofAtrium.transmitted_illuminance)
