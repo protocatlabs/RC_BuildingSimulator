@@ -44,11 +44,11 @@ sudo apt-get install python3-pandas -y
 # Echo virtualenvironment things into bashrc, also for python3 compatibility
 echo "
 VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3'
-export WORKON_HOME=/rc-simulator/.virtualenvs
-export PROJECT_HOME=/rc-simulator/
+export WORKON_HOME=/arcy/.virtualenvs
+export PROJECT_HOME=/arcy/
 source /usr/local/bin/virtualenvwrapper.sh
-cd /rc-simulator/
-workon rc_simulator
+cd /arcy/
+workon arcy
 " >> /home/vagrant/.bashrc
 
 # Unmount swap
