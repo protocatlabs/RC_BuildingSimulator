@@ -1,18 +1,11 @@
-# 5R1C Building Simulation Model
+# Grasshopper Module for 5R1C model 
 
-## 10min Guide to your first simulation
+## Aims
 
-See the [10min guide in the wiki page](https://github.com/architecture-building-systems/RC_BuildingSimulator/wiki/10min-guide-to-your-first-simulation)
+This branch is dedicated to adapting the 5R1C model into a Grasshopper module as part of the A/S HIVE project. Such a module would allow single-zone building simulations to be performed completely within the Grasshopper environment, providing a simpler alternative to Honeybee.
 
-## Developer Material
+The target users are architects familiar with Grasshopper and Ladybug tools, who do not have experience in building simulation.
 
-Can be found in [the wiki](https://github.com/architecture-building-systems/RC_BuildingSimulator/wiki)
+## Developer guides
 
-## References
-
-Madsen, Henrik, and Jan Holst. "Estimation of continuous-time models for the heat dynamics of a building." Energy and Buildings 22.1 (1995): 67-79.
-
-Bacher, Peder, and Henrik Madsen. "Identifying suitable models for the heat dynamics of buildings." Energy and Buildings 43.7 (2011): 1511-1522.
-
-Sonderegger, Robert. "Diagnostic tests determining the thermal response of a house." Lawrence Berkeley National Laboratory (2010).
-
+For information about the module architecture, testing and features, check the [project wiki](https://github.com/architecture-building-systems/RC_BuildingSimulator/wiki/Grasshopper-Module).
