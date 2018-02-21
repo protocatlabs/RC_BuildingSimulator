@@ -1,19 +1,37 @@
-﻿"""
-This script is adapted from building_physics.py in RC_BuildingSimulator.
-Refer to the python file for variable and parameter definitions
+﻿# This comoponent contains an object-oriented adaptation of the RC model referred to as the 'Simple Hourly Method' in ISO 13790, (superceded by EN ISO 52016-1).
+#
+# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
+# This component is based on building_physics.py in the RC_BuildingSimulator github repository
+# https://github.com/architecture-building-systems/RC_BuildingSimulator
+# Extensive documentation is available on the project wiki.
+#
+# Authors: Prageeth Jayathissa <jayathissa@arch.ethz.ch>, Justin Zarb <zarbj@student.ethz.ch>
+# Credits: Gabriel Happle, Justin Zarb, Michael Fehr
+# Converted into a grasshopper plugin by Justin Zarb
+#
+# This file is part of Oasys
+#
+# Licensing/Copywrite and liability comments go here.
+# Copyright 2018, Architecture and Building Systems - ETH Zurich
+# Licence: MIT
+
+"""
+Place this component in the grasshopper workspace so that zones can be defined and simulations run.
+-
+Provided by Oasys 0.0.1
 """
 
-__authors__ = "Prageeth Jayathissa, Justin Zarb"
-__copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
-__credits__ = ["Gabriel Happle, Justin Zarb, Michael Fehr"]
-__license__ = "MIT"
-__version__ = "0.1"
-__maintainer__ = "Prageeth Jayathissa"
-__email__ = "jayathissa@arch.ethz.ch"
-__status__ = "BETA"
+ghenv.Component.Name = "Building Physics"
+ghenv.Component.NickName = 'BuildingPhysics'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
+ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
+ghenv.Component.Category = "Oasys"
+ghenv.Component.SubCategory = "0 | Core"
 
+try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
+except: pass
 
-import scriptcontext
+import scriptcontext as sc
 
 class Building(object):
     '''Sets the parameters of the building. '''
@@ -39,10 +57,10 @@ class Building(object):
                  t_set_cooling=26.0,
                  max_cooling_energy_per_floor_area=-float("inf"),
                  max_heating_energy_per_floor_area=float("inf"),
-                 heating_supply_system=scriptcontext.sticky["OilBoilerNew"],  
-                 cooling_supply_system=scriptcontext.sticky["HeatPumpAir"],
-                 heating_emission_system=scriptcontext.sticky["OldRadiators"],
-                 cooling_emission_system=scriptcontext.sticky["AirConditioning"],
+                 heating_supply_system=sc.sticky["OilBoilerNew"],  
+                 cooling_supply_system=sc.sticky["HeatPumpAir"],
+                 heating_emission_system=sc.sticky["OldRadiators"],
+                 cooling_emission_system=sc.sticky["AirConditioning"],
                  ):
 
         # Building Dimensions
@@ -213,7 +231,7 @@ class Building(object):
 
             # Calculate the Heating/Cooling Input Energy Required
 
-            supply_director = scriptcontext.sticky["SupplyDirector"]()  # Initialise Heating System Manager
+            supply_director = sc.sticky["SupplyDirector"]()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
                 supply_director.set_builder(self.heating_supply_system(load=self.energy_demand, 
@@ -419,7 +437,7 @@ class Building(object):
 
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
-        emDirector = scriptcontext.sticky["EmissionDirector"]()
+        emDirector = sc.sticky["EmissionDirector"]()
         # Set the emission system to the type specified by the user
         emDirector.set_builder(self.heating_emission_system(
             energy_demand=energy_demand))
@@ -529,4 +547,6 @@ class Building(object):
 
         self.t_opperative = 0.3 * self.t_air + 0.7 * self.t_s
 
-scriptcontext.sticky["RC_Zone"] = Building
+sc.sticky["RC_Zone"] = Building
+
+print 'Building Physics is go!'
