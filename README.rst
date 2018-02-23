@@ -1,7 +1,8 @@
 # 5R1C Building Simulation Model
 
 ## Cite the RC Model
-[![DOI](https://zenodo.org/badge/52793390.svg)](https://zenodo.org/badge/latestdoi/52793390)
+.. image:: https://zenodo.org/badge/52793390.svg
+   :target: https://zenodo.org/badge/latestdoi/52793390
 
 @online{rcsimulator,
   author = {Jayathissa, Prageeth},
