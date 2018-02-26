@@ -23,7 +23,7 @@ Provided by Oasys 0.0.1
         outdoor_air_temperature: The outdoor air temperature for the hour being simulated
         previous_mass_temperature: The temperature of the mass node during the previous hour. This temperature represents the average temperature of the building envelope itself.
         internal_gains: internal heat gains for the hour being simulated in [Watts]
-        solar_irradiation: Solar irradiation gains for the hour being simulated in [Watts]. Does not account for losses through window!
+        solar_gains: Solar irradiation gains for the hour being simulated in [Watts]. Does not account for losses through window!
         illuminance: Illuminance after transmitting through the window [Lumens]
         occupancy: Occupancy for the timestep [people/hour/square_meter]
     Returns:
@@ -38,7 +38,7 @@ Provided by Oasys 0.0.1
 
 ghenv.Component.Name = "Simulate a Single Time Step"
 ghenv.Component.NickName = 'SimulateOneTimeStep'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_26_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = "Simulation"
@@ -49,65 +49,51 @@ except: pass
 import Grasshopper.Kernel as gh
 import scriptcontext as sc
 
+inputs = {'outdoor_air_temperature':outdoor_air_temperature,
+        'previous_mass_temperature':previous_mass_temperature,
+        'internal_gains':internal_gains,
+        'solar_gains':solar_gains,
+        'illuminance':illuminance,
+        'occupancy':occupancy,
+        'Zone':Zone}
+
+defaults = {'outdoor_air_temperature':10,
+        'previous_mass_temperature':20,
+        'internal_gains':10,
+        'solar_gains':2000,
+        'illuminance':44000,
+        'occupancy':0.1,
+        'Zone':sc.sticky["RC_Zone"]()}
+
 # Initialise parameters
+def assign_default_values(input):
+    try:
+        assert inputs[input] is not None
+    except:
+        inputs[input] = defaults[input]
+    print input,inputs[input]
 
-if outdoor_air_temperature == None:
-    warning = "outdoor_air_temperature not specified. Assumed to be 10C"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    t_air = 10
-else:
-    t_air = outdoor_air_temperature
-    
-if previous_mass_temperature == None:
-    warning = "previous_mass_temperature not specified. Assumed to be 20C"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    t_m_prev = 22
-else:
-    t_m_prev = previous_mass_temperature
+for i in inputs.keys():
+    assign_default_values(i)
 
-if internal_gains == None:
-    warning = "internal_gains not specified. Assumed to be 10W"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    internal_gains = 10  # Watts
+Zone = inputs['Zone']
+Zone.solve_building_energy(inputs['internal_gains'], 
+                           inputs['solar_gains'],
+                           inputs['outdoor_air_temperature'],
+                           inputs['previous_mass_temperature'])
 
-if solar_irradiation == None:
-    warning = "solar_irradiation not specified. Assumed to be 2000W"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    solar_irradiation = 2000 # Watts. Requires adjustment to account for window losses
-
-if illuminance == None:
-    warning = "illuminance not specified. Assumed to be 44000W"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    ill = 44000  # Illuminance after transmitting through the window [Lumens]
-
-if occupancy == None:
-    warning = "Occupancy assumed to be 0.1"
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-    occupancy = 0.1  # Occupancy for the timestep [people/hour/square_meter]
-
-if Zone == None:
-    Zone = sc.sticky["RC_Zone"]()
-    warning = """No zone definition has been detected. The default zone will be
-    applied."""
-    w = gh.GH_RuntimeMessageLevel.Warning
-    ghenv.Component.AddRuntimeMessage(w, warning)
-else:
-    Zone = Zone
-
-solar_gains = solar_irradiation * Zone.g_windows
-
-Zone.solve_building_energy(internal_gains, solar_gains, t_air, t_m_prev)
-Zone.solve_building_lighting(ill, occupancy)
+Zone.solve_building_lighting(inputs['illuminance'],
+                             inputs['occupancy'])
 
 indoor_air_temperature = Zone.t_air
 mass_temperature = Zone.t_m  # Printing Room Temperature of the medium
 lighting_demand =  Zone.lighting_demand  # Print Lighting Demand
 energy_demand = Zone.energy_demand  # Print heating/cooling loads
 heating_demand = Zone.heating_demand
+heating_sys_electricity = Zone.heating_sys_electricity
 cooling_demand = Zone.cooling_demand
+cooling_sys_electricity = Zone.cooling_sys_electricity
+try:
+    cop = Zone.cop
+except AttributeError:
+    cop = None
