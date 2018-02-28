@@ -29,16 +29,20 @@ Provided by Oasys 0.0.1
     Returns:
         readMe!: ...
         indoor_air_temperature: Indoor air temperature for the given time step
+        mass_temperature: The mass node temperature for the hour simulated
         lighting_demand: lighting energy demand for the given time step
         heating_demand: heating energy demand required to maintain the heating setpoint temperature defined in the Zone.
+        heating_sys_electricity: Heating electricity consumption
         cooling_demand: cooling energy demand required to maintain the cooling setpoint temperature defined in the Zone.
+        cooling_sys_electricity: Cooling electricity consumption
         energy_demand: Sum of heating, cooling and lighting demand for the given timestep.
+        cop: coefficient of performance of the heating/cooling system for this hour
  
 """
 
 ghenv.Component.Name = "Simulate a Single Time Step"
 ghenv.Component.NickName = 'SimulateOneTimeStep'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_26_2018'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = "Simulation"

@@ -36,7 +36,7 @@ Provided by Oasys 0.0.1
 
 ghenv.Component.Name = "Unit Test Master"
 ghenv.Component.NickName = 'unit_test_master'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_26_2018'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = "Simulation"
@@ -98,24 +98,13 @@ sc.sticky['expected_results'] = {
     3.83,7.9,3.75,4.62]
     }
 
-# Initialize test loop parameters
-timeout = time.time() + 5   # 5 seconds from now
-sc.sticky['run_test']=1000
+number_of_tests= len(sc.sticky['expected_results']['name']) -1
 
-if run:
-    sc.sticky['run_test'] = 0
+Office = zones[run]
+outdoor_air_temperature = tests['t_out'][run]
+previous_mass_temperature = tests['t_m_prev'][run]
+internal_gains = tests['internal_gains'][run]
+solar_gains = tests['solar_gains'][run]
+illuminance = tests['ill'][run]
+occupancy = tests['occ'][run]
 
-while True:    
-    # Break after 5 seconds if it doesn't work
-    if sc.sticky['run_test'] >= len(sc.sticky['expected_results']['name'])\
-    or time.time() > timeout:
-        break
-    
-    # Set output parameters for the current test
-    Office = zones[sc.sticky['run_test']]
-    outdoor_air_temperature = tests['t_out'][sc.sticky['run_test']]
-    previous_mass_temperature = tests['t_m_prev'][sc.sticky['run_test']]
-    internal_gains = tests['internal_gains'][sc.sticky['run_test']]
-    solar_gains = tests['solar_gains'][sc.sticky['run_test']]
-    illuminance = tests['ill'][sc.sticky['run_test']]
-    occupancy = tests['occ'][sc.sticky['run_test']]
