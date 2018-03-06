@@ -32,7 +32,7 @@ Provided by Oasys 0.0.1
 
 ghenv.Component.Name = "Glazed Element"
 ghenv.Component.NickName = 'GlazedElement'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
+ghenv.Component.Message = 'VER 0.0.1\nMar_06_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = " 1 | Zone"

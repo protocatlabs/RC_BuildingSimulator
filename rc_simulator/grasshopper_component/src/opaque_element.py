@@ -23,12 +23,14 @@ Provided by Oasys 0.0.1
         element_name: optional element name
         u_value: element u-value in W/(m^2.K)
     Returns:
+        centers: list of center points to check input
+        normals: list of normals to check input
         opaque_elements: list of element objects representing each surface that was inputted.
 """
 
 ghenv.Component.Name = "Opaque Element"
 ghenv.Component.NickName = 'OpaqueElement'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
+ghenv.Component.Message = 'VER 0.0.1\nMAR_06_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = " 1 | Zone"
@@ -41,3 +43,5 @@ import scriptcontext as sc
 Builder = sc.sticky['ElementBuilder'](element_name,u_value,None,None,None,True)
 
 centers,normals,opaque_element = Builder.Elements(_geometry)
+
+print opaque_element

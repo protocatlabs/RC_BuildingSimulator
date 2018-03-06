@@ -1,4 +1,5 @@
-﻿# This comoponent allows the user to override the default zone parameters to create a zone with their preferred level of customization
+﻿# This comoponent creates a basic default zone: the user is allowed 
+# to override the default attributes and customize it.
 #
 # Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator Github repository
@@ -14,7 +15,8 @@
 # <Licence: MIT>
 
 """
-Use this component to define a customized thermal zone. Parameters left blank will be filled with default values.
+Create a custom thermal zone. This method is more manual than the
+element-based approach. Parameters left blank will be filled with default values.
 -
 Provided by Oasys 0.0.1
     
@@ -48,13 +50,14 @@ Provided by Oasys 0.0.1
     Returns:
         readMe!: ...
         Zone: A Zone object described by the args.
-        local_and_global_variables: a list of tuples seperated by a colon which can be used to export and quickly reproduce the zone properties in a Python-based testing environment.
+        unique_inputs: a dictionary of non-default inputs, which can be used to reproduce results in python
+        zone_variables: variables of the Zone object, for diagnostics.
         
 """
 
-ghenv.Component.Name = "Zone"
-ghenv.Component.NickName = 'Zone'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
+ghenv.Component.Name = "Zone1"
+ghenv.Component.NickName = 'Zone1'
+ghenv.Component.Message = 'VER 0.0.1\nMAR_06_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
 ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = " 1 | Zone"
@@ -76,71 +79,60 @@ zone_attributes = ['window_area','external_envelope_area','room_depth',
                   'cooling_supply_system', 'heating_emission_system',
                   'cooling_emission_system']
 
-initial_values = ['4.0','15.0','7.0','5.0','3.0','11.7','300.0','0.455','0.9',
-                  '0.2','1.1','0.6','1.5','0.5','0.6','165000','20.0','26.0',
-                  '-float("inf")','float("inf")','sc.sticky["OilBoilerNew"]',
-                  'sc.sticky["HeatPumpAir"]', 'sc.sticky["OldRadiators"]',
-                  'sc.sticky["AirConditioning"]']
+default_values = [4.0,15.0,7.0,5.0,3.0,11.7,300.0,0.455,0.9,0.2,1.1,0.6,1.5,0.5,
+                  0.6,165000,20.0,26.0,-float("inf"),float("inf"),
+                  sc.sticky["OilBoilerNew"],sc.sticky["HeatPumpAir"],
+                  sc.sticky["OldRadiators"],sc.sticky["AirConditioning"]]
 
 default_attributes = {}
-for a,v in zip(zone_attributes,initial_values):
+for a,v in zip(zone_attributes,default_values):
     default_attributes[a] = v
 
-#Create a list of zone inputs for testing and debugging in Python
-local_and_global_variables = ['Key:Value']
-
-# Check namespace for variables provided as inputs
-local_keys = list(locals())
-local_values = list(locals().values())
-
-for key,value in zip(local_keys,local_values):
-    
-    if key in zone_attributes and 'supply' not in key and 'emission' not in key:
-            if value is not None:
-                local_and_global_variables.append(key+':'+str(value))
-            else:
-                # Assign default values
-                exec('%s = %s'%(key,default_attributes[key]))
-                local_and_global_variables.append(key+':'+default_attributes[key])
-    
-    elif key in zone_attributes and 'supply' in key:
-        local_and_global_variables.append(a+': supply_system.'+v[22:-2])
-        exec('%s = %s'%(key,default_attributes[key]))
-    
-    elif key in zone_attributes and 'emission' in key:
-        local_and_global_variables.append(a+': emission_system.'+v[22:-2])
-        exec('%s = %s'%(key,default_attributes[key]))
+unique_inputs = {}
+for t in default_attributes.keys():
+#    print locals()[t]
+    if locals()[t] is not None:
+        # replace the default value with the value given to the component
+        default_attributes[t] = locals()[t]
+        # Generate a useful text output which can be used as an input in python
+        if 'supply' not in t and 'emission' not in t:
+            value = t+':'+str(locals()[t])
+        elif 'supply' in t:
+            value = t+': supply_system.'+str(locals()[t])[22:-2]
+        elif 'emission' in t:
+            value = t+': emission_system.'+str(locals()[t])[22:-2]
+        unique_inputs[t] = value
 
 
 #Initialise zone object
 Zone = sc.sticky["RC_Zone"](
-     window_area=window_area,
-     external_envelope_area=external_envelope_area,
-     room_depth=room_depth,
-     room_width=room_width,
-     room_height=room_width,
-     lighting_load=lighting_load,
-     lighting_control=lighting_control,
-     lighting_utilisation_factor=lighting_utilisation_factor,
-     lighting_maintenance_factor=lighting_maintenance_factor,
-     u_walls=u_walls,
-     u_windows=u_windows,
-     g_windows=g_windows,
-     ach_vent=ach_vent,
-     ach_infl=ach_infl,
-     ventilation_efficiency=ventilation_efficiency,
-     thermal_capacitance_per_floor_area=thermal_capacitance_per_floor_area,
-     t_set_heating=t_set_heating,
-     t_set_cooling=t_set_cooling,
-     max_cooling_energy_per_floor_area=max_cooling_energy_per_floor_area,
-     max_heating_energy_per_floor_area=max_heating_energy_per_floor_area,
-     heating_supply_system=heating_supply_system,  
-     cooling_supply_system=cooling_supply_system,
-     heating_emission_system=heating_emission_system,
-     cooling_emission_system=cooling_emission_system)
+     window_area=default_attributes['window_area'],
+     external_envelope_area=default_attributes['external_envelope_area'],
+     room_depth=default_attributes['room_depth'],
+     room_width=default_attributes['room_width'],
+     room_height=default_attributes['room_width'],
+     lighting_load=default_attributes['lighting_load'],
+     lighting_control=default_attributes['lighting_control'],
+     lighting_utilisation_factor=default_attributes['lighting_utilisation_factor'],
+     lighting_maintenance_factor=default_attributes['lighting_maintenance_factor'],
+     u_walls=default_attributes['u_walls'],
+     u_windows=default_attributes['u_windows'],
+     g_windows=default_attributes['g_windows'],
+     ach_vent=default_attributes['ach_vent'],
+     ach_infl=default_attributes['ach_infl'],
+     ventilation_efficiency=default_attributes['ventilation_efficiency'],
+     thermal_capacitance_per_floor_area=default_attributes['thermal_capacitance_per_floor_area'],
+     t_set_heating=default_attributes['t_set_heating'],
+     t_set_cooling=default_attributes['t_set_cooling'],
+     max_cooling_energy_per_floor_area=default_attributes['max_cooling_energy_per_floor_area'],
+     max_heating_energy_per_floor_area=default_attributes['max_heating_energy_per_floor_area'],
+     heating_supply_system=default_attributes['heating_supply_system'],  
+     cooling_supply_system=default_attributes['cooling_supply_system'],
+     heating_emission_system=default_attributes['heating_emission_system'],
+     cooling_emission_system=default_attributes['cooling_emission_system'])
 
-#  Add obect attributes to local_and_global_variables
-attrs = vars(Zone)
-for item in attrs.items():
-    local_and_global_variables.append("%s: %s" % item)
+zone_variables = vars(Zone)
+
+for i in unique_inputs:
+    print i,unique_inputs[i]
 
