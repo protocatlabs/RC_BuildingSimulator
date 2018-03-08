@@ -19,13 +19,17 @@
 """
 Use this component to run standard tests on the RC model within the GH environment.
 This test ensures that the grasshopper component returns the same results as the python model.
+
+As opposed to the python unit tests, where test parameters are defined within
+the function for that specific test, all the parameters are declared within 
+dictionaries at the beginning of the script.
 -
 Provided by Oasys 0.0.1
     
     Args:
-        Run: Button
+        Run: The index of the test to be run. 
     Returns:
-        Office: Zone to be tested
+        Zone: Zone to be tested
         outdoor_air_temperature: The outdoor air temperature for the hour being simulated
         previous_mass_temperature: The temperature of the mass node during the previous hour. This temperature represents the average temperature of the building envelope itself.
         internal_gains: internal heat gains for the hour being simulated in [Watts]
@@ -100,11 +104,13 @@ sc.sticky['expected_results'] = {
 
 number_of_tests= len(sc.sticky['expected_results']['name']) -1
 
-Office = zones[run]
-outdoor_air_temperature = tests['t_out'][run]
-previous_mass_temperature = tests['t_m_prev'][run]
-internal_gains = tests['internal_gains'][run]
-solar_gains = tests['solar_gains'][run]
-illuminance = tests['ill'][run]
-occupancy = tests['occ'][run]
-
+try:
+    Zone = zones[run]
+    outdoor_air_temperature = tests['t_out'][run]
+    previous_mass_temperature = tests['t_m_prev'][run]
+    internal_gains = tests['internal_gains'][run]
+    solar_gains = tests['solar_gains'][run]
+    illuminance = tests['ill'][run]
+    occupancy = tests['occ'][run]
+except TypeError:
+    pass

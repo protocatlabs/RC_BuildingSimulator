@@ -87,10 +87,13 @@ x,test_passed = run_test(run)
 
 # record result
 if 'recL' in locals():
-    if not (x in recL):
+    if not (run in tests_run):
+        tests_run.append(run)
         recL.append(x)
+        
     # reset when slider goes to zero
-    if run == 1:
+    if run == 0:
+        tests_run = [0]
         recL = [run_test(0)[0]]
     else:
         pass
