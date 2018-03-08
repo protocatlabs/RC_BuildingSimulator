@@ -1,13 +1,13 @@
 ﻿# This component can be used to simulate indoor temperature, heating, cooling and lighting demand for a series of hourly time steps.
 #
-# Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
+# Nest: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is adapted from examples\annualSimulation.py in the RC_BuildingSimulator Github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation about the model is available on the project wiki.
 #
 # Author: Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copyright and liability comments go here.
 # <Copyright 2018, Architecture and Building Systems - ETH Zurich>
@@ -16,7 +16,7 @@
 """
 Use this component to simulate indoor temperature, heating, cooling and lighting for a series of hourly time steps. You may add a custom zone or leave the Zone arg blank for the default zone.
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
     
     Args:
         Zone: Input a customized Zone from the Zone component.
@@ -41,9 +41,9 @@ ghenv.Component.Name = "Simulate Multiple Time Steps"
 ghenv.Component.NickName = 'SimulateMultipleTimeSteps'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = "2 | Simulation"
-#compatibleOasysVersion = VER 0.0.1\nFEB_21_2018
+#compatibleNestVersion = VER 0.0.1\nFEB_21_2018
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
 except: pass
 
@@ -51,21 +51,21 @@ import Grasshopper.Kernel as gh
 import scriptcontext as sc
 
 loc = locals()
-simulation_variables = ['outdoor_air_temperature',
-'internal_gains','solar_irradiation','occupancy']
+simulation_variables = ['outdoor_air_temperature','internal_gains',
+                    'solar_irradiation','occupancy']
 variable_summary = {}
-
-for key,value in loc.iteritems():
-    if key in simulation_variables:
-        variable_summary[key] = len(value)
+for s in simulation_variables:
+    if s in loc:
+        variable_summary[s] = len(loc[s])
         # Raise warning if no value is detected
-        if len(value)==0:
-            warning = "No data for %s"%key
-            w = gh.GH_RuntimeMessageLevel.Warning
-            ghenv.Component.AddRuntimeMessage(w, warning)
+        if len(loc[s])==0:
+            error = "No data for %s"%s
+            e = gh.GH_RuntimeMessageLevel.Error
+            ghenv.Component.AddRuntimeMessage(e, error)
 print variable_summary
 
 hours = len(outdoor_air_temperature)
+
 
 #Initialise zone object
 if Zone is None:
@@ -92,23 +92,22 @@ else:
 if internal_gains == []:
     internal_gains = [10]*hours  # Watts
 
-if solar_irradiation == []:
-    solar_irradiation = [2000]*hours # Watts. Requires adjustment to account for window losses
+if len(solar_irradiation) != hours:
+    print '!!Solar gains = 0'
+    print '!!Illuminance = 0'
+    solar_irradiation = [0]*hours 
+    ill = [0]*hours
+else:
+    #Spectral luminous efficacy (108)- can be calculated from the weather file 
+    #https://en.wikipedia.org/wiki/Luminous_efficacy
+    ill = [s * 108 for s in solar_irradiation]
 
-solar_gains = [x * Zone.g_windows for x in solar_irradiation]
-
-#Spectral luminous efficacy (108)- can be calculated from the weather file https://en.wikipedia.org/wiki/Luminous_efficacy
-ill = [s * 108 for s in solar_irradiation]
+#This should either be here or (pereferably) in the solar gains calculations
+#solar_gains = [x * Zone.g_windows for x in solar_irradiation]
+solar_gains = solar_irradiation
 
 if occupancy == []:
     occupancy = [0.1]*hours  # Occupancy for the timestep [people/hour/square_meter]
-
-"""
-#  Export obect attributes for testing and debugging
-attrs = vars(Zone)
-for item in attrs.items():
-    local_and_global_variables.append("%s: %s" % item)
-"""
 
 #Initialise result lists
 indoor_air_temperature = []

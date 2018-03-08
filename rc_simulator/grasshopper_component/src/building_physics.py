@@ -1,15 +1,15 @@
 ﻿# This comoponent contains an object-oriented adaptation of the RC model referred to as the 'Simple Hourly Method' in ISO 13790, (superceded by EN ISO 52016-1).
 #
-# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
+# Nest: An educational plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
 #
 # Authors: Prageeth Jayathissa <jayathissa@arch.ethz.ch>, Justin Zarb <zarbj@student.ethz.ch>
 # Credits: Gabriel Happle, Justin Zarb, Michael Fehr
-# Converted into a grasshopper plugin by Justin Zarb
+# Adapted for Grasshopper by Justin Zarb
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copywrite and liability comments go here.
 # Copyright 2018, Architecture and Building Systems - ETH Zurich
@@ -18,14 +18,14 @@
 """
 Place this component in the grasshopper workspace so that zones can be defined and simulations run.
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
 """
 
 ghenv.Component.Name = "Building Physics"
 ghenv.Component.NickName = 'BuildingPhysics'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_26_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = "0 | Core"
 
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -37,13 +37,13 @@ class Building(object):
     '''Sets the parameters of the building. '''
 
     def __init__(self,
-                 window_area=4.0,
-                 external_envelope_area=15.0, #external wall area + window area
-                 room_depth=7.0,
-                 room_width=5.0,
-                 room_height=3.0,
+                 window_area=13.5,
+                 external_envelope_area=15.19,
+                 room_depth=7,
+                 room_width=4.9,
+                 room_height=3.1,
                  lighting_load=11.7,
-                 lighting_control=300.0,
+                 lighting_control=300,
                  lighting_utilisation_factor=0.45,
                  lighting_maintenance_factor=0.9,
                  u_walls=0.2,
@@ -51,15 +51,15 @@ class Building(object):
                  g_windows=0.6,
                  ach_vent=1.5,
                  ach_infl=0.5,
-                 ventilation_efficiency=0.6,
+                 ventilation_efficiency=0,
                  thermal_capacitance_per_floor_area=165000,
-                 t_set_heating=20.0,
-                 t_set_cooling=26.0,
-                 max_cooling_energy_per_floor_area=-float("inf"),
-                 max_heating_energy_per_floor_area=float("inf"),
-                 heating_supply_system=sc.sticky["OilBoilerNew"],  
-                 cooling_supply_system=sc.sticky["HeatPumpAir"],
-                 heating_emission_system=sc.sticky["OldRadiators"],
+                 t_set_heating=20,
+                 t_set_cooling=26,
+                 max_cooling_energy_per_floor_area=-12,
+                 max_heating_energy_per_floor_area=12,
+                 heating_supply_system=sc.sticky["DirectHeater"],
+                 cooling_supply_system=sc.sticky["DirectCooler"],
+                 heating_emission_system=sc.sticky["AirConditioning"],
                  cooling_emission_system=sc.sticky["AirConditioning"],
                  ):
 

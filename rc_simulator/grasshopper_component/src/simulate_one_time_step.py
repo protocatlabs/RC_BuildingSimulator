@@ -1,13 +1,13 @@
 ﻿# This component can be used to simulate a single timestep, which is mostly useful for testing and debugging.
 #
-# Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
+# Nest: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is based on examples\hourSimulation.py in the RC_BuildingSimulator Github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
 #
 # Author: Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copyright and liability comments go here.
 # <Copyright 2018, Architecture and Building Systems - ETH Zurich>
@@ -16,7 +16,7 @@
 """
 Use this component to simulate a single timestep. You may add a custom zone or leave the Zone arg blank for the default zone.
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
     
     Args:
         Zone: Input a customized Zone from the Zone component.
@@ -44,9 +44,9 @@ ghenv.Component.Name = "Simulate a Single Time Step"
 ghenv.Component.NickName = 'SimulateOneTimeStep'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = "Simulation"
-#compatibleOasysVersion = VER 0.0.1\nFEB_21_2018
+#compatibleNestVersion = VER 0.0.1\nFEB_21_2018
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
 except: pass
 

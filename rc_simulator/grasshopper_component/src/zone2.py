@@ -1,14 +1,14 @@
 ﻿# This comoponent creates a zone made of elements: the user is allowed 
 # to override the default attributes and customize it.
 #
-# Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
+# Nest: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator Github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
 #
 # Author: Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copyright and liability comments go here.
 # <Copyright 2018, Architecture and Building Systems - ETH Zurich>
@@ -18,7 +18,7 @@
 Create a customized zone using elements as inputs.
 Parameters left blank will be filled with default values.
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
     
     Args:
         glazed_elements: Element objects with additional glazing properties
@@ -62,9 +62,9 @@ ghenv.Component.Name = "Zone2"
 ghenv.Component.NickName = 'Zone2'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = " 1 | Zone"
-#compatibleOasysVersion = VER 0.0.1\nFEB_21_2018
+#compatibleNestVersion = VER 0.0.1\nFEB_21_2018
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
 except: pass
 

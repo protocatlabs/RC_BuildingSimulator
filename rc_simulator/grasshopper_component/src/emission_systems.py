@@ -1,30 +1,30 @@
 ﻿# This comoponent contains a car-builder system of objects which define simple 
 # emission systems.
 #
-# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
+# Nest: An educational plugin developed by the A/S chair at ETH Zurich
 # This component is based on emission_system.py in the RC_BuildingSimulator github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 #
 # Authors: Prageeth Jayathissa <jayathissa@arch.ethz.ch>, Michael Fehr
 # Converted into a grasshopper plugin by Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copywrite and liability comments go here.
 # Copyright 2018, Architecture and Building Systems - ETH Zurich
 # Licence: MIT
 
 """
-Place this component in the grasshopper workspace so that other Oasys components can access the emission systems object definitions
+Place this component in the grasshopper workspace so that other Nest components can access the emission systems object definitions
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
 """
 
 ghenv.Component.Name = "Emission Systems"
 ghenv.Component.NickName = 'EmissionSystems'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_21_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = "0 | Core"
 
 try: ghenv.Component.AdditionalHelpFromDocStrings = "2"

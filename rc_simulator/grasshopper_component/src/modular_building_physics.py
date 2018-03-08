@@ -3,7 +3,7 @@
 # branch, and is based on the nested_rc branch. The modifications make it easier
 # to accomodate a more modular zone definiton, made of a zone and elements. 
 
-# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
+# Nest: An educational plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator 
 # github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
@@ -13,7 +13,7 @@
 # <zarbj@student.ethz.ch>
 # Adapted for Grasshopper by Justin Zarb
 #
-# This file is part of Oasys
+# This file is part of Nest
 #
 # Licensing/Copywrite and liability comments go here.
 # Copyright 2018, Architecture and Building Systems - ETH Zurich
@@ -22,21 +22,22 @@
 """
 Place this component in the grasshopper workspace so that zones can be defined and simulations run.
 -
-Provided by Oasys 0.0.1
+Provided by Nest 0.0.1
 """
 
 ghenv.Component.Name = "Modular Building Physics"
 ghenv.Component.NickName = 'ModularBuildingPhysics'
-ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
+ghenv.Component.Message = 'VER 0.0.1\nMAR_08_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Oasys"
+ghenv.Component.Category = "Nest"
 ghenv.Component.SubCategory = "0 | Core"
 
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
 except: pass
 
 import scriptcontext as sc
-
+import rhinoscriptsyntax as rs
+import Rhino as rc
 
 class Element(object):
     """
@@ -49,7 +50,7 @@ class Element(object):
     method below with the same attributes!
     """
     def __init__(self,
-                 name = 'opaque_element', #should contain one of the following: [Wall, Window, Ground slab, Roof]
+                 name = 'Element', #should contain one of the following: [Wall, Window, Ground slab, Roof]
                  area = 15.0, #Element area, [m2]
                  u_value = 1.0, #Element u_value-value, [W/m2.K]
                  azimuth_tilt = 0, #South facing by default
@@ -57,7 +58,6 @@ class Element(object):
                  opaque = True,
                  solar_transmittance = 0.7,
                  light_transmittance=0.8,
-                 shading_factor=1.0,
                  frame_factor=1.0
                  ):
 
@@ -67,8 +67,8 @@ class Element(object):
         self.h_tr = self.u_value * self.area #element conductance [W/K]
         self.azimuth_tilt = azimuth_tilt
         self.altitude_tilt = altitude_tilt
-        self.shading_factor = shading_factor
         self.frame_factor = frame_factor
+        self.opaque = opaque
 
         if opaque:
             self.solar_transmittance = 0
@@ -76,6 +76,98 @@ class Element(object):
         else:
             self.solar_transmittance = solar_transmittance
             self.light_transmittance = light_transmittance
+
+
+class ElementBuilder(object):
+    def __init__(self,element_name,u_value,solar_transmittance,
+                light_transmittance,frame_factor,opaque):
+        
+        self.opaque= opaque
+        if self.opaque:
+            self.element_name = element_name if element_name is not None else 'Wall'
+            self.u_value = 0.2 if u_value is None else u_value
+            self.solar_transmittance = 0
+            self.light_transmittance = 0
+            self.frame_factor = 1
+        else:
+            self.element_name = element_name if element_name is not None else 'Window'
+            self.u_value = 1 if u_value is None else u_value
+            self.solar_transmittance = 0.7 if solar_transmittance is None else solar_transmittance
+            self.light_transmittance = 0.8 if light_transmittance is None else light_transmittance
+            self.frame_factor = 1 if frame_factor is None else frame_factor
+
+    def get_data(self,surface):
+        north = rc.Geometry.Vector3d(0,1,0)
+        vertical = rc.Geometry.Vector3d(0,0,1)
+        faces_west = False
+        # Get area, normal (show this in rhino),
+        centroid = rs.SurfaceAreaCentroid(surface)[0]
+        normal = rs.SurfaceNormal(surface,[0.5,0.5])
+        if normal[0] < 0:
+            faces_west = True
+        else:
+            faces_west = False
+        normal_xy = rc.Geometry.Vector3d(normal[0],normal[1],0)
+        normal_xz = rc.Geometry.Vector3d(normal[0],0,normal[2])
+        try:
+            azimuth = rs.VectorAngle(north,normal_xy)
+            if faces_west:
+                azimuth = 360-azimuth
+        except ValueError:
+            azimuth = 0
+        try: 
+            altitude = rs.VectorAngle(vertical,normal_xz)
+        except ValueError:
+            altitude = 0
+        area = rs.SurfaceArea(surface)[0]
+        return centroid,normal,area,azimuth,altitude
+
+    def Elements(self,geometry):
+        centroids = []
+        normals = []
+        glazed_elements = []
+        if geometry is not None:
+            # Invalid input
+            if not (rs.IsSurface(geometry) or rs.IsPolysurface(geometry)):
+                error = """geometry is not a surface or polysurface"""
+                w = gh.GH_RuntimeMessageLevel.Error
+                ghenv.Component.AddRuntimeMessage(w, warning)
+        
+            # Single surface
+            elif rs.IsSurface(geometry):
+                centroid,normal,area,azimuth,altitude = self.get_data(geometry)
+                centroids = centroid
+                normals = normal
+                glazed_elements = sc.sticky['Element'](
+                    name=self.element_name,
+                    area=area,
+                    u_value=self.u_value, 
+                    azimuth_tilt=azimuth,
+                    altitude_tilt=altitude,
+                    opaque=self.opaque,
+                    solar_transmittance=self.solar_transmittance,
+                    light_transmittance=self.light_transmittance,
+                    frame_factor=self.frame_factor)
+
+            # Polysurface
+            elif rs.IsPolysurface(geometry):
+                all_parts = rs.ExplodePolysurfaces(geometry)
+                for part in all_parts:
+                    centroid,normal,area,azimuth,angle = self.get_data(part)
+                    centroids.append(centroid)
+                    normals.append(n)
+                    glazed_element = sc.sticky['Element'](
+                        name=self.element_name,
+                        area=area,
+                        u_value=self.u_value, 
+                        azimuth_tilt=azimuth,
+                        altitude_tilt=altitude,
+                        opaque=self.opaque,
+                        solar_transmittance=self.solar_transmittance,
+                        light_transmittance=self.light_transmittance,
+                        frame_factor=self.frame_factor)
+                    glazed_elements.append(glazed_element)
+        return centroids,normals,glazed_elements
 
 
 class ThermalBridge(object):
@@ -181,7 +273,10 @@ class Zone(object):
         print 'Conductance of opaque surfaces to exterior [W/K], h_tr_em:', self.h_tr_em
         print 'Conductance to exterior through glazed surfaces [W/K], h_tr_w', self.h_tr_w
         print 'windows: %f m2, walls: %f m2, total: %f m2'%(self.window_area,self.wall_area,self.window_area+self.wall_area)
-        print 'window to wall ratio: %f %%\n'%(int(round(self.window_area/self.wall_area*100,1)))
+        try:
+            print 'window to wall ratio: %f %%\n'%(int(round(self.window_area/self.wall_area*100,1)))
+        except ZeroDivisionError:
+            print '100% glazed'
 
 
 class Building(object):
@@ -355,7 +450,7 @@ class Building(object):
 
             # Calculate the Heating/Cooling Input Energy Required
 
-            supply_director = supply_system.SupplyDirector()  # Initialise Heating System Manager
+            supply_director = sc.sticky["SupplyDirector"]()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
                 supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
@@ -549,7 +644,7 @@ class Building(object):
 
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
-        emDirector = emission_system.EmissionDirector()
+        emDirector = sc.sticky["EmissionDirector"]()
         # Set the emission system to the type specified by the user
 
         emDirector.set_builder(self.heating_emission_system(
@@ -676,6 +771,7 @@ class Building(object):
 
 
 sc.sticky["Element"] = Element
+sc.sticky["ElementBuilder"] = ElementBuilder
 sc.sticky["ThermalBridge"] = ThermalBridge
 sc.sticky["Zone"] = Zone
 sc.sticky["ModularRCZone"] = Building
