@@ -200,4 +200,6 @@ class Window(object):
 
 
 if __name__ == '__main__':
-    pass
+    Zurich = Location(epwfile_path='Zurich.epw')
+    lat,long = Zurich.calc_sun_location(latitude_deg=47.377, longitude_deg=8.549, year=2005, hoy=637)
+    print lat, long
