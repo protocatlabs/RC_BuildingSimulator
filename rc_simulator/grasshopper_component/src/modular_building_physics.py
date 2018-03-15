@@ -3,7 +3,7 @@
 # branch, and is based on the nested_rc branch. The modifications make it easier
 # to accomodate a more modular zone definiton, made of a zone and elements. 
 
-# Nest: An educational plugin developed by the A/S chair at ETH Zurich
+# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator 
 # github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
@@ -13,7 +13,7 @@
 # <zarbj@student.ethz.ch>
 # Adapted for Grasshopper by Justin Zarb
 #
-# This file is part of Nest
+# This file is part of Oasys
 #
 # Licensing/Copywrite and liability comments go here.
 # Copyright 2018, Architecture and Building Systems - ETH Zurich
@@ -22,14 +22,14 @@
 """
 Place this component in the grasshopper workspace so that zones can be defined and simulations run.
 -
-Provided by Nest 0.0.1
+Provided by Oasys 0.0.1
 """
 
 ghenv.Component.Name = "Modular Building Physics"
 ghenv.Component.NickName = 'ModularBuildingPhysics'
-ghenv.Component.Message = 'VER 0.0.1\nMAR_08_2018'
+ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Nest"
+ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = "0 | Core"
 
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
@@ -38,6 +38,378 @@ except: pass
 import scriptcontext as sc
 import rhinoscriptsyntax as rs
 import Rhino as rc
+
+
+class RadiationWindow(object):
+    """
+    Adapted from RC-building simulator's Window object in radiation.py
+    
+    returns solar_gains, illuminance through window as a list
+    """
+
+    def __init__(self, window_geometry, context_geometry, location, year, 
+                 glass_solar_transmittance=0.7, glass_light_transmittance=0.8):
+        
+        self.window_geometry = window_geometry
+        self.context_geometry = context_geometry
+        # initialize window centroid, vertices, normal and tilt
+        self.extract_window_geometry()
+        
+        #TODO: make this part of location
+        self.year = year 
+        
+        # Extract location data
+        x_lines = [s.strip() for s in location.splitlines()]
+        self.latitude_deg = float(x_lines[2].split(',')[0])
+        self.longitude_deg = float(x_lines[3].split(',')[0])
+        self.utc_offset = float(x_lines[4].split(',')[0])
+
+        self.glass_solar_transmittance = glass_solar_transmittance
+        self.glass_light_transmittance = glass_light_transmittance
+
+    def extract_window_geometry(self):
+        """
+        This function creates the following attributes during __init__:
+        self.window_centroid
+        self.window_normal
+        self.window_vertices
+        self.altitude_tilt_rad
+        self.azimuth_tilt_rad
+        """
+        north = rc.Geometry.Vector3d(0,1,0)
+        vertical = rc.Geometry.Vector3d(0,0,1)
+        faces_west = False
+        self.window_centroid = rs.SurfaceAreaCentroid(self.window_geometry)[0]
+        normal = rs.SurfaceNormal(self.window_geometry,[0.5,0.5])
+        self.window_normal = normal
+        self.window_vertices = rs.SurfaceEditPoints(window_geometry)
+        
+        if normal[0] < 0:
+            faces_west = True
+        else:
+            faces_west = False
+        
+        normal_xy = rc.Geometry.Vector3d(normal[0],normal[1],0)
+        normal_xz = rc.Geometry.Vector3d(normal[0],0,normal[2])
+
+        
+        try:
+            azimuth = rs.VectorAngle(north,normal_xy)
+            if faces_west:
+                azimuth = 360-azimuth
+        except ValueError:
+            azimuth = 0
+        
+        try: 
+            altitude = rs.VectorAngle(vertical,normal_xz)
+        except ValueError:
+            altitude = 0
+        
+        self.alititude_tilt_rad = math.radians(altitude)
+        self.azimuth_tilt_rad = math.radians(azimuth)
+
+    def calc_sun_position(self, hoy):
+        """
+        Credits: Prageeth Jayathissa, Joan Domènech Masferrer 
+        Calculates the sun position for a specific hour of the year and location,
+        according to traditional convention.
+        :param latitude_deg: Local Latitude [Degrees]. North+, South-.
+        :type latitude_deg: float
+        :param longitude_deg: Local Longitude [Degrees]. East+, West-.
+        :type longitude_deg: float
+        :param year: year
+        :type year: int
+        :param hoy: Hour of the year from the start. The first hour of January is 1
+        :type hoy: int
+        :param utc_offset: Time zone offset i.r. to Prime Meridian [hours]
+        :type utc_offset: int
+        :return: altitude, azimuth, sunvec: Sun altitude and azimuth [Degrees] (Traditional convention) and sun vecto
+        :rtype: float,float,Vector3d
+        """
+        # Source http://www.pveducation.org/pvcdrom/properties-of-sunlight/declination-angle
+    
+        # Set the date in UTC based off the hour of year and the year itself
+        start_of_year = datetime.datetime(self.year, 1, 1, 0, 0, 0, 0);
+        utc_datetime = start_of_year + datetime.timedelta(hours = hoy);
+    
+        # Determine the day of the year
+        day_of_year = utc_datetime.timetuple().tm_yday;
+    
+        # Calculate B parameter (in radians) for equation of time
+        b_factor = (day_of_year - 1) * ((2 * math.pi) / 365);
+    
+        # Equation of time: empirical equation that corrects for the eccentricity of 
+        # the Earth's orbit and the Earth's axial tilt        
+        equation_of_time = 229.2 * 0.000075 + 229.2 * (0.001868 * math.cos(b_factor) - \
+                                                       0.032077 * math.sin(b_factor)) - \
+                                                       229.2 * (0.014615 * math.cos(2 * b_factor) + \
+                                                                0.04089 * math.sin(2 * b_factor));
+    
+        # Local Standart Time Meridian (Earth rotation 15 degrees/h)
+        standard_time = 15 * self.utc_offset
+    
+        # Time correction between local standard time and true solar time (in minutes) 
+        time_correction = 4 * (self.longitude_deg - standard_time) + equation_of_time 
+    
+        # Local Solar Time (in hours) = Local Time + TC (in hours)
+        solar_time = utc_datetime.hour + (utc_datetime.minute + time_correction) / 60.0;
+    
+        # Translate Local Solar Time to an angle 
+        hour_angle_rad = (math.pi * 2 / 24) * (solar_time - 12);
+    
+        # Calculate the declination angle: The variation due to the earths tilt
+        declination_rad = math.radians(23.45 * math.sin((2 * math.pi / 365.0) * 
+                                                        (day_of_year - 81)));
+    
+        # Convert latitude to to radians
+        latitude_rad = math.radians(self.latitude_deg);
+    
+        # Altitude Position of the sun in radians
+        sun_alt_rad = math.asin(math.cos(latitude_rad) * math.cos(declination_rad) * 
+                                 math.cos(hour_angle_rad) +
+                                 math.sin(latitude_rad) * math.sin(declination_rad));
+    
+        # Azimuth Position fo the sun in radians
+        sun_az_rad = math.acos((math.sin(declination_rad) *
+                                    math.cos(latitude_rad) - math.cos(declination_rad) *
+                                    math.sin(latitude_rad) * math.cos(hour_angle_rad)) /
+                                    math.cos(sun_alt_rad))
+    
+        # Range azimuth [0, 360) degrees
+        if hour_angle_rad > 0 or hour_angle_rad < - math.pi :
+            sun_az_rad = math.pi * 2 - sun_az_rad
+        
+        sunvec_x = -math.sin(sun_az_rad) * math.cos(sun_alt_rad);
+        sunvec_y = -math.cos(sun_az_rad) * math.cos(sun_alt_rad);
+        sunvec_z = -math.sin(sun_alt_rad)
+        sunvec = rc.Geometry.Vector3d(sunvec_x,sunvec_y,sunvec_z)
+    
+        return math.degrees(sun_alt_rad), math.degrees(sun_az_rad), sunvec
+
+    def is_sunny(self,hoy):
+        """
+        Checks wether is sunny or not by comparing the sun vector and window normal.
+        :rtype: bool
+        """
+
+        sun_alt_deg,sun_az_deg,sunvec = self.calc_sun_position(hoy)
+        
+        x_win = self.window_normal[0] > 0
+        x_sun = sunvec[0] > 0
+        y_win = self.window_normal[1] > 0
+        y_sun = sunvec[1] > 0
+        
+        x = (x_win and not x_sun) or (x_sun and not x_win)
+        y = (y_win and not y_sun) or (y_sun and not y_win)
+        z = sunvec[2] < 0
+        
+        return x and y and z
+
+    def context_to_clockwise_points(self,shade):
+        """
+        :return sorted_points: list of points sorted clockwise
+        :rtype sorted_points: list
+        """
+        points = rs.SurfacePoints(shade,True)
+        centroid, error= rs.SurfaceAreaCentroid(shade)
+        
+        # Generate plane oriented to world-Z
+        plane = rc.Geometry.Plane(centroid,rc.Geometry.Vector3d(0,0,-1))
+        
+        # calculate vectors from center to points
+        vecs = [centroid - point for point in points]
+        
+        # calculate angles between vectors and plane x-axis
+        angles = [rc.Geometry.Vector3d.VectorAngle(plane.XAxis,v,plane) for v in vecs]
+        sorted_points = [p[1] for p in sorted(zip(angles,points))] 
+        return sorted_points
+
+    def point_in_window(self,point):
+        x = []
+        y = []
+        z = []
+
+        for v in self.window_vertices:
+            x.append(v[0])
+            y.append(v[1])
+            z.append(v[2])
+        
+        x_range = min(x) <= point[0] <= max(x)
+        y_range = min(y) <= point[1] <= max(y)
+        z_range = min(z) <= point[2] <= max(z)
+        
+        return x_range and y_range and z_range
+
+    def unshaded_window_surfaces(self, sun_vector):
+        """
+        returns a set of surfaces representing the unshaded parts of the window
+        """
+        
+        # Scale window geometry so that all points hit the surface
+        window_plane = rs.ScaleObject(self.window_geometry,self.window_centroid,
+            (10,10,10),True)
+        
+        # Project shadows to window surface and merge overlapping shadows
+        shadow_geometry = []
+        for shade in self.context_geometry:
+            # Arrange shade vertices clockwise
+            shade_points = shade_to_clockwise_points(shade)
+    
+            # Draw Shadow
+            shadow_points = rs.ProjectPointToSurface(shade_points,window_plane,sun_vector)
+            if shadow_points is not None:
+                shadow = rs.AddSrfPt(shadow_points)
+                if shadow is None:
+                    shadow = gh.SurfaceFromPoints(shadow_points)
+    
+            # First shadow
+            if shadow_geometry == []:
+                shadow_geometry = [shadow]
+                
+            # Subsequent shadows
+            else:
+                for existing_shadow in shadow_geometry:
+                    # try boolean union
+                    union = rs.BooleanUnion(existing_shadow,shadow)
+                    
+                    if union is not None:
+                        # current shadow successfully merged with existing shadow
+                        existing_shadow = union
+                        
+                    else:
+                        # No intersection. current shadow is isolated
+                        shadow_geometry.append(shadow)
+    
+        # sequentially subtract each shadow from the window geometry.
+        if self.window_geometry is not None and shadow_geometry != []:
+    
+            # Initialise unshaded fragments
+            unshaded_fragments = [self.window_geometry]
+            
+            for shadow in shadow_geometry:
+                for ff in range(0,len(unshaded_fragments)):
+                    intersection = rs.BooleanIntersection(unshaded_fragments[ff], shadow, False)
+                    
+                    # Discard intersections outside window geometry
+                    new_fragments = []
+                    for i in intersection:
+                        intersection_centroid = rs.SurfaceAreaCentroid(i)[0]
+                        if self.point_in_window(intersection_centroid):
+                            new_fragments.append(i)
+                    
+                    # replace existing fragment with newly created fragments
+                    unshaded_fragments[ff] = new_fragments
+    
+                # Flatten new list of fragments for the next shadow iteration
+                if any(type(f) is list for f in unshaded_fragments):
+                    unshaded_fragments = [item for sublist in unshaded_fragments for item in sublist]
+            
+            return unshaded_fragments
+        else:
+            return None
+
+    def calc_unshaded_area(self,sun_vector):
+        unshaded_fragments = self.unshaded_window_surfaces(sun_vector)
+        if unshaded_fragments is not None:
+            fragment_areas = [rs.SurfaceArea(f)[0] for f in unshaded_fragments]
+            unshaded_area = sum(fragment_areas)
+            percent_shaded = unshaded_area / rs.SurfaceArea(self.window_geometry)[0] * 100
+            return unshaded_area, percent_shaded
+        else:
+            return 0, 100
+
+    def calc_solar_gains(self, hoy, direct_normal_irradiation, diffuse_horizontal_irradiation):
+        """
+        Calculates the Solar Gains in the building zone through the set Window
+
+        :param sun_altitude: Altitude Angle of the Sun in Degrees
+        :type sun_altitude: float
+        :param sun_azimuth: Azimuth angle of the sun in degrees
+        :type sun_azimuth: float
+        :param direct_normal_irradiation: Normal Direct Radiation from weather file
+        :type direct_normal_irradiation: float
+        :param diffuse_horizontal_irradiation: Horizontal Diffuse Radiation from weather file
+        :type diffuse_horizontal_irradiation: float
+        :return: self.incident_solar, Incident Solar Radiation on window
+        :return: self.solar_gains - Solar gains in building after transmitting through the window
+        :rtype: float
+        """
+
+        sun_altitude,sun_azimuth,sun_vector = self.calc_sun_position(hoy)
+        
+        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth)
+        diffuse_factor = self.calc_diffuse_solar_factor()
+
+        direct_solar = direct_factor * direct_normal_irradiation
+        diffuse_solar = diffuse_horizontal_irradiation * diffuse_factor
+        
+        unshaded_area, percent_unshaded = self.calc_unshaded_area(sun_vector)
+        
+        incident_solar = (direct_solar + diffuse_solar) * unshaded_area
+        
+        solar_gains = incident_solar * self.glass_solar_transmittance
+        
+        return solar_gains
+
+    def calc_illuminance(self, hoy, direct_normal_illuminance, diffuse_horizontal_illuminance):
+        """
+        Calculates the Illuminance in the building zone through the set Window
+
+        :param sun_altitude: Altitude Angle of the Sun in Degrees
+        :type sun_altitude: float
+        :param sun_azimuth: Azimuth angle of the sun in degrees
+        :type sun_azimuth: float
+        :param direct_normal_illuminance: Normal Direct Illuminance from weather file [Lx]
+        :type direct_normal_illuminance: float
+        :param diffuse_horizontal_illuminance: Horizontal Diffuse Illuminance from weather file [Lx]
+        :type diffuse_horizontal_illuminance: float
+        :return: self.incident_illuminance, Incident Illuminance on window [Lumens]
+        :return: self.transmitted_illuminance - Illuminance in building after transmitting through the window [Lumens]
+        :rtype: float
+        """
+
+        sun_altitude,sun_azimuth,sun_vector = self.calc_sun_position(hoy)
+        
+        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
+        diffuse_factor = self.calc_diffuse_solar_factor()
+
+        direct_illuminance = direct_factor * direct_normal_illuminance
+        diffuse_illuminance = diffuse_factor * diffuse_horizontal_illuminance
+
+        unshaded_area, percent_unshaded = self.calc_unshaded_area(sun_vector)
+        
+        incident_illuminance = (
+            direct_illuminance + diffuse_illuminance) * unshaded_area
+        transmitted_illuminance = incident_illuminance * \
+            self.glass_light_transmittance
+        
+        return transmitted_illuminance
+
+    def calc_direct_solar_factor(self, sun_altitude, sun_azimuth):
+        """
+        Calculates the cosine of the angle of incidence on the window 
+        """
+        sun_altitude_rad = math.radians(sun_altitude)
+        sun_azimuth_rad = math.radians(sun_azimuth)
+
+        # If the sun is in front of the window surface
+        if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
+            # Proportion of the radiation incident on the window (cos of the
+            # incident ray)
+            direct_factor = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
+                math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+
+        else:
+            # If sun is behind the window surface
+            direct_factor = 0
+
+        return direct_factor
+
+    def calc_diffuse_solar_factor(self):
+        """Calculates the proportion of diffuse radiation"""
+        # Proportion of incident light on the window surface
+        return (1 + math.cos(self.alititude_tilt_rad)) / 2
+
 
 class Element(object):
     """
@@ -769,7 +1141,7 @@ class Building(object):
         
         self.t_opperative = 0.3 * self.t_air + 0.7 * self.t_s
 
-
+sc.sticky["RadiationWindow"] = RadiationWindow
 sc.sticky["Element"] = Element
 sc.sticky["ElementBuilder"] = ElementBuilder
 sc.sticky["ThermalBridge"] = ThermalBridge

@@ -1,6 +1,6 @@
 ﻿# This comoponent contains an object-oriented adaptation of the RC model referred to as the 'Simple Hourly Method' in ISO 13790, (superceded by EN ISO 52016-1).
 #
-# Nest: An educational plugin developed by the A/S chair at ETH Zurich
+# Oasys: An educational plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
@@ -9,7 +9,7 @@
 # Credits: Gabriel Happle, Justin Zarb, Michael Fehr
 # Adapted for Grasshopper by Justin Zarb
 #
-# This file is part of Nest
+# This file is part of Oasys
 #
 # Licensing/Copywrite and liability comments go here.
 # Copyright 2018, Architecture and Building Systems - ETH Zurich
@@ -18,14 +18,14 @@
 """
 Place this component in the grasshopper workspace so that zones can be defined and simulations run.
 -
-Provided by Nest 0.0.1
+Provided by Oasys 0.0.1
 """
 
 ghenv.Component.Name = "Building Physics"
 ghenv.Component.NickName = 'BuildingPhysics'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_26_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Nest"
+ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = "0 | Core"
 
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
