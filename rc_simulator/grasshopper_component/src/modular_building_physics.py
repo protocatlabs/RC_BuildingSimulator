@@ -38,6 +38,9 @@ except: pass
 import scriptcontext as sc
 import rhinoscriptsyntax as rs
 import Rhino as rc
+import ghpythonlib.components as gh
+import math
+import datetime
 
 
 class RadiationWindow(object):
@@ -52,6 +55,7 @@ class RadiationWindow(object):
         
         self.window_geometry = window_geometry
         self.context_geometry = context_geometry
+
         # initialize window centroid, vertices, normal and tilt
         self.extract_window_geometry()
         
@@ -82,7 +86,7 @@ class RadiationWindow(object):
         self.window_centroid = rs.SurfaceAreaCentroid(self.window_geometry)[0]
         normal = rs.SurfaceNormal(self.window_geometry,[0.5,0.5])
         self.window_normal = normal
-        self.window_vertices = rs.SurfaceEditPoints(window_geometry)
+        self.window_vertices = rs.SurfaceEditPoints(self.window_geometry)
         
         if normal[0] < 0:
             faces_west = True
@@ -249,37 +253,40 @@ class RadiationWindow(object):
         window_plane = rs.ScaleObject(self.window_geometry,self.window_centroid,
             (10,10,10),True)
         
-        # Project shadows to window surface and merge overlapping shadows
-        shadow_geometry = []
-        for shade in self.context_geometry:
-            # Arrange shade vertices clockwise
-            shade_points = shade_to_clockwise_points(shade)
-    
-            # Draw Shadow
-            shadow_points = rs.ProjectPointToSurface(shade_points,window_plane,sun_vector)
-            if shadow_points is not None:
-                shadow = rs.AddSrfPt(shadow_points)
-                if shadow is None:
-                    shadow = gh.SurfaceFromPoints(shadow_points)
-    
-            # First shadow
-            if shadow_geometry == []:
-                shadow_geometry = [shadow]
-                
-            # Subsequent shadows
-            else:
-                for existing_shadow in shadow_geometry:
-                    # try boolean union
-                    union = rs.BooleanUnion(existing_shadow,shadow)
+        if self.context_geometry is None:
+            return [self.window_geometry]
+        else:
+            # Project shadows to window surface and merge overlapping shadows
+            shadow_geometry = []
+            for shade in self.context_geometry:
+                # Arrange shade vertices clockwise
+                shade_points = self.context_to_clockwise_points(shade)
+        
+                # Draw Shadow
+                shadow_points = rs.ProjectPointToSurface(shade_points,window_plane,sun_vector)
+                if shadow_points is not None:
+                    shadow = rs.AddSrfPt(shadow_points)
+                    if shadow is None:
+                        shadow = gh.SurfaceFromPoints(shadow_points)
+        
+                # First shadow
+                if shadow_geometry == []:
+                    shadow_geometry = [shadow]
                     
-                    if union is not None:
-                        # current shadow successfully merged with existing shadow
-                        existing_shadow = union
+                # Subsequent shadows
+                else:
+                    for existing_shadow in shadow_geometry:
+                        # try boolean union
+                        union = rs.BooleanUnion(existing_shadow,shadow)
                         
-                    else:
-                        # No intersection. current shadow is isolated
-                        shadow_geometry.append(shadow)
-    
+                        if union is not None:
+                            # current shadow successfully merged with existing shadow
+                            existing_shadow = union
+                            
+                        else:
+                            # No intersection. current shadow is isolated
+                            shadow_geometry.append(shadow)
+        
         # sequentially subtract each shadow from the window geometry.
         if self.window_geometry is not None and shadow_geometry != []:
     
@@ -425,101 +432,57 @@ class Element(object):
                  name = 'Element', #should contain one of the following: [Wall, Window, Ground slab, Roof]
                  area = 15.0, #Element area, [m2]
                  u_value = 1.0, #Element u_value-value, [W/m2.K]
-                 azimuth_tilt = 0, #South facing by default
-                 altitude_tilt = 90, #vertical surfaces by default
-                 opaque = True,
-                 solar_transmittance = 0.7,
-                 light_transmittance=0.8,
-                 frame_factor=1.0
+                 frame_factor=1.0,
+                 opaque = True
                  ):
 
         self.name = name
         self.area = area
         self.u_value = u_value
         self.h_tr = self.u_value * self.area #element conductance [W/K]
-        self.azimuth_tilt = azimuth_tilt
-        self.altitude_tilt = altitude_tilt
         self.frame_factor = frame_factor
         self.opaque = opaque
 
-        if opaque:
-            self.solar_transmittance = 0
-            self.light_transmittance = 0
-        else:
-            self.solar_transmittance = solar_transmittance
-            self.light_transmittance = light_transmittance
-
 
 class ElementBuilder(object):
-    def __init__(self,element_name,u_value,solar_transmittance,
-                light_transmittance,frame_factor,opaque):
-        
-        self.opaque= opaque
+    def __init__(self,element_name,u_value,frame_factor,opaque):
+        self.element_name = element_name if element_name is not None else 'Wall'
+        self.opaque = opaque
         if self.opaque:
-            self.element_name = element_name if element_name is not None else 'Wall'
             self.u_value = 0.2 if u_value is None else u_value
-            self.solar_transmittance = 0
-            self.light_transmittance = 0
             self.frame_factor = 1
         else:
-            self.element_name = element_name if element_name is not None else 'Window'
             self.u_value = 1 if u_value is None else u_value
-            self.solar_transmittance = 0.7 if solar_transmittance is None else solar_transmittance
-            self.light_transmittance = 0.8 if light_transmittance is None else light_transmittance
             self.frame_factor = 1 if frame_factor is None else frame_factor
 
     def get_data(self,surface):
-        north = rc.Geometry.Vector3d(0,1,0)
-        vertical = rc.Geometry.Vector3d(0,0,1)
-        faces_west = False
-        # Get area, normal (show this in rhino),
         centroid = rs.SurfaceAreaCentroid(surface)[0]
         normal = rs.SurfaceNormal(surface,[0.5,0.5])
-        if normal[0] < 0:
-            faces_west = True
-        else:
-            faces_west = False
-        normal_xy = rc.Geometry.Vector3d(normal[0],normal[1],0)
-        normal_xz = rc.Geometry.Vector3d(normal[0],0,normal[2])
-        try:
-            azimuth = rs.VectorAngle(north,normal_xy)
-            if faces_west:
-                azimuth = 360-azimuth
-        except ValueError:
-            azimuth = 0
-        try: 
-            altitude = rs.VectorAngle(vertical,normal_xz)
-        except ValueError:
-            altitude = 0
         area = rs.SurfaceArea(surface)[0]
-        return centroid,normal,area,azimuth,altitude
+        return centroid,normal,area
 
-    def Elements(self,geometry):
+    def add_element(self,geometry):
         centroids = []
         normals = []
-        glazed_elements = []
+        elements = []
         if geometry is not None:
             # Invalid input
             if not (rs.IsSurface(geometry) or rs.IsPolysurface(geometry)):
                 error = """geometry is not a surface or polysurface"""
-                w = gh.GH_RuntimeMessageLevel.Error
-                ghenv.Component.AddRuntimeMessage(w, warning)
+                e = gh.GH_RuntimeMessageLevel.Error
+                ghenv.Component.AddRuntimeMessage(e, error)
         
             # Single surface
             elif rs.IsSurface(geometry):
-                centroid,normal,area,azimuth,altitude = self.get_data(geometry)
+                centroid,normal,area = self.get_data(geometry)
                 centroids = centroid
                 normals = normal
-                glazed_elements = sc.sticky['Element'](
+                elements = [sc.sticky['Element'](
                     name=self.element_name,
                     area=area,
                     u_value=self.u_value, 
-                    azimuth_tilt=azimuth,
-                    altitude_tilt=altitude,
-                    opaque=self.opaque,
-                    solar_transmittance=self.solar_transmittance,
-                    light_transmittance=self.light_transmittance,
-                    frame_factor=self.frame_factor)
+                    frame_factor=self.frame_factor,
+                    opaque = self.opaque)]
 
             # Polysurface
             elif rs.IsPolysurface(geometry):
@@ -527,19 +490,15 @@ class ElementBuilder(object):
                 for part in all_parts:
                     centroid,normal,area,azimuth,angle = self.get_data(part)
                     centroids.append(centroid)
-                    normals.append(n)
-                    glazed_element = sc.sticky['Element'](
+                    normals.append(normal)
+                    element = sc.sticky['Element'](
                         name=self.element_name,
                         area=area,
                         u_value=self.u_value, 
-                        azimuth_tilt=azimuth,
-                        altitude_tilt=altitude,
-                        opaque=self.opaque,
-                        solar_transmittance=self.solar_transmittance,
-                        light_transmittance=self.light_transmittance,
-                        frame_factor=self.frame_factor)
-                    glazed_elements.append(glazed_element)
-        return centroids,normals,glazed_elements
+                        frame_factor=self.frame_factor,
+                        opaque = self.opaque)
+                    elements.append(element)
+        return centroids,normals,elements
 
 
 class ThermalBridge(object):
@@ -547,6 +506,7 @@ class ThermalBridge(object):
                  name,
                  length,
                  linear_conductance):
+        self.name = name if name is not None else 'Thermal bridge'
         self.name = name
         self.length = length
         self.linear_conductance = linear_conductance
@@ -633,7 +593,6 @@ class Zone(object):
             self.h_tr_w += e.h_tr
             self.elements_added += 1
             self.window_area += e.area
-        
 
     def add_thermal_bridge(self,tb):
         self.h_tr_em += tb.h_tr

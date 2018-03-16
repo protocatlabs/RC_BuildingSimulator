@@ -1,13 +1,13 @@
 ﻿# Opaque element
 #
-# Nest: A energy simulation plugin developed by the A/S chair at ETH Zurich
+# Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator Github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
 #
 # Author: Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Nest
+# This file is part of Oasys
 #
 # Licensing/Copyright and liability comments go here.
 # <Copyright 2018, Architecture and Building Systems - ETH Zurich>
@@ -16,7 +16,7 @@
 """
 Define an opaque by adding a surface.
 -
-Provided by Nest 0.0.1
+Provided by Oasys 0.0.1
     
     Args:
         geometry: a surface or polysurface representing the heat-transfer area of the element
@@ -32,16 +32,16 @@ ghenv.Component.Name = "Opaque Element"
 ghenv.Component.NickName = 'OpaqueElement'
 ghenv.Component.Message = 'VER 0.0.1\nMAR_06_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Nest"
+ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = " 1 | Zone"
-#compatibleNestVersion = VER 0.0.1\nFEB_21_2018
+#compatibleOasysVersion = VER 0.0.1\nFEB_21_2018
 try: ghenv.Component.AdditionalHelpFromDocStrings = "2"
 except: pass
 
 import scriptcontext as sc
 
-Builder = sc.sticky['ElementBuilder'](element_name,u_value,None,None,None,True)
+Builder = sc.sticky['ElementBuilder'](element_name,u_value,None,False)
+centers,normals,opaque_element = Builder.add_element(_geometry)
 
-centers,normals,opaque_element = Builder.Elements(_geometry)
-
-print opaque_element
+for e in opaque_element:
+    print e.name,':', e.u_value,'W/m2K'

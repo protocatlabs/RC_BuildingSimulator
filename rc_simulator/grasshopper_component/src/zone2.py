@@ -1,14 +1,14 @@
 ﻿# This comoponent creates a zone made of elements: the user is allowed 
 # to override the default attributes and customize it.
 #
-# Nest: A energy simulation plugin developed by the A/S chair at ETH Zurich
+# Oasys: A energy simulation plugin developed by the A/S chair at ETH Zurich
 # This component is based on building_physics.py in the RC_BuildingSimulator Github repository
 # https://github.com/architecture-building-systems/RC_BuildingSimulator
 # Extensive documentation is available on the project wiki.
 #
 # Author: Justin Zarb <zarbj@student.ethz.ch>
 #
-# This file is part of Nest
+# This file is part of Oasys
 #
 # Licensing/Copyright and liability comments go here.
 # <Copyright 2018, Architecture and Building Systems - ETH Zurich>
@@ -18,7 +18,7 @@
 Create a customized zone using elements as inputs.
 Parameters left blank will be filled with default values.
 -
-Provided by Nest 0.0.1
+Provided by Oasys 0.0.1
     
     Args:
         glazed_elements: Element objects with additional glazing properties
@@ -62,14 +62,19 @@ ghenv.Component.Name = "Zone2"
 ghenv.Component.NickName = 'Zone2'
 ghenv.Component.Message = 'VER 0.0.1\nFEB_28_2018'
 ghenv.Component.IconDisplayMode = ghenv.Component.IconDisplayMode.application
-ghenv.Component.Category = "Nest"
+ghenv.Component.Category = "Oasys"
 ghenv.Component.SubCategory = " 1 | Zone"
-#compatibleNestVersion = VER 0.0.1\nFEB_21_2018
+#compatibleOasysVersion = VER 0.0.1\nFEB_21_2018
 try: ghenv.Component.AdditionalHelpFromDocStrings = "1"
 except: pass
 
 import scriptcontext as sc
 import Grasshopper.Kernel as gh
+
+
+#==============================================================================
+#                            Set up thermal zone
+#==============================================================================
 
 #  Initialize default values if no input is detected
 thermal_attributes = {"elements":None,
@@ -89,11 +94,6 @@ thermal_attributes = {"elements":None,
               "heating_emission_system":sc.sticky["AirConditioning"],
               "cooling_emission_system":sc.sticky["AirConditioning"]
               }
-
-lighting_attributes = {'lighting_load':11.7,
-                       'lighting_control':300.0,
-                       'lighting_utilisation_factor':0.45,
-                       'lighting_maintenance_factor':0.9}
 
 def validate_element(element):
     # Check if the element object has the mian three parameters
@@ -162,12 +162,23 @@ ThermalZone = sc.sticky['Zone'](elements = elements,
 
 ThermalZone.summary()
 
+
+#==============================================================================
+#                        Add lighting attributes
+#==============================================================================
+
+lighting_attributes = {'lighting_load':11.7,
+                       'lighting_control':300.0,
+                       'lighting_utilisation_factor':0.45,
+                       'lighting_maintenance_factor':0.9}
+                       
 for l in lighting_attributes.keys():
     if locals()[l] is not None:
         lighting_attributes[l] = locals()[l]
         value = l+':'+str(locals()[l])
         unique_inputs[l] = value
 
+# Zone with thermal and lighting attributes
 Zone = sc.sticky['ModularRCZone'](zone=ThermalZone,                 
               lighting_load=lighting_attributes['lighting_load'],
               lighting_control=lighting_attributes['lighting_control'],
