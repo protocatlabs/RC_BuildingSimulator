@@ -1,0 +1,1 @@
+To avoid conflicts, the contents of this folder have been deleted. Refer to [hive](https://github.com/architecture-building-systems/hive) for the latest version.
