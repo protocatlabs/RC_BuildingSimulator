@@ -49,40 +49,40 @@ Zurich = Location(epwfile_path=os.path.join(
 
 # Initialise an instance of the building. Empty spaces take on the default
 # parameters. See buildingPhysics.py to see the default values
-Office = Building(window_area=60.0,
-						external_envelope_area=147, #roof + walls
-						room_depth=7.0,
-						room_width=11.5,
-						room_height=4.75,
+Office = Building(window_area=84,
+						external_envelope_area=115, #walls
+						room_depth=10.5,
+						room_width=14,
+						room_height=3,
 						lighting_load=11.7,
 						lighting_control=300.0,
 						lighting_utilisation_factor=0.45,
 						lighting_maintenance_factor=0.9,
-						u_walls=0.5,
-						u_windows=0.8,
+						u_walls=0.2,
+						u_windows=0.6,
 						ach_vent=1.0,
 						ach_infl=0.5,
 						ventilation_efficiency=0.6,
 						thermal_capacitance_per_floor_area=165000,
 						t_set_heating=20.0,
 						t_set_cooling=26.0,
-						max_cooling_energy_per_floor_area=-np.inf,
-						max_heating_energy_per_floor_area=np.inf,
+						max_cooling_energy_per_floor_area=0,#-np.inf,
+						max_heating_energy_per_floor_area=0, #np.inf,
 						heating_supply_system=supply_system.HeatPumpAir,
 						cooling_supply_system=supply_system.HeatPumpAir,
 						heating_emission_system=emission_system.AirConditioning,
 						cooling_emission_system=emission_system.AirConditioning,)
 
 # Define Windows
-WestWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.19,
-										 glass_light_transmittance=0.1, area=30.0)
+WestWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.03,
+										 glass_light_transmittance=0.1, area=42.0)
 
-EastWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.19,
-										glass_light_transmittance=0.1, area=30.0)
+EastWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.03,
+										glass_light_transmittance=0.1, area=42.0)
 
 # Define constants for the building
-gain_per_person = 100  # W per person
-appliance_gains = 14  # W per sqm
+gain_per_person = 0.0  # W per person
+appliance_gains = 0.0  # W per sqm
 max_occupancy = 3.0
 
 
@@ -164,6 +164,7 @@ annualResults = pd.DataFrame({
 })
 
 print(annualResults.sum())
+print(Office.floor_area)
 
 # Plotting has been commented out as it can not be conducted in a virtual environment over ssh
 plt.figure(0)
@@ -173,7 +174,7 @@ plt.ylabel('Energy Demand (W/m2)')
 
 
 plt.figure(1)
-annualResults[['IndoorAir','OutsideTemp']].plot()
+annualResults[['IndoorAir','OutsideTemp', 'IndoorAir']].plot()
 plt.xlabel('Hour of the day')
 plt.ylabel('Temperature (C)')
 
