@@ -74,10 +74,10 @@ Office = Building(window_area=84,
 						cooling_emission_system=emission_system.AirConditioning,)
 
 # Define Windows
-WestWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.03,
+WestWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.19,
 										 glass_light_transmittance=0.1, area=42.0)
 
-EastWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.03,
+EastWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.19,
 										glass_light_transmittance=0.1, area=42.0)
 
 # Define constants for the building
