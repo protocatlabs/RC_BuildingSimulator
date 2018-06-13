@@ -61,9 +61,9 @@ Office = Building(window_area=150.0,
 						lighting_maintenance_factor=0.9,
 						u_walls=0.16,
 						u_windows=0.81,
-						ach_vent=1.7,
+						ach_vent=0.9,
 						ach_infl=0.03,
-						ventilation_efficiency=0.0, #Check this!!
+						ventilation_efficiency=0.6, #Check this!!
 						thermal_capacitance_per_floor_area=165000,
 						t_set_heating=20.0,
 						t_set_cooling=26.0,
@@ -83,7 +83,7 @@ WestTransparentWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_
 WestTranslucentWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.19,
 										 glass_light_transmittance=0.1, area=50.0-9.0)
 #TODO: Add gvalue
-WestOpaqueWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.00,
+WestOpaqueWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.09,
 										 glass_light_transmittance=0.0, area=25.0)
 
 #East Side - HIB
@@ -91,7 +91,7 @@ EastTranslucentWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_t
 										glass_light_transmittance=0.1, area=50.0)
 
 #TODO Add G value
-EastOpaqueWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.00,
+EastOpaqueWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.09,
 										glass_light_transmittance=0.0, area=25.0)
 
 window_list = [WestTransparentWindow, WestTranslucentWindow, WestOpaqueWindow, EastTranslucentWindow, EastOpaqueWindow]
