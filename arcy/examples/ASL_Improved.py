@@ -48,20 +48,23 @@ InternalGains = []
 Zurich = Location(epwfile_path=os.path.join(
 		mainPath, 'auxiliary', 'Zurich-Kloten_2013.epw'))
 
+
+
+
 # Initialise an instance of the building. Empty spaces take on the default
 # parameters. See buildingPhysics.py to see the default values
-Office = Building(window_area=150.0,
-						external_envelope_area=250.0, #roof + walls
+Office = Building(window_area=100.0,
+						external_envelope_area=200.0, #roof + walls
 						room_depth=9.5,
 						room_width=10.5,
-						room_height=5.16,
+						room_height=3.51,
 						lighting_load=11.7,
 						lighting_control=300.0,
 						lighting_utilisation_factor=0.45,
 						lighting_maintenance_factor=0.9,
 						u_walls=0.16,
-						u_windows=0.81,
-						ach_vent=0.9,
+						u_windows=0.76,
+						ach_vent=1.7,
 						ach_infl=0.03,
 						ventilation_efficiency=0.6, #Check this!!
 						thermal_capacitance_per_floor_area=165000,
@@ -74,25 +77,28 @@ Office = Building(window_area=150.0,
 						heating_emission_system=emission_system.AirConditioning,
 						cooling_emission_system=emission_system.AirConditioning,)
 
+#Hack to get variable ventilation. Set a constant, and then vary the argument .h_ve_adj
+max_h_ve_adj = Office.h_ve_adj
+
 # Define Windows
 
 #West Side
 WestTransparentWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.5,
-										 glass_light_transmittance=0.9, area=9.0)
+										 glass_light_transmittance=0.9, area=18.0)
 
 WestTranslucentWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.19,
-										 glass_light_transmittance=0.1, area=50.0-9.0)
+										 glass_light_transmittance=0.1, area=34.0-18.0)
 #TODO: Add gvalue
 WestOpaqueWindow = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.09,
-										 glass_light_transmittance=0.0, area=25.0)
+										 glass_light_transmittance=0.0, area=16.0)
 
 #East Side - HIB
 EastTranslucentWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.19,
-										glass_light_transmittance=0.1, area=50.0)
+										glass_light_transmittance=0.1, area=34.0)
 
 #TODO Add G value
 EastOpaqueWindow = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.09,
-										glass_light_transmittance=0.0, area=25.0)
+										glass_light_transmittance=0.0, area=16.0)
 
 window_list = [WestTransparentWindow, WestTranslucentWindow, WestOpaqueWindow, EastTranslucentWindow, EastOpaqueWindow]
 
@@ -136,7 +142,10 @@ for hour in range(0,8760,1):
 	# Occupancy for the time step
 	occupancy = occupancyProfile.loc[hour, 'People'] * max_occupancy
 	# Gains from occupancy and appliances
-	internal_gains = occupancy * gain_per_person + appliance_gains * Office.floor_area
+	internal_gains = occupancy * gain_per_person + appliance_gains * Office.floor_area * occupancyProfile.loc[hour, 'People']
+	#Add variable ventilation schedule via hack - referr to line81
+	#Office.h_ve_adj = max_h_ve_adj*(occupancyProfile.loc[hour, 'People']/2.0 + 0.5 )
+
 
 	# Extract the outdoor temperature in Zurich for that hour
 	t_out = Zurich.weather_data['drybulb_C'][hour]
