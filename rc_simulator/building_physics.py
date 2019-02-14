@@ -189,6 +189,30 @@ class Building(object):
         self.heating_emission_system = heating_emission_system
         self.cooling_emission_system = cooling_emission_system
 
+    @property
+    def h_tr_1(self):
+        """
+        Definition to simplify calc_phi_m_tot
+        # (C.6) in [C.3 ISO 13790]
+        """
+        return 1.0 / (1.0 / self.h_ve_adj + 1.0 / self.h_tr_is)
+
+    @property
+    def h_tr_2(self):
+        """
+        Definition to simplify calc_phi_m_tot
+        # (C.7) in [C.3 ISO 13790]
+        """
+        return self.h_tr_1 + self.h_tr_w
+
+    @property
+    def h_tr_3(self):
+        """
+        Definition to simplify calc_phi_m_tot
+        # (C.8) in [C.3 ISO 13790]
+        """
+        return  1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
+
     def solve_building_lighting(self, illuminance, occupancy):
         """
         Calculates the lighting demand for a set timestep
@@ -241,11 +265,6 @@ class Building(object):
 
         """
         # Main File
-
-        # Calculate the heat transfer definitions for formula simplification
-        self.calc_h_tr_1()
-        self.calc_h_tr_2()
-        self.calc_h_tr_3()
 
         # check demand, and change state of self.has_heating_demand, and self._has_cooling_demand
         self.has_demand(internal_gains, solar_gains, t_out, t_m_prev)
@@ -536,33 +555,6 @@ class Building(object):
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
             self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
                            ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
-
-    def calc_h_tr_1(self):
-        """
-        Definition to simplify calc_phi_m_tot
-        # (C.6) in [C.3 ISO 13790]
-
-        """
-        self.h_tr_1 = 1.0 / (1.0 / self.h_ve_adj + 1.0 / self.h_tr_is)
-
-    def calc_h_tr_2(self):
-        """
-        Definition to simplify calc_phi_m_tot
-        # (C.7) in [C.3 ISO 13790]
-
-        """
-
-        self.h_tr_2 = self.h_tr_1 + self.h_tr_w
-
-    def calc_h_tr_3(self):
-        """
-        Definition to simplify calc_phi_m_tot
-        # (C.8) in [C.3 ISO 13790]
-
-        """
-
-        self.h_tr_3 = 1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
-
 
     def calc_t_m(self, t_m_prev):
         """
