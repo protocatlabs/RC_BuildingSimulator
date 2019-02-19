@@ -285,7 +285,7 @@ class Building(object):
             # --> rc_model_function_1(...)
             self.energy_demand = 0
 
-            # y u no pep8 bra?
+            
             self.heating_demand = 0  # Energy required by the zone
             self.cooling_demand = 0  # Energy surplus of the zone
             # Energy (in electricity) required by the supply system to provide
@@ -302,6 +302,8 @@ class Building(object):
             self.cooling_sys_fossils = 0
             # Electricity produced by the supply system (e.g. CHP)
             self.electricity_out = 0
+            #Set COP to nan if no heating or cooling is required
+            self.cop=float('nan')
 
         else:
 
