@@ -199,7 +199,7 @@ class Window(object):
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
 
-class Photovoltaic_surface(object):
+class PhotovoltaicSurface(object):
     """docstring for Window"""
 
     def __init__(self, azimuth_tilt, alititude_tilt=90, stc_efficiency=0.16,
