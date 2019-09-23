@@ -139,6 +139,7 @@ class Window(object):
         direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
         diffuse_factor = self.calc_diffuse_solar_factor()
 
+
         direct_solar = direct_factor * normal_direct_radiation
         diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
         self.incident_solar = (direct_solar + diffuse_solar) * self.area
@@ -180,16 +181,18 @@ class Window(object):
         sun_altitude_rad = math.radians(sun_altitude)
         sun_azimuth_rad = math.radians(sun_azimuth)
 
+        # Proportion of the radiation incident on the window (cos of the
+        # incident ray)
+        direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
+            math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+
+
         # If the sun is in front of the window surface
-        if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
-            # Proportion of the radiation incident on the window (cos of the
-            # incident ray)
-            direct_factor = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
-                math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+        if(math.degrees(math.acos(direct_factor)) > 90):
+            direct_factor=0
 
         else:
-            # If sun is behind the window surface
-            direct_factor = 0
+            pass
 
         return direct_factor
 
@@ -198,69 +201,6 @@ class Window(object):
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
-
-class PhotovoltaicSurface(object):
-    """docstring for Window"""
-
-    def __init__(self, azimuth_tilt, alititude_tilt=90, stc_efficiency=0.16,
-                 performance_ratio=0.8, area=1):
-
-        self.alititude_tilt_rad = math.radians(alititude_tilt)
-        self.azimuth_tilt_rad = math.radians(azimuth_tilt)
-        self.efficiency = stc_efficiency
-        self.performance_ratio = performance_ratio
-        self.area = area
-
-    def calc_solar_yield(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
-        """
-        Calculates the Solar yield of a defined PV area.
-
-        :param sun_altitude: Altitude Angle of the Sun in Degrees
-        :type sun_altitude: float
-        :param sun_azimuth: Azimuth angle of the sun in degrees
-        :type sun_azimuth: float
-        :param normal_direct_radiation: Normal Direct Radiation from weather file
-        :type normal_direct_radiation: float
-        :param horizontal_diffuse_radiation: Horizontal Diffuse Radiation from weather file
-        :type horizontal_diffuse_radiation: float
-        :return: self.incident_solar, Incident Solar Radiation on window
-        :return: self.solar_gains - Solar gains in building after transmitting through the window
-        :rtype: float
-        """
-
-        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
-        diffuse_factor = self.calc_diffuse_solar_factor()
-
-        direct_solar = direct_factor * normal_direct_radiation
-        diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
-        self.incident_solar = (direct_solar + diffuse_solar) * self.area
-
-        self.solar_yield = self.incident_solar * self.efficiency*self.performance_ratio
-
-    def calc_direct_solar_factor(self, sun_altitude, sun_azimuth):
-        """
-        Calculates the cosine of the angle of incidence on the window
-        """
-        sun_altitude_rad = math.radians(sun_altitude)
-        sun_azimuth_rad = math.radians(sun_azimuth)
-
-        # If the sun is in front of the window surface
-        if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
-            # Proportion of the radiation incident on the window (cos of the
-            # incident ray)
-            direct_factor = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
-                math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
-
-        else:
-            # If sun is behind the window surface
-            direct_factor = 0
-
-        return direct_factor
-
-    def calc_diffuse_solar_factor(self):
-        """Calculates the proportion of diffuse radiation"""
-        # Proportion of incident light on the window surface
-        return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
 if __name__ == '__main__':
     pass
