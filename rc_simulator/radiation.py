@@ -14,12 +14,12 @@ import datetime
 
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
-__credits__ = ["pysolar"]
+__credits__ = ["pysolar, Quaschning Volker,  Rolf Hanitsch, Linus Walker"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
-__email__ = "jayathissa@arch.ethz.ch"
-__status__ = "BETA"
+__email__ = "p.jayathissa@gmail.com"
+__status__ = "production"
 
 
 
@@ -183,6 +183,7 @@ class Window(object):
 
         # Proportion of the radiation incident on the window (cos of the
         # incident ray)
+        #ref:Quaschning, Volker, and Rolf Hanitsch. "Shade calculations in photovoltaic systems." ISES Solar World Conference, Harare. 1995.
         direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
             math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
 

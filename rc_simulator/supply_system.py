@@ -15,7 +15,7 @@ __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
 __email__ = "jayathissa@arch.ethz.ch"
-__status__ = "BETA"
+__status__ = "production"
 
 
 
