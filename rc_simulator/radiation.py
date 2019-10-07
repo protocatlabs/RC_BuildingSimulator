@@ -14,12 +14,12 @@ import datetime
 
 __authors__ = "Prageeth Jayathissa"
 __copyright__ = "Copyright 2016, Architecture and Building Systems - ETH Zurich"
-__credits__ = ["pysolar"]
+__credits__ = ["pysolar, Quaschning Volker,  Rolf Hanitsch, Linus Walker"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
-__email__ = "jayathissa@arch.ethz.ch"
-__status__ = "BETA"
+__email__ = "p.jayathissa@gmail.com"
+__status__ = "production"
 
 
 
@@ -139,6 +139,7 @@ class Window(object):
         direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
         diffuse_factor = self.calc_diffuse_solar_factor()
 
+
         direct_solar = direct_factor * normal_direct_radiation
         diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
         self.incident_solar = (direct_solar + diffuse_solar) * self.area
@@ -180,16 +181,19 @@ class Window(object):
         sun_altitude_rad = math.radians(sun_altitude)
         sun_azimuth_rad = math.radians(sun_azimuth)
 
+        # Proportion of the radiation incident on the window (cos of the
+        # incident ray)
+        #ref:Quaschning, Volker, and Rolf Hanitsch. "Shade calculations in photovoltaic systems." ISES Solar World Conference, Harare. 1995.
+        direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
+            math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+
+
         # If the sun is in front of the window surface
-        if math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) > 0:
-            # Proportion of the radiation incident on the window (cos of the
-            # incident ray)
-            direct_factor = math.cos(sun_altitude_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
-                math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+        if(math.degrees(math.acos(direct_factor)) > 90):
+            direct_factor=0
 
         else:
-            # If sun is behind the window surface
-            direct_factor = 0
+            pass
 
         return direct_factor
 

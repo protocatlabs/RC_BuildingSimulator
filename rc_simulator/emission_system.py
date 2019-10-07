@@ -20,8 +20,8 @@ __credits__ = ["CEA Toolbox"]
 __license__ = "MIT"
 __version__ = "0.1"
 __maintainer__ = "Prageeth Jayathissa"
-__email__ = "jayathissa@arch.ethz.ch"
-__status__ = "Development"
+__email__ = "p.jayathissa@gmail.com"
+__status__ = "production"
 
 
 
