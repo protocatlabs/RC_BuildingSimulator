@@ -43,24 +43,24 @@ COP = []
 
 
 # Initialise the Location with a weather file
-Zurich = Location(epwfile_path=os.path.join(
+Wellington = Location(epwfile_path=os.path.join(
 		mainPath, 'auxiliary', 'wellington_2006.epw'))
 
 # Initialise an instance of the building. Empty spaces take on the default
 # parameters. See buildingPhysics.py to see the default values
-Greenhouse = Building(window_area=110.0,
-									external_envelope_area=110.0,
-									room_depth=10.0,
-									room_width=5.0,
+Greenhouse = Building(window_area=370.0,
+									external_envelope_area=370.0 + 160.0,
+									room_depth=20.0,
+									room_width=8.0,
 									room_height=3.0,
 									lighting_load=0.0,
 									lighting_control=0.0,
 									u_walls=0.2,
-									u_windows=3.5,
+									u_windows=1.5,
 									ach_vent=0.0,
-									ach_infl=1.2,
+									ach_infl=0.5,
 									ventilation_efficiency=0.0,
-									thermal_capacitance_per_floor_area=20000,
+									thermal_capacitance_per_floor_area=20000 * 15,
 									t_set_heating=-20.0,
 									t_set_cooling=260.0,
 									max_cooling_energy_per_floor_area=-np.inf,
@@ -71,14 +71,27 @@ Greenhouse = Building(window_area=110.0,
 									cooling_emission_system=emission_system.AirConditioning,)
 
 # Define Windows
-SouthWindow = Window(azimuth_tilt=0, alititude_tilt=90, glass_solar_transmittance=0.9,
-										 glass_light_transmittance=0.8, area=30)
 
-NorthWindow = Window(azimuth_tilt=180, alititude_tilt=90, glass_solar_transmittance=0.9,
-										 glass_light_transmittance=0.8, area=30)
+EastWall = Window(azimuth_tilt=270, alititude_tilt=90, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.9, area=60.0)
 
-Roof = Window(azimuth_tilt=180, alititude_tilt=0, glass_solar_transmittance=0.9,
-										 glass_light_transmittance=0.8, area=50)
+WestWall = Window(azimuth_tilt=90, alititude_tilt=90, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.9, area=60.0)
+
+EastRoof = Window(azimuth_tilt=270, alititude_tilt=30, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.9, area=92.0)
+
+WestRoof = Window(azimuth_tilt=90, alititude_tilt=30, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.9, area=92.0)
+
+
+SouthWall = Window(azimuth_tilt=0, alititude_tilt=90, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.8, area=33.0)
+
+NorthWall = Window(azimuth_tilt=180, alititude_tilt=90, glass_solar_transmittance=0.8,
+										 glass_light_transmittance=0.8, area=33.0)
+
+
 
 # Find default ventilation conductance rate
 h_ve_adj_default = Greenhouse.h_ve_adj
@@ -87,24 +100,29 @@ print("default h_ve_sdj is:", h_ve_adj_default)
 # Starting temperature of the builidng
 t_m_prev = 20
 
+heating_hours = 0
+
 # Loop through all 8760 hours of the year
 for hour in range(8760):
 
 
-		# Extract the outdoor temperature in Zurich for that hour
-		t_out = Zurich.weather_data['drybulb_C'][hour]
+		# Extract the outdoor temperature in Wellington for that hour
+		t_out = Wellington.weather_data['drybulb_C'][hour]
 
-		Altitude, Azimuth = Zurich.calc_sun_position(
-				latitude_deg=47.480, longitude_deg=8.536, year=2015, hoy=hour)
+		Altitude, Azimuth = Wellington.calc_sun_position(
+				latitude_deg= -40.750, longitude_deg=175.13, year=2020, hoy=hour)
 
 		# Loop through all windows
-		for selected_window in [SouthWindow, NorthWindow, Roof]:
+		total_solar_gains = 0
+		for selected_window in [EastWall, WestWall, EastRoof, WestRoof, SouthWall, NorthWall]:
 			selected_window.calc_solar_gains(sun_altitude=Altitude, sun_azimuth=Azimuth,
-												normal_direct_radiation=Zurich.weather_data[
+												normal_direct_radiation=Wellington.weather_data[
 												'dirnorrad_Whm2'][hour],
-												horizontal_diffuse_radiation=Zurich.weather_data['difhorrad_Whm2'][hour])
+												horizontal_diffuse_radiation=Wellington.weather_data['difhorrad_Whm2'][hour])
 
-		total_solar_gains = SouthWindow.solar_gains + NorthWindow.solar_gains + Roof.solar_gains
+			#print(selected_window.solar_gains)
+			total_solar_gains += selected_window.solar_gains
+		#print("hour is",hour)
 		# print("south", SouthWindow.solar_gains)
 		# print("north", NorthWindow.solar_gains)
 		# print("roof",Roof.solar_gains)
@@ -112,15 +130,18 @@ for hour in range(8760):
 
 		
 		Greenhouse.solve_building_energy(internal_gains=0,solar_gains=total_solar_gains, t_out=t_out, t_m_prev=t_m_prev)
-		Greenhouse.solve_building_energy(internal_gains=0,solar_gains=total_solar_gains, t_out=t_out, t_m_prev=t_m_prev)
 
-		# Add mechanical ventilation control to reduce upper bound temperatures 
+
+		# Add ventilation control to reduce upper bound temperatures 
 		if Greenhouse.t_air > 35:
-			Greenhouse.h_ve_adj = h_ve_adj_default + 5000 # Open windows, no source, need better value
+			Greenhouse.h_ve_adj = h_ve_adj_default * 10 # Open windows, rough assumption
 			# Rerun calculation with windows open
 			Greenhouse.solve_building_energy(internal_gains=0,solar_gains=total_solar_gains, t_out=t_out, t_m_prev=t_m_prev)
 		else:
 			Greenhouse.h_ve_adj = h_ve_adj_default # closed windows
+
+		if Greenhouse.t_air < 15:
+			heating_hours += 1
 
 		# Set the previous temperature for the next time step
 		t_m_prev = Greenhouse.t_m_next
@@ -132,7 +153,7 @@ for hour in range(8760):
 		ElectricityOut.append(Greenhouse.electricity_out)
 		IndoorAir.append(Greenhouse.t_air)
 		OutsideTemp.append(t_out)
-		SolarGains.append(SouthWindow.solar_gains)
+		SolarGains.append(total_solar_gains)
 		COP.append(Greenhouse.cop)
 
 
@@ -147,11 +168,13 @@ annualResults = pd.DataFrame({
 		'COP': COP
 })
 
-print(annualResults.IndoorAir)
-print(annualResults.IndoorAir[0:10])
+# print(annualResults.IndoorAir)
+# print(annualResults.IndoorAir[0:10])
 
-start = 4000
-end = 4000 + 24*7
+print("hours of heating are", heating_hours)
+
+start = 4200
+end = 4200 + 24*7
 
 fig = plt.figure()
 plt.plot(range(start,end), annualResults.IndoorAir[start:end], range(start,end), annualResults.OutsideTemp[start:end], alpha = 0.5 )
